@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import backupActions from './backupActions.json';
 
@@ -11,9 +11,7 @@ const DrinkingGameApp = () => {
   const [playerName, setPlayerName] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);
   
-  // API states
-  const [huggingFaceApiKey] = useState('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');
-  const [apiError, setApiError] = useState(null);
+  // Loading state for better UX
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingProgress, setGeneratingProgress] = useState(0);
   
@@ -68,7 +66,7 @@ const DrinkingGameApp = () => {
     }
   ];
   
-  // Room content - questions and challenges for each room
+  // Room content - questions and challenges for each room (fallback)
   const roomContent = {
     redRoom: [
       { text: "Raccontaci la tua più grande fantasia sessuale oppure 5 penalità" },
@@ -136,243 +134,62 @@ const DrinkingGameApp = () => {
     setCurrentRoomIndex((prevIndex) => (prevIndex - 1 + rooms.length) % rooms.length);
   };
   
-  // Select a room and move to player setup after generating actions
+  // Select a room and move to player setup after preparing actions
   const selectRoom = async (room) => {
     setSelectedRoom(room);
-    // Generate actions for the selected room
-    await generateActionsBatch(room.id);
+    // Prepare actions for the selected room
+    await prepareActionsForRoom(room.id);
     setGameState('playerSetup');
   };
   
-  // Generate a batch of actions using the Hugging Face API
-  const generateActionsBatch = async (roomId) => {
+  // Prepare actions for a room from the backup file
+  const prepareActionsForRoom = async (roomId) => {
     setIsGenerating(true);
     setGeneratingProgress(0);
-    setApiError(null);
     
     try {
-      // Prepare improved prompts based on room type - with emphasis on variety and uniqueness
-      const promptByRoom = {
-        redRoom: "Genera 50 domande e sfide piccanti UNICHE E DIVERSE TRA LORO su sesso e relazioni per un gioco di penitenze tra adulti, IN LINGUA ITALIANA. IMPORTANTE: OGNI DOMANDA DEVE ESSERE COMPLETAMENTE DIVERSA DALLE ALTRE. Varia gli argomenti, i tipi di sfide e le penitenze. Ogni domanda deve includere la frase 'oppure X penalità' direttamente alla fine, dove X è un numero tra 3 e 6. Esempio formato: 'Confessa la tua fantasia più segreta oppure 4 penalità'. ASSICURATI CHE NON CI SIANO RIPETIZIONI.",
-        darkRoom: "Genera 50 sfide estreme e domande ASSOLUTAMENTE UNICHE sui segreti più imbarazzanti per un gioco tra adulti, IN LINGUA ITALIANA. IMPORTANTE: OGNI SFIDA DEVE ESSERE COMPLETAMENTE DIVERSA DALLE ALTRE, sia nei temi che nel tipo di sfida proposta. Ogni sfida deve includere la frase 'oppure X penalità' direttamente alla fine, dove X è un numero tra 4 e 7. Esempio formato: 'Mostra il messaggio più compromettente sul tuo telefono oppure 5 penalità'. EVITA ASSOLUTAMENTE QUALSIASI RIPETIZIONE.",
-        clash: "Genera 50 sfide uno contro uno COMPLETAMENTE DIVERSE TRA LORO per un gioco di penitenze tra adulti, IN LINGUA ITALIANA. IMPORTANTE: OGNI SFIDA DEVE ESSERE UNICA. Varia i tipi di competizione, le abilità testate e le penitenze. Ogni sfida deve specificare una competizione tra due giocatori e includere 'Il perdente fa X penalità' dove X è un numero tra 3 e 6. Esempio formato: 'Sfida: Gara di flessioni con un altro giocatore. Il perdente fa 4 penalità'. ASSICURATI CHE NON CI SIANO DUPLICATI.",
-        lounge: "Genera 50 domande e sfide TOTALMENTE UNICHE in modalità soft per un gioco di penitenze, IN LINGUA ITALIANA. IMPORTANTE: OGNI DOMANDA DEVE ESSERE DIVERSA DALLE ALTRE nei temi, nello stile e nel tipo di risposta richiesta. Non troppo imbarazzanti, adatte a tutti. Ogni domanda deve includere la frase 'oppure X penalità' direttamente alla fine, dove X è un numero tra 1 e 3. Esempio formato: 'Racconta il tuo hobby preferito oppure 2 penalità'. EVITA COMPLETAMENTE QUALSIASI RIPETIZIONE DI CONCETTI."
-      };
+      // Simulate loading with a timer for better UX
+      for (let step = 1; step <= 10; step++) {
+        await new Promise(resolve => setTimeout(resolve, 150)); // Small delay to simulate progress
+        setGeneratingProgress(Math.floor((step / 10) * 100));
+      }
       
-      // Simulate the generation with a timer
-      const simulateGeneration = async () => {
-        let progress = 0;
-        const totalSteps = 10; // Divide into 10 steps
-        
-        for (let step = 1; step <= totalSteps; step++) {
-          await new Promise(resolve => setTimeout(resolve, 300)); // Small delay to simulate progress
-          progress = Math.floor((step / totalSteps) * 100);
-          setGeneratingProgress(progress);
-        }
-        
-        // Try to call the Hugging Face API
-        try {
-          // API endpoint
-          const apiUrl = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
-          
-          const response = await fetch(apiUrl, {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${huggingFaceApiKey}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              inputs: promptByRoom[roomId],
-              parameters: {
-                max_new_tokens: 1500, // Increased token limit
-                temperature: 0.8,     // Slightly increased temperature for more variety
-                return_full_text: false
-              }
-            })
-          });
-          
-          if (!response.ok) {
-            throw new Error(`API error: ${response.statusText}`);
-          }
-          
-          const data = await response.json();
-          const generatedText = data[0]?.generated_text || "";
-          
-          // Parse the generated text into action objects
-          // Improved parsing to get complete phrases
-          const lines = generatedText.split("\n").filter(line => {
-            const trimmedLine = line.trim();
-            return trimmedLine !== "" && 
-                  (trimmedLine.includes("oppure") || 
-                   trimmedLine.includes("penalità") || 
-                   trimmedLine.includes("Il perdente fa"));
-          });
-          
-          // Process lines to remove numbering and clean up
-          const cleanedLines = lines.map(line => {
-            // Remove numbering at the beginning (e.g., "1. ", "2) ", etc.)
-            return line.replace(/^\d+[\.\)\-]?\s*/, '').trim();
-          });
-          
-          // Remove duplicates based on exact matches
-          const uniqueLines = [...new Set(cleanedLines)];
-          
-          // Function to check similarity between strings
-          const isSimilar = (str1, str2) => {
-            // Simple similarity check - if strings are too similar
-            const str1Lower = str1.toLowerCase();
-            const str2Lower = str2.toLowerCase();
-            
-            // Check for substantial overlap
-            if (str1Lower.includes(str2Lower.substring(0, Math.min(30, str2Lower.length))) ||
-                str2Lower.includes(str1Lower.substring(0, Math.min(30, str1Lower.length)))) {
-              return true;
-            }
-            
-            // Check word similarity
-            const words1 = str1Lower.split(/\s+/);
-            const words2 = str2Lower.split(/\s+/);
-            let commonWords = 0;
-            
-            for (const word of words1) {
-              if (word.length > 4 && words2.includes(word)) { // Only check significant words
-                commonWords++;
-              }
-            }
-            
-            // If more than 60% of significant words are the same, consider them similar
-            return commonWords > Math.min(words1.length, words2.length) * 0.6;
-          };
-          
-          // Further filter to remove similar actions
-          const nonSimilarActions = [];
-          for (const line of uniqueLines) {
-            let isDuplicate = false;
-            for (const existingAction of nonSimilarActions) {
-              if (isSimilar(line, existingAction.text)) {
-                isDuplicate = true;
-                break;
-              }
-            }
-            
-            if (!isDuplicate) {
-              nonSimilarActions.push({ text: line });
-            }
-          }
-          
-          // Combine with predefined actions, but avoid duplicates
-          let combinedActions = [...nonSimilarActions];
-          
-          // If we don't have enough unique actions, add some from predefined content
-          if (combinedActions.length < 50) {
-            // First try to use backup actions
-            const backupActionsForRoom = backupActions[roomId] || [];
-            const shuffledBackupActions = [...backupActionsForRoom].sort(() => Math.random() - 0.5);
-            
-            for (const action of shuffledBackupActions) {
-              let isDuplicate = false;
-              for (const existingAction of combinedActions) {
-                if (isSimilar(action.text, existingAction.text)) {
-                  isDuplicate = true;
-                  break;
-                }
-              }
-              
-              if (!isDuplicate && combinedActions.length < 50) {
-                combinedActions.push(action);
-              }
-              
-              // If we've reached 50 actions, break out of the loop
-              if (combinedActions.length >= 50) {
-                break;
-              }
-            }
-            
-            // If we still don't have enough, use the original predefined actions
-            if (combinedActions.length < 50) {
-              const predefinedActions = [...roomContent[roomId]].map(item => ({ text: item.text }));
-              
-              for (const action of predefinedActions) {
-                let isDuplicate = false;
-                for (const existingAction of combinedActions) {
-                  if (isSimilar(action.text, existingAction.text)) {
-                    isDuplicate = true;
-                    break;
-                  }
-                }
-                
-                if (!isDuplicate && combinedActions.length < 50) {
-                  combinedActions.push(action);
-                }
-              }
-            }
-          }
-          
-          // Shuffle the combined actions for variety
-          combinedActions = combinedActions.sort(() => Math.random() - 0.5);
-          
-          // Update the actions pool for this room
-          setRoomActionsPool(prev => ({
-            ...prev,
-            [roomId]: combinedActions.slice(0, 50) // Limit to 50 actions
-          }));
-          
-          // Reset action index for this room
-          setCurrentActionIndex(prev => ({
-            ...prev,
-            [roomId]: 0
-          }));
-          
-        } catch (apiError) {
-          console.error('API error:', apiError);
-          setApiError(`Errore API: ${apiError.message}`);
-          
-          // Use backup actions when API fails
-          console.log('Using backup actions');
-          const backupActionsForRoom = backupActions[roomId] || [];
-          
-          if (backupActionsForRoom.length > 0) {
-            // Shuffle and select 50 random actions from the backup
-            const shuffledBackupActions = [...backupActionsForRoom].sort(() => Math.random() - 0.5).slice(0, 50);
-            
-            setRoomActionsPool(prev => ({
-              ...prev,
-              [roomId]: shuffledBackupActions
-            }));
-          } else {
-            // Fallback to original predefined actions
-            setRoomActionsPool(prev => ({
-              ...prev,
-              [roomId]: [...roomContent[roomId]].sort(() => Math.random() - 0.5)
-            }));
-          }
-        }
-      };
-      
-      await simulateGeneration();
-      
-    } catch (error) {
-      console.error('Error during generation:', error);
-      setApiError(`Errore: ${error.message}`);
-      
-      // Use backup actions as fallback
+      // Get actions from backup file
       const backupActionsForRoom = backupActions[roomId] || [];
       
       if (backupActionsForRoom.length > 0) {
         // Shuffle and select 50 random actions from the backup
-        const shuffledBackupActions = [...backupActionsForRoom].sort(() => Math.random() - 0.5).slice(0, 50);
+        const shuffledBackupActions = [...backupActionsForRoom]
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 50);
         
+        // Update the actions pool for this room
         setRoomActionsPool(prev => ({
           ...prev,
           [roomId]: shuffledBackupActions
         }));
       } else {
-        // Fallback to original predefined actions
+        // Fallback to original predefined actions if backup is empty
         setRoomActionsPool(prev => ({
           ...prev,
           [roomId]: [...roomContent[roomId]].sort(() => Math.random() - 0.5)
         }));
       }
+      
+      // Reset action index for this room
+      setCurrentActionIndex(prev => ({
+        ...prev,
+        [roomId]: 0
+      }));
+      
+    } catch (error) {
+      console.error('Error preparing actions:', error);
+      
+      // Fallback to original predefined actions
+      setRoomActionsPool(prev => ({
+        ...prev,
+        [roomId]: [...roomContent[roomId]].sort(() => Math.random() - 0.5)
+      }));
     } finally {
       setIsGenerating(false);
       setGeneratingProgress(100);
@@ -446,7 +263,6 @@ const DrinkingGameApp = () => {
     setCurrentAction(null);
     setPlayerName('');
     setSelectedRoom(null);
-    setApiError(null);
     
     // Reset room actions pool
     setRoomActionsPool({
@@ -543,11 +359,11 @@ const DrinkingGameApp = () => {
         </div>
       )}
       
-      {/* Loading Screen (when generating actions) */}
+      {/* Loading Screen (when preparing actions) */}
       {isGenerating && (
         <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 w-full max-w-md text-center space-y-6">
           <h2 className="text-2xl font-bold">Preparazione in Corso</h2>
-          <p>Stiamo generando le penitenze per la stanza {selectedRoom?.name}...</p>
+          <p>Stiamo preparando le penitenze per la stanza {selectedRoom?.name}...</p>
           
           <div className="w-full bg-gray-200 rounded-full h-4 bg-opacity-20">
             <div 
@@ -556,13 +372,6 @@ const DrinkingGameApp = () => {
             ></div>
           </div>
           <p>{generatingProgress}% completato</p>
-          
-          {apiError && (
-            <div className="bg-red-600 bg-opacity-70 rounded p-2 text-sm">
-              <p>{apiError}</p>
-              <p className="mt-2">Usando le penitenze predefinite come alternativa.</p>
-            </div>
-          )}
         </div>
       )}
       
