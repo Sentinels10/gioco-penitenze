@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import backupActions from './backupActions.json';
 
 const DrinkingGameApp = () => {
-  // Game states: 'entrance', 'roomSelection', 'playerSetup', 'playing'
-  const [gameState, setGameState] = useState('entrance');
+  // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing'
+  const [gameState, setGameState] = useState('welcome');
   const [players, setPlayers] = useState([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [currentAction, setCurrentAction] = useState(null);
   const [playerName, setPlayerName] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);
   
-  // Loading state for better UX
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatingProgress, setGeneratingProgress] = useState(0);
+  // State for the loading
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   
-  // State for the room slider
+  // State for selected room index (for swiper)
   const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
   
   // Generated actions for each room
@@ -34,169 +34,134 @@ const DrinkingGameApp = () => {
     lounge: 0
   });
   
+  // App name and description
+  const appName = "Furry Bones Club";
+  const appDescription = "Questo club è gestito da un AI. Lei formulerà domande sempre nuove e inaspettate.";
+  
   // Room definitions with their content types
   const rooms = [
     { 
       id: 'redRoom', 
       name: 'Red Room', 
-      description: 'Domande e penitenze su sesso e relazioni',
-      color: 'bg-red-600',
-      icon: '❤️'
+      description: 'Domande piccanti e provocanti',
+      color: '#DC2626'
     },
     { 
       id: 'darkRoom', 
       name: 'Dark Room', 
-      description: 'Sfide estreme e segreti imbarazzanti',
-      color: 'bg-gray-800',
-      icon: '🖤'
+      description: 'Non entrare se hai qualcosa da nascondere',
+      color: '#1F2937'
     },
     { 
       id: 'clash', 
-      name: 'Clash', 
+      name: 'Sfide', 
       description: 'Sfide uno contro uno',
-      color: 'bg-yellow-500',
-      icon: '⚔️'
+      color: '#EAB308'
     },
     { 
       id: 'lounge', 
-      name: 'Lounge', 
-      description: 'Modalità soft',
-      color: 'bg-blue-500',
-      icon: '🛋️'
+      name: '5 Sorsi', 
+      description: 'Tutti votano, chi perde beve',
+      color: '#2563EB'
     }
   ];
   
-  // Room content - questions and challenges for each room (fallback)
+  // Fallback room content
   const roomContent = {
     redRoom: [
-      { "text": "Raccontaci la tua più grande fantasia sessuale oppure 5 penalità" },
-      { "text": "Indica chi è la persona più attraente in questa stanza e spiega perché oppure 4 penalità" },
-      { "text": "Racconta la cosa più intima che hai fatto in un luogo pubblico oppure 3 penalità" },
-      { "text": "Rivela quanto tempo è passato dall'ultima volta che hai fatto sesso oppure 3 penalità" },
-      { "text": "Confessa qual è la tua posizione preferita oppure 5 penalità" },
-      { "text": "Ammetti se hai mai tradito un partner oppure 4 penalità" },
-      { "text": "Spiega qual è il tuo più grande turn-on oppure 3 penalità" },
-      { "text": "Rivela chi sceglieresti in questa stanza per passare una notte insieme oppure 5 penalità" },
-      { "text": "Racconta la tua esperienza sessuale più imbarazzante oppure 4 penalità" },
-      { "text": "Confessa il tuo fetish più strano oppure 3 penalità" }
+      { text: "Raccontaci la tua più grande fantasia sessuale oppure 5 penalità" },
+      { text: "Indica chi è la persona più attraente in questa stanza e spiega perché oppure 4 penalità" },
+      { text: "Racconta la cosa più intima che hai fatto in un luogo pubblico oppure 3 penalità" }
     ],
     darkRoom: [
-      { "text": "Rivela un segreto oscuro che non hai mai detto a nessuno oppure 5 penalità" },
-      { "text": "Confessa la cosa peggiore che hai fatto di nascosto oppure 6 penalità" },
-      { "text": "Mostra l'ultimo messaggio privato che hai inviato oppure 5 penalità" },
-      { "text": "Racconta la bugia più grande che hai mai detto oppure 4 penalità" },
-      { "text": "Lascia che un altro giocatore posti qualcosa sui tuoi social oppure 7 penalità" },
-      { "text": "Confessa qualcosa che nessuno si aspetterebbe da te oppure 5 penalità" },
-      { "text": "Mostra la foto più imbarazzante che hai sul telefono oppure 6 penalità" },
-      { "text": "Rivela il pensiero più oscuro che hai avuto oppure 8 penalità" },
-      { "text": "Racconta il tuo più grande rimpianto oppure 5 penalità" },
-      { "text": "Descrivi il momento in cui hai toccato il fondo oppure 4 penalità" }
+      { text: "Rivela un segreto oscuro che non hai mai detto a nessuno oppure 5 penalità" },
+      { text: "Confessa la cosa peggiore che hai fatto di nascosto oppure 6 penalità" },
+      { text: "Mostra l'ultimo messaggio privato che hai inviato oppure 5 penalità" }
     ],
     clash: [
-      { "text": "Sfida: Tu e il giocatore alla tua destra dovete mantenere il contatto visivo per 30 secondi senza ridere. Se perdete, entrambi fate 5 penalità" },
-      { "text": "Sfida: Chi riesce a stare più a lungo in equilibrio su una gamba sola tra te e un giocatore a scelta. Il perdente fa 6 penalità" },
-      { "text": "Sfida: Braccio di ferro con la persona di fronte a te. Il perdente fa 4 penalità" },
-      { "text": "Sfida: Tu e un altro giocatore dovete fare una gara a chi beve un bicchiere d'acqua più velocemente. Il perdente fa 5 penalità" },
-      { "text": "Sfida: Gara di addominali con un giocatore a scelta per 20 secondi. Il perdente fa 7 penalità" },
-      { "text": "Sfida: Chi riesce a trattenere il respiro più a lungo tra te e il giocatore successivo. Il perdente fa 5 penalità" },
-      { "text": "Sfida: Gara di barzellette con un altro giocatore, vince chi fa ridere più persone. Il perdente fa 5 penalità" },
-      { "text": "Sfida: Tu e un altro giocatore dovete mimarvi a vicenda per 30 secondi. Chi ride primo fa 4 penalità" },
-      { "text": "Sfida: Gara di insulti creativi con un altro giocatore (senza offendere veramente). Il perdente fa 5 penalità" },
-      { "text": "Sfida: Gara di sguardi intensi con un altro giocatore. Chi distoglie lo sguardo primo fa 3 penalità" }
+      { text: "Sfida: Tu e il giocatore alla tua destra dovete mantenere il contatto visivo per 30 secondi senza ridere. Se perdete, entrambi fate 5 penalità" },
+      { text: "Sfida: Chi riesce a stare più a lungo in equilibrio su una gamba sola tra te e un giocatore a scelta. Il perdente fa 6 penalità" }
     ],
     lounge: [
-      { "text": "Racconta qual è il tuo film preferito e perché oppure 2 penalità" },
-      { "text": "Condividi un ricordo d'infanzia felice oppure 3 penalità" },
-      { "text": "Se potessi viaggiare ovunque, dove andresti? Oppure 2 penalità" },
-      { "text": "Descrivi il tuo giorno perfetto oppure 1 penalità" },
-      { "text": "Qual è il tuo piatto preferito? Oppure 2 penalità" },
-      { "text": "Racconta la cosa più gentile che qualcuno ha fatto per te oppure 2 penalità" },
-      { "text": "Descrivi il tuo talento nascosto oppure 1 penalità" },
-      { "text": "Racconta qual è il tuo sogno nel cassetto oppure 2 penalità" },
-      { "text": "Se potessi avere un superpotere, quale sceglieresti? Oppure 1 penalità" },
-      { "text": "Qual è il tuo primo ricordo? Oppure 3 penalità" }
+      { text: "Racconta qual è il tuo film preferito e perché oppure 2 penalità" },
+      { text: "Condividi un ricordo d'infanzia felice oppure 3 penalità" },
+      { text: "Se potessi viaggiare ovunque, dove andresti? Oppure 2 penalità" }
     ]
   };
   
-  // Enter room selection from entrance screen
-  const enterRoomSelection = () => {
-    setGameState('roomSelection');
-    setCurrentRoomIndex(0); // Reset to the first room
-  };
+  // Effetto per caricare la prima domanda quando lo stato è 'playing'
+  useEffect(() => {
+    if (gameState === 'playing' && selectedRoom) {
+      // Breve timeout per assicurarsi che lo stato sia aggiornato
+      setTimeout(() => {
+        updateCurrentAction();
+      }, 100);
+    }
+  }, [gameState, selectedRoom]);
   
-  // Navigate to next room
-  const nextRoom = () => {
-    setCurrentRoomIndex((prevIndex) => (prevIndex + 1) % rooms.length);
-  };
-  
-  // Navigate to previous room
-  const prevRoom = () => {
-    setCurrentRoomIndex((prevIndex) => (prevIndex - 1 + rooms.length) % rooms.length);
-  };
-  
-  // Select a room and move to player setup after preparing actions
-  const selectRoom = async (room) => {
-    setSelectedRoom(room);
-    // Prepare actions for the selected room
-    await prepareActionsForRoom(room.id);
+  // Enter the player setup screen
+  const enterPlayerSetup = () => {
     setGameState('playerSetup');
   };
   
-  // Prepare actions for a room from the backup file
-  const prepareActionsForRoom = async (roomId) => {
-    setIsGenerating(true);
-    setGeneratingProgress(0);
+  // Go to room selection after player setup
+  const goToRoomSelection = () => {
+    if (players.length < 2) {
+      alert("Inserisci almeno 2 giocatori per iniziare!");
+      return;
+    }
+    setGameState('roomSelection');
+  };
+  
+  // Seleziona una stanza e prepara il gioco
+  const selectRoom = async (room) => {
+    setSelectedRoom(room);
+    setIsLoading(true);
     
     try {
-      // Simulate loading with a timer for better UX
-      for (let step = 1; step <= 10; step++) {
-        await new Promise(resolve => setTimeout(resolve, 150)); // Small delay to simulate progress
-        setGeneratingProgress(Math.floor((step / 10) * 100));
+      // Simulazione caricamento
+      for (let i = 0; i <= 100; i += 10) {
+        setLoadingProgress(i);
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
-      // Get actions from backup file
-      const backupActionsForRoom = backupActions[roomId] || [];
+      // Ottieni azioni dal backup file
+      const backupActionsForRoom = backupActions[room.id] || [];
       
       if (backupActionsForRoom.length > 0) {
-        // Shuffle and select 50 random actions from the backup
+        // Mescola e seleziona 50 azioni casuali
         const shuffledBackupActions = [...backupActionsForRoom]
           .sort(() => Math.random() - 0.5)
           .slice(0, 50);
         
-        // Update the actions pool for this room
+        // Aggiorna le azioni disponibili
         setRoomActionsPool(prev => ({
           ...prev,
-          [roomId]: shuffledBackupActions
-        }));
-      } else {
-        // Fallback to original predefined actions if backup is empty
-        setRoomActionsPool(prev => ({
-          ...prev,
-          [roomId]: [...roomContent[roomId]].sort(() => Math.random() - 0.5)
+          [room.id]: shuffledBackupActions
         }));
       }
       
-      // Reset action index for this room
+      // Resetta l'indice delle azioni
       setCurrentActionIndex(prev => ({
         ...prev,
-        [roomId]: 0
+        [room.id]: 0
       }));
+      
+      // Seleziona un giocatore casuale per iniziare
+      const randomPlayerIndex = Math.floor(Math.random() * players.length);
+      setCurrentPlayerIndex(randomPlayerIndex);
+      
+      // Vai alla schermata di gioco
+      setGameState('playing');
       
     } catch (error) {
-      console.error('Error preparing actions:', error);
-      
-      // Fallback to original predefined actions
-      setRoomActionsPool(prev => ({
-        ...prev,
-        [roomId]: [...roomContent[roomId]].sort(() => Math.random() - 0.5)
-      }));
+      console.error('Errore:', error);
     } finally {
-      setIsGenerating(false);
-      setGeneratingProgress(100);
+      setIsLoading(false);
     }
   };
   
-  // Add a player to the list
+  // Aggiunge un giocatore alla lista
   const addPlayer = () => {
     if (playerName.trim() && players.length < 10) {
       setPlayers([...players, playerName.trim()]);
@@ -204,61 +169,48 @@ const DrinkingGameApp = () => {
     }
   };
   
-  // Start the game with current players
-  const startGame = () => {
-    if (players.length < 2) {
-      alert("Inserisci almeno 2 giocatori per iniziare!");
-      return;
-    }
-    
-    setGameState('playing');
-    
-    // Seleziona un giocatore casuale all'inizio
-    const randomPlayerIndex = Math.floor(Math.random() * players.length);
-    setCurrentPlayerIndex(randomPlayerIndex);
-    
-    nextAction();
+  // Rimuove un giocatore dalla lista
+  const removePlayer = (index) => {
+    setPlayers(players.filter((_, i) => i !== index));
   };
   
-  // Get next action from the selected room with player interaction support
-  const nextAction = () => {
+  // Funzione dedicata per aggiornare l'azione corrente
+  const updateCurrentAction = () => {
+    if (!selectedRoom) return;
+    
     const roomId = selectedRoom.id;
     const currentPool = roomActionsPool[roomId];
     const index = currentActionIndex[roomId];
     
-    // If there are no actions in the pool, use predefined ones
+    // Se non ci sono azioni nel pool, usa quelle predefinite
     if (!currentPool || currentPool.length === 0) {
-      const randomIndex = Math.floor(Math.random() * roomContent[roomId].length);
-      setCurrentAction({ text: roomContent[roomId][randomIndex].text });
+      console.log("Nessuna azione nel pool, uso il fallback");
+      const fallbackPool = roomContent[roomId] || [];
+      if (fallbackPool.length > 0) {
+        const randomIndex = Math.floor(Math.random() * fallbackPool.length);
+        setCurrentAction({ text: fallbackPool[randomIndex].text });
+      } else {
+        setCurrentAction({ text: "Nessuna azione disponibile" });
+      }
       return;
     }
     
-    // If we've exhausted the actions, start over
+    // Se abbiamo esaurito le azioni, ricomincia
     const adjustedIndex = index % currentPool.length;
     
-    // Increment the index for next time
-    setCurrentActionIndex({
-      ...currentActionIndex,
-      [roomId]: index + 1
-    });
-    
-    // Ottieni l'azione dal pool
+    // Ottieni l'azione
     let actionText = currentPool[adjustedIndex].text;
     
-    // Controlla se questa azione richiede un giocatore specifico (contiene il segnaposto {playerB})
+    // Gestisci il segnaposto playerB
     if (actionText.includes("{playerB}")) {
-      // Scegli un giocatore casuale diverso dal giocatore corrente
       let otherPlayers = players.filter((_, idx) => idx !== currentPlayerIndex);
       
-      // Se non ci sono altri giocatori (situazione improbabile), usa la versione senza sostituzione
       if (otherPlayers.length > 0) {
         const randomPlayerIndex = Math.floor(Math.random() * otherPlayers.length);
         const randomPlayerName = otherPlayers[randomPlayerIndex];
         
-        // Sostituisci il segnaposto con il nome del giocatore casuale
         actionText = actionText.replace(/{playerB}/g, randomPlayerName);
       } else {
-        // Rimuovi il segnaposto se non ci sono altri giocatori
         actionText = actionText.replace(/{playerB}/g, "qualcun altro");
       }
     }
@@ -266,234 +218,231 @@ const DrinkingGameApp = () => {
     setCurrentAction({ text: actionText });
   };
   
-  // Move to next player's turn (selezione casuale)
+  // Passa al turno successivo
   const nextTurn = () => {
-    // Se c'è solo un giocatore, non cambierà
+    const roomId = selectedRoom.id;
+    
+    // Incrementa l'indice per la prossima volta
+    setCurrentActionIndex(prev => ({
+      ...prev,
+      [roomId]: prev[roomId] + 1
+    }));
+    
+    // Se c'è solo un giocatore, non cambia
     if (players.length <= 1) {
-      nextAction();
+      updateCurrentAction();
       return;
     }
     
-    // Selezione casuale del prossimo giocatore (diverso da quello attuale)
+    // Seleziona un giocatore casuale diverso da quello attuale
     let nextPlayerIndex;
     do {
       nextPlayerIndex = Math.floor(Math.random() * players.length);
     } while (nextPlayerIndex === currentPlayerIndex);
     
     setCurrentPlayerIndex(nextPlayerIndex);
-    nextAction();
+    updateCurrentAction();
   };
   
-  // Handle key press in input fields
+  // Gestisce il tasto Enter nel campo di input
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && gameState === 'playerSetup' && playerName) {
+    if (e.key === 'Enter' && playerName.trim()) {
       addPlayer();
     }
   };
   
-  // Reset the game to entrance screen
+  // Resetta il gioco
   const resetGame = () => {
-    setGameState('entrance');
+    setGameState('welcome');
     setPlayers([]);
     setCurrentPlayerIndex(0);
     setCurrentAction(null);
-    setPlayerName('');
     setSelectedRoom(null);
-    
-    // Reset room actions pool
-    setRoomActionsPool({
-      redRoom: [],
-      darkRoom: [],
-      clash: [],
-      lounge: []
-    });
-    
-    setCurrentActionIndex({
-      redRoom: 0,
-      darkRoom: 0,
-      clash: 0,
-      lounge: 0
-    });
   };
 
-  // Render different screens based on game state
+  // Navigazione tra le schermate
+  const goBack = () => {
+    switch (gameState) {
+      case 'playerSetup':
+        setGameState('welcome');
+        break;
+      case 'roomSelection':
+        setGameState('playerSetup');
+        break;
+      case 'playing':
+        setGameState('roomSelection');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-purple-600 to-blue-500 text-white">
-      {/* Entrance Screen */}
-      {gameState === 'entrance' && (
-        <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 w-full max-w-md text-center space-y-8">
-          <h1 className="text-4xl font-bold mb-8">🎮 Party Game</h1>
-          <button 
-            onClick={enterRoomSelection} 
-            className="w-full bg-purple-600 hover:bg-purple-700 px-6 py-4 rounded-lg font-bold text-2xl transition-transform transform hover:scale-105"
-          >
-            Entra
-          </button>
-        </div>
-      )}
-      
-      {/* Room Selection Screen */}
-      {gameState === 'roomSelection' && !isGenerating && (
-        <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 w-full max-w-md text-center space-y-6">
-          <h2 className="text-2xl font-bold">Scegli una Stanza</h2>
-          
-          {/* Room Slider/Carousel */}
-          <div className="relative">
-            {/* Current room card */}
-            <div 
-              className={`${rooms[currentRoomIndex].color} rounded-lg p-6 h-80 flex flex-col justify-between transition-transform duration-300 transform`}
-            >
-              <div className="text-6xl mb-4">{rooms[currentRoomIndex].icon}</div>
-              <div>
-                <h3 className="text-2xl font-bold">{rooms[currentRoomIndex].name}</h3>
-                <p className="text-lg mt-3">{rooms[currentRoomIndex].description}</p>
-              </div>
-              
-              <button 
-                onClick={() => selectRoom(rooms[currentRoomIndex])}
-                className="mt-4 bg-white bg-opacity-30 hover:bg-opacity-50 py-2 px-6 rounded-lg font-bold transition-all"
-              >
-                Seleziona
-              </button>
-            </div>
-            
-            {/* Navigation buttons */}
-            <button 
-              onClick={prevRoom}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 -ml-4 bg-white bg-opacity-50 rounded-full p-2 text-black"
-              aria-label="Stanza precedente"
-            >
-              ◀
-            </button>
+    <div className="app-container">
+      {/* Welcome Screen */}
+      {gameState === 'welcome' && (
+        <div className="screen welcome-screen">
+          <div className="content-container">
+            <h1 className="app-title">{appName}</h1>
+            <p className="app-description">{appDescription}</p>
             
             <button 
-              onClick={nextRoom}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 -mr-4 bg-white bg-opacity-50 rounded-full p-2 text-black"
-              aria-label="Stanza successiva"
+              className="primary-button" 
+              onClick={enterPlayerSetup}
             >
-              ▶
+              Entra nel club
             </button>
           </div>
-          
-          {/* Dots indicator */}
-          <div className="flex justify-center space-x-2 mt-4">
-            {rooms.map((room, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentRoomIndex(index)}
-                className={`h-3 w-3 rounded-full ${
-                  currentRoomIndex === index ? 'bg-white' : 'bg-white bg-opacity-30'
-                }`}
-                aria-label={`Vai alla stanza ${index + 1}`}
-              />
-            ))}
-          </div>
-          
-          <button onClick={resetGame} className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 rounded">
-            Indietro
-          </button>
-        </div>
-      )}
-      
-      {/* Loading Screen (when preparing actions) */}
-      {isGenerating && (
-        <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 w-full max-w-md text-center space-y-6">
-          <h2 className="text-2xl font-bold">Preparazione in Corso</h2>
-          <p>Stiamo preparando le penitenze per la stanza {selectedRoom?.name}...</p>
-          
-          <div className="w-full bg-gray-200 rounded-full h-4 bg-opacity-20">
-            <div 
-              className="bg-blue-600 h-4 rounded-full" 
-              style={{ width: `${generatingProgress}%` }}
-            ></div>
-          </div>
-          <p>{generatingProgress}% completato</p>
         </div>
       )}
       
       {/* Player Setup Screen */}
-      {gameState === 'playerSetup' && selectedRoom && (
-        <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 w-full max-w-md text-center space-y-6">
-          <h2 className="text-2xl font-bold">{selectedRoom.icon} {selectedRoom.name}</h2>
-          <p>{selectedRoom.description}</p>
+      {gameState === 'playerSetup' && (
+        <div className="screen player-setup-screen">
+          <button className="back-button" onClick={goBack}>
+            ←
+          </button>
           
-          <div>
-            <label className="block mb-1 font-semibold">Inserisci i nomi dei giocatori</label>
-            <div className="flex gap-2">
-              <input 
-                type="text" 
-                className="flex-1 p-2 rounded text-black" 
-                value={playerName} 
-                onChange={(e) => setPlayerName(e.target.value)} 
+          <div className="content-container">
+            <h1 className="screen-title">Chi vuole entrare?</h1>
+            
+            <h2 className="section-title">I membri</h2>
+            
+            <div className="player-input-container">
+              <input
+                type="text"
+                className="player-input"
+                placeholder="Inserisci il nome"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Nome giocatore"
               />
-              <button onClick={addPlayer} className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Aggiungi</button>
+              <button 
+                className="icon-button add-button" 
+                onClick={addPlayer}
+              >
+                +
+              </button>
             </div>
-          </div>
-          
-          <div>
-            <p className="font-semibold">Giocatori ({players.length}):</p>
-            <ul className="text-sm space-y-1 mt-2 max-h-40 overflow-y-auto">
-              {players.map((p, i) => (
-                <li key={i} className="bg-white bg-opacity-20 rounded p-2 flex justify-between">
-                  <span>👤 {p}</span>
+            
+            <div className="players-list">
+              {players.map((player, index) => (
+                <div key={index} className="player-item">
+                  <span className="player-name">{player}</span>
                   <button 
-                    onClick={() => setPlayers(players.filter((_, index) => index !== i))}
-                    className="text-red-400 hover:text-red-600"
+                    className="icon-button remove-button"
+                    onClick={() => removePlayer(index)}
                   >
-                    ❌
+                    −
                   </button>
-                </li>
+                </div>
               ))}
-            </ul>
-          </div>
-          
-          <div className="flex gap-4 pt-4">
+            </div>
+            
             <button 
-              onClick={() => setGameState('roomSelection')} 
-              className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded"
-            >
-              Indietro
-            </button>
-            <button 
-              onClick={startGame} 
-              className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded font-bold"
+              className="primary-button"
+              onClick={goToRoomSelection}
               disabled={players.length < 2}
             >
-              Gioca
+              Siamo pronti
             </button>
           </div>
         </div>
       )}
       
-      {/* Game Screen */}
-      {gameState === 'playing' && selectedRoom && (
-        <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 w-full max-w-md text-center space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold">{selectedRoom.icon} {selectedRoom.name}</h2>
-            <button onClick={resetGame} className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm">Esci</button>
-          </div>
+      {/* Room Selection Screen */}
+      {gameState === 'roomSelection' && (
+        <div className="screen room-selection-screen">
+          <button className="back-button" onClick={goBack}>
+            ←
+          </button>
           
-          <div className="my-6">
-            <div className={`${selectedRoom.color} rounded-t-lg p-2`}>
-              <p className="font-bold">Turno di: {players[currentPlayerIndex]}</p>
+          <div className="content-container">
+            <div className="room-card" style={{ backgroundColor: rooms[currentRoomIndex].color === '#1F2937' ? '#1F2937' : '#fff' }}>
+              <h1 className="room-title" style={{ color: rooms[currentRoomIndex].color === '#1F2937' ? '#fff' : '#000' }}>
+                {rooms[currentRoomIndex].name}
+              </h1>
+              
+              <button 
+                className="primary-button"
+                onClick={() => selectRoom(rooms[currentRoomIndex])}
+              >
+                Entra
+              </button>
+              
+              <p className="room-description" style={{ color: rooms[currentRoomIndex].color === '#1F2937' ? '#9CA3AF' : '#4B5563' }}>
+                {rooms[currentRoomIndex].description}
+              </p>
             </div>
-            <div className="bg-gray-800 bg-opacity-50 p-6 rounded-b-lg min-h-[150px] flex flex-col items-center justify-center">
+            
+            <div className="room-navigation">
+              <button 
+                className="nav-button"
+                onClick={() => setCurrentRoomIndex((prev) => (prev === 0 ? rooms.length - 1 : prev - 1))}
+              >
+                ‹
+              </button>
+              
+              <div className="room-indicators">
+                {rooms.map((_, index) => (
+                  <div 
+                    key={index}
+                    className={`room-indicator ${index === currentRoomIndex ? 'active' : ''}`}
+                    onClick={() => setCurrentRoomIndex(index)}
+                  ></div>
+                ))}
+              </div>
+              
+              <button 
+                className="nav-button"
+                onClick={() => setCurrentRoomIndex((prev) => (prev === rooms.length - 1 ? 0 : prev + 1))}
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Playing Screen */}
+      {gameState === 'playing' && selectedRoom && (
+        <div className="screen playing-screen">
+          <button className="back-button" onClick={goBack}>
+            ←
+          </button>
+          
+          <div className="content-container">
+            <h1 className="player-turn">{selectedRoom.name === '5 Sorsi' ? '5 Sorsi' : `Turno di ${players[currentPlayerIndex]}`}</h1>
+            
+            <div className="action-container">
               {currentAction && (
-                <div>
-                  <p className="text-xl">{currentAction.text}</p>
-                </div>
+                <p className="action-text">{currentAction.text}</p>
+              )}
+              
+              {selectedRoom.name === '5 Sorsi' && (
+                <p className="action-description">
+                  Tutti votano contemporaneamente puntando il dito.
+                </p>
               )}
             </div>
+            
+            <button 
+              className="primary-button next-button"
+              onClick={nextTurn}
+            >
+              Prossima
+            </button>
           </div>
-          
-          <button 
-            onClick={nextTurn} 
-            className="w-full bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-lg font-bold"
-          >
-            Prossima
-          </button>
+        </div>
+      )}
+      
+      {/* Loading Screen */}
+      {isLoading && (
+        <div className="overlay-screen">
+          <div className="loader-container">
+            <div className="spinner"></div>
+            <p>Caricamento in corso...</p>
+          </div>
         </div>
       )}
     </div>
