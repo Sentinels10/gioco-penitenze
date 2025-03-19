@@ -212,7 +212,11 @@ const DrinkingGameApp = () => {
     }
     
     setGameState('playing');
-    setCurrentPlayerIndex(0);
+    
+    // Seleziona un giocatore casuale all'inizio
+    const randomPlayerIndex = Math.floor(Math.random() * players.length);
+    setCurrentPlayerIndex(randomPlayerIndex);
+    
     nextAction();
   };
   
@@ -262,10 +266,21 @@ const DrinkingGameApp = () => {
     setCurrentAction({ text: actionText });
   };
   
-  // Move to next player's turn
+  // Move to next player's turn (selezione casuale)
   const nextTurn = () => {
-    const nextIndex = (currentPlayerIndex + 1) % players.length;
-    setCurrentPlayerIndex(nextIndex);
+    // Se c'è solo un giocatore, non cambierà
+    if (players.length <= 1) {
+      nextAction();
+      return;
+    }
+    
+    // Selezione casuale del prossimo giocatore (diverso da quello attuale)
+    let nextPlayerIndex;
+    do {
+      nextPlayerIndex = Math.floor(Math.random() * players.length);
+    } while (nextPlayerIndex === currentPlayerIndex);
+    
+    setCurrentPlayerIndex(nextPlayerIndex);
     nextAction();
   };
   
