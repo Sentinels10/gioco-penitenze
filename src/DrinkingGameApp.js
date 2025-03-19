@@ -60,8 +60,8 @@ const DrinkingGameApp = () => {
     },
     { 
       id: 'lounge', 
-      name: '5 Sorsi', 
-      description: 'Tutti votano, chi perde beve',
+      name: 'Lounge', 
+      description: 'Domande leggere e rilassanti',
       color: '#2563EB'
     }
   ];
@@ -412,17 +412,11 @@ const DrinkingGameApp = () => {
           </button>
           
           <div className="content-container">
-            <h1 className="player-turn">{selectedRoom.name === '5 Sorsi' ? '5 Sorsi' : `Turno di ${players[currentPlayerIndex]}`}</h1>
+            <h1 className="player-turn">Turno di {players[currentPlayerIndex]}</h1>
             
             <div className="action-container">
               {currentAction && (
                 <p className="action-text">{currentAction.text}</p>
-              )}
-              
-              {selectedRoom.name === '5 Sorsi' && (
-                <p className="action-description">
-                  Tutti votano contemporaneamente puntando il dito.
-                </p>
               )}
             </div>
             
