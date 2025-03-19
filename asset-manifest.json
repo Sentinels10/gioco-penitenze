@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/gioco-penitenze/static/css/main.1b19ce2f.css",
-    "main.js": "/gioco-penitenze/static/js/main.130d5696.js",
+    "main.js": "/gioco-penitenze/static/js/main.6e2143ae.js",
     "index.html": "/gioco-penitenze/index.html",
     "main.1b19ce2f.css.map": "/gioco-penitenze/static/css/main.1b19ce2f.css.map",
-    "main.130d5696.js.map": "/gioco-penitenze/static/js/main.130d5696.js.map"
+    "main.6e2143ae.js.map": "/gioco-penitenze/static/js/main.6e2143ae.js.map"
   },
   "entrypoints": [
     "static/css/main.1b19ce2f.css",
-    "static/js/main.130d5696.js"
+    "static/js/main.6e2143ae.js"
   ]
 }
