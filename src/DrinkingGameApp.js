@@ -69,52 +69,52 @@ const DrinkingGameApp = () => {
   // Room content - questions and challenges for each room (fallback)
   const roomContent = {
     redRoom: [
-      { text: "Raccontaci la tua più grande fantasia sessuale oppure 5 penalità" },
-      { text: "Indica chi è la persona più attraente in questa stanza e spiega perché oppure 4 penalità" },
-      { text: "Racconta la cosa più intima che hai fatto in un luogo pubblico oppure 3 penalità" },
-      { text: "Rivela quanto tempo è passato dall'ultima volta che hai fatto sesso oppure 3 penalità" },
-      { text: "Confessa qual è la tua posizione preferita oppure 5 penalità" },
-      { text: "Ammetti se hai mai tradito un partner oppure 4 penalità" },
-      { text: "Spiega qual è il tuo più grande turn-on oppure 3 penalità" },
-      { text: "Rivela chi sceglieresti in questa stanza per passare una notte insieme oppure 5 penalità" },
-      { text: "Racconta la tua esperienza sessuale più imbarazzante oppure 4 penalità" },
-      { text: "Confessa il tuo fetish più strano oppure 3 penalità" }
+      { "text": "Raccontaci la tua più grande fantasia sessuale oppure 5 penalità" },
+      { "text": "Indica chi è la persona più attraente in questa stanza e spiega perché oppure 4 penalità" },
+      { "text": "Racconta la cosa più intima che hai fatto in un luogo pubblico oppure 3 penalità" },
+      { "text": "Rivela quanto tempo è passato dall'ultima volta che hai fatto sesso oppure 3 penalità" },
+      { "text": "Confessa qual è la tua posizione preferita oppure 5 penalità" },
+      { "text": "Ammetti se hai mai tradito un partner oppure 4 penalità" },
+      { "text": "Spiega qual è il tuo più grande turn-on oppure 3 penalità" },
+      { "text": "Rivela chi sceglieresti in questa stanza per passare una notte insieme oppure 5 penalità" },
+      { "text": "Racconta la tua esperienza sessuale più imbarazzante oppure 4 penalità" },
+      { "text": "Confessa il tuo fetish più strano oppure 3 penalità" }
     ],
     darkRoom: [
-      { text: "Rivela un segreto oscuro che non hai mai detto a nessuno oppure 5 penalità" },
-      { text: "Confessa la cosa peggiore che hai fatto di nascosto oppure 6 penalità" },
-      { text: "Mostra l'ultimo messaggio privato che hai inviato oppure 5 penalità" },
-      { text: "Racconta la bugia più grande che hai mai detto oppure 4 penalità" },
-      { text: "Lascia che un altro giocatore posti qualcosa sui tuoi social oppure 7 penalità" },
-      { text: "Confessa qualcosa che nessuno si aspetterebbe da te oppure 5 penalità" },
-      { text: "Mostra la foto più imbarazzante che hai sul telefono oppure 6 penalità" },
-      { text: "Rivela il pensiero più oscuro che hai avuto oppure 8 penalità" },
-      { text: "Racconta il tuo più grande rimpianto oppure 5 penalità" },
-      { text: "Descrivi il momento in cui hai toccato il fondo oppure 4 penalità" }
+      { "text": "Rivela un segreto oscuro che non hai mai detto a nessuno oppure 5 penalità" },
+      { "text": "Confessa la cosa peggiore che hai fatto di nascosto oppure 6 penalità" },
+      { "text": "Mostra l'ultimo messaggio privato che hai inviato oppure 5 penalità" },
+      { "text": "Racconta la bugia più grande che hai mai detto oppure 4 penalità" },
+      { "text": "Lascia che un altro giocatore posti qualcosa sui tuoi social oppure 7 penalità" },
+      { "text": "Confessa qualcosa che nessuno si aspetterebbe da te oppure 5 penalità" },
+      { "text": "Mostra la foto più imbarazzante che hai sul telefono oppure 6 penalità" },
+      { "text": "Rivela il pensiero più oscuro che hai avuto oppure 8 penalità" },
+      { "text": "Racconta il tuo più grande rimpianto oppure 5 penalità" },
+      { "text": "Descrivi il momento in cui hai toccato il fondo oppure 4 penalità" }
     ],
     clash: [
-      { text: "Sfida: Tu e il giocatore alla tua destra dovete mantenere il contatto visivo per 30 secondi senza ridere. Se perdete, entrambi fate 5 penalità" },
-      { text: "Sfida: Chi riesce a stare più a lungo in equilibrio su una gamba sola tra te e un giocatore a scelta. Il perdente fa 6 penalità" },
-      { text: "Sfida: Braccio di ferro con la persona di fronte a te. Il perdente fa 4 penalità" },
-      { text: "Sfida: Tu e un altro giocatore dovete fare una gara a chi beve un bicchiere d'acqua più velocemente. Il perdente fa 5 penalità" },
-      { text: "Sfida: Gara di addominali con un giocatore a scelta per 20 secondi. Il perdente fa 7 penalità" },
-      { text: "Sfida: Chi riesce a trattenere il respiro più a lungo tra te e il giocatore successivo. Il perdente fa 5 penalità" },
-      { text: "Sfida: Gara di barzellette con un altro giocatore, vince chi fa ridere più persone. Il perdente fa 5 penalità" },
-      { text: "Sfida: Tu e un altro giocatore dovete mimarvi a vicenda per 30 secondi. Chi ride primo fa 4 penalità" },
-      { text: "Sfida: Gara di insulti creativi con un altro giocatore (senza offendere veramente). Il perdente fa 5 penalità" },
-      { text: "Sfida: Gara di sguardi intensi con un altro giocatore. Chi distoglie lo sguardo primo fa 3 penalità" }
+      { "text": "Sfida: Tu e il giocatore alla tua destra dovete mantenere il contatto visivo per 30 secondi senza ridere. Se perdete, entrambi fate 5 penalità" },
+      { "text": "Sfida: Chi riesce a stare più a lungo in equilibrio su una gamba sola tra te e un giocatore a scelta. Il perdente fa 6 penalità" },
+      { "text": "Sfida: Braccio di ferro con la persona di fronte a te. Il perdente fa 4 penalità" },
+      { "text": "Sfida: Tu e un altro giocatore dovete fare una gara a chi beve un bicchiere d'acqua più velocemente. Il perdente fa 5 penalità" },
+      { "text": "Sfida: Gara di addominali con un giocatore a scelta per 20 secondi. Il perdente fa 7 penalità" },
+      { "text": "Sfida: Chi riesce a trattenere il respiro più a lungo tra te e il giocatore successivo. Il perdente fa 5 penalità" },
+      { "text": "Sfida: Gara di barzellette con un altro giocatore, vince chi fa ridere più persone. Il perdente fa 5 penalità" },
+      { "text": "Sfida: Tu e un altro giocatore dovete mimarvi a vicenda per 30 secondi. Chi ride primo fa 4 penalità" },
+      { "text": "Sfida: Gara di insulti creativi con un altro giocatore (senza offendere veramente). Il perdente fa 5 penalità" },
+      { "text": "Sfida: Gara di sguardi intensi con un altro giocatore. Chi distoglie lo sguardo primo fa 3 penalità" }
     ],
     lounge: [
-      { text: "Racconta qual è il tuo film preferito e perché oppure 2 penalità" },
-      { text: "Condividi un ricordo d'infanzia felice oppure 3 penalità" },
-      { text: "Se potessi viaggiare ovunque, dove andresti? Oppure 2 penalità" },
-      { text: "Descrivi il tuo giorno perfetto oppure 1 penalità" },
-      { text: "Qual è il tuo piatto preferito? Oppure 2 penalità" },
-      { text: "Racconta la cosa più gentile che qualcuno ha fatto per te oppure 2 penalità" },
-      { text: "Descrivi il tuo talento nascosto oppure 1 penalità" },
-      { text: "Racconta qual è il tuo sogno nel cassetto oppure 2 penalità" },
-      { text: "Se potessi avere un superpotere, quale sceglieresti? Oppure 1 penalità" },
-      { text: "Qual è il tuo primo ricordo? Oppure 3 penalità" }
+      { "text": "Racconta qual è il tuo film preferito e perché oppure 2 penalità" },
+      { "text": "Condividi un ricordo d'infanzia felice oppure 3 penalità" },
+      { "text": "Se potessi viaggiare ovunque, dove andresti? Oppure 2 penalità" },
+      { "text": "Descrivi il tuo giorno perfetto oppure 1 penalità" },
+      { "text": "Qual è il tuo piatto preferito? Oppure 2 penalità" },
+      { "text": "Racconta la cosa più gentile che qualcuno ha fatto per te oppure 2 penalità" },
+      { "text": "Descrivi il tuo talento nascosto oppure 1 penalità" },
+      { "text": "Racconta qual è il tuo sogno nel cassetto oppure 2 penalità" },
+      { "text": "Se potessi avere un superpotere, quale sceglieresti? Oppure 1 penalità" },
+      { "text": "Qual è il tuo primo ricordo? Oppure 3 penalità" }
     ]
   };
   
@@ -216,7 +216,7 @@ const DrinkingGameApp = () => {
     nextAction();
   };
   
-  // Get next action from the selected room
+  // Get next action from the selected room with player interaction support
   const nextAction = () => {
     const roomId = selectedRoom.id;
     const currentPool = roomActionsPool[roomId];
@@ -238,7 +238,28 @@ const DrinkingGameApp = () => {
       [roomId]: index + 1
     });
     
-    setCurrentAction({ text: currentPool[adjustedIndex].text });
+    // Ottieni l'azione dal pool
+    let actionText = currentPool[adjustedIndex].text;
+    
+    // Controlla se questa azione richiede un giocatore specifico (contiene il segnaposto {playerB})
+    if (actionText.includes("{playerB}")) {
+      // Scegli un giocatore casuale diverso dal giocatore corrente
+      let otherPlayers = players.filter((_, idx) => idx !== currentPlayerIndex);
+      
+      // Se non ci sono altri giocatori (situazione improbabile), usa la versione senza sostituzione
+      if (otherPlayers.length > 0) {
+        const randomPlayerIndex = Math.floor(Math.random() * otherPlayers.length);
+        const randomPlayerName = otherPlayers[randomPlayerIndex];
+        
+        // Sostituisci il segnaposto con il nome del giocatore casuale
+        actionText = actionText.replace(/{playerB}/g, randomPlayerName);
+      } else {
+        // Rimuovi il segnaposto se non ci sono altri giocatori
+        actionText = actionText.replace(/{playerB}/g, "qualcun altro");
+      }
+    }
+    
+    setCurrentAction({ text: actionText });
   };
   
   // Move to next player's turn
