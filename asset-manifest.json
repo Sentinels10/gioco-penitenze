@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/gioco-penitenze/static/css/main.1b19ce2f.css",
+    "main.js": "/gioco-penitenze/static/js/main.63ecc64b.js",
+    "index.html": "/gioco-penitenze/index.html",
+    "main.1b19ce2f.css.map": "/gioco-penitenze/static/css/main.1b19ce2f.css.map",
+    "main.63ecc64b.js.map": "/gioco-penitenze/static/js/main.63ecc64b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1b19ce2f.css",
+    "static/js/main.63ecc64b.js"
+  ]
+}
