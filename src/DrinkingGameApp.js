@@ -163,7 +163,7 @@ const DrinkingGameApp = () => {
   
   // Aggiunge un giocatore alla lista
   const addPlayer = () => {
-    if (playerName.trim() && players.length < 10) {
+    if (playerName.trim() && players.length < 15) {
       setPlayers([...players, playerName.trim()]);
       setPlayerName('');
     }
