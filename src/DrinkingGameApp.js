@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import backupActions from './backupActions.json';
 // Importa l'immagine del guanto che punta
-// Nota: Dovrai salvare l'immagine nella cartella src/assets con questo nome
 import pointingGlove from './assets/pointing-glove.png';
 
 const DrinkingGameApp = () => {
   // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing', 'gameOver'
   const [gameState, setGameState] = useState('welcome');
   const [players, setPlayers] = useState([]);
+  const [inputPlayers, setInputPlayers] = useState([{ id: 1, name: '' }]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [currentAction, setCurrentAction] = useState(null);
-  const [playerName, setPlayerName] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [previousAction, setPreviousAction] = useState(null);
   // Contatore per le azioni giocate in una partita (nascosto dall'UI)
@@ -43,6 +42,42 @@ const DrinkingGameApp = () => {
     lounge: 0,
     neonRoulette: 0
   });
+  
+  // Stato per la funzionalità del buttafuori
+  const [bouncerUsed, setBouncerUsed] = useState({
+    redRoom: false,
+    darkRoom: false,
+    clash: false,
+    lounge: false,
+    neonRoulette: false
+  });
+  const [bouncerRound, setBouncerRound] = useState({
+    redRoom: Math.floor(Math.random() * 10) + 15, // Tra 15 e 25 round
+    darkRoom: Math.floor(Math.random() * 10) + 15,
+    clash: Math.floor(Math.random() * 10) + 15,
+    lounge: Math.floor(Math.random() * 10) + 15,
+    neonRoulette: Math.floor(Math.random() * 10) + 15
+  });
+  const [showBouncerAction, setShowBouncerAction] = useState(false);
+  const [bouncerPlayer, setBouncerPlayer] = useState(null);
+  
+  // Stato per la funzionalità del dito della verità
+  const [truthFingerUsed, setTruthFingerUsed] = useState({
+    redRoom: false,
+    darkRoom: false,
+    clash: false,
+    lounge: false,
+    neonRoulette: false
+  });
+  const [truthFingerRound, setTruthFingerRound] = useState({
+    redRoom: Math.floor(Math.random() * 10) + 30, // Tra 30 e 40 round
+    darkRoom: Math.floor(Math.random() * 10) + 30,
+    clash: Math.floor(Math.random() * 10) + 30,
+    lounge: Math.floor(Math.random() * 10) + 30,
+    neonRoulette: Math.floor(Math.random() * 10) + 30
+  });
+  const [showTruthFingerAction, setShowTruthFingerAction] = useState(false);
+  const [truthFingerPlayer, setTruthFingerPlayer] = useState(null);
   
   // App name and description
   const appName = "Furry Bones Club";
@@ -121,13 +156,60 @@ const DrinkingGameApp = () => {
     setGameState('playerSetup');
   };
   
-  // Go to room selection after player setup
-  const goToRoomSelection = () => {
-    if (players.length < 2) {
+  // Aggiunge un nuovo input box per un giocatore
+  const addPlayerInput = () => {
+    if (inputPlayers.length < 15) {
+      const newId = inputPlayers.length > 0 
+        ? Math.max(...inputPlayers.map(p => p.id)) + 1 
+        : 1;
+      setInputPlayers([...inputPlayers, { id: newId, name: '' }]);
+    }
+  };
+  
+  // Aggiorna il nome di un giocatore negli input
+  const updatePlayerName = (id, name) => {
+    setInputPlayers(
+      inputPlayers.map(input => 
+        input.id === id ? { ...input, name } : input
+      )
+    );
+  };
+  
+  // Rimuove un input di giocatore
+  const removePlayerInput = (id) => {
+    if (inputPlayers.length > 1) {
+      setInputPlayers(inputPlayers.filter(input => input.id !== id));
+    }
+  };
+  
+  // Avvia una nuova partita
+  const startGame = () => {
+    // Verifica che ci siano almeno 2 giocatori validi
+    const validPlayers = inputPlayers
+      .filter(input => input.name.trim() !== '')
+      .map(input => input.name.trim());
+    
+    if (validPlayers.length < 2) {
       alert("Inserisci almeno 2 giocatori per iniziare!");
       return;
     }
+    
+    setPlayers(validPlayers);
     setGameState('roomSelection');
+  };
+  
+  // Gestisce il tasto Enter negli input dei giocatori
+  const handleKeyPress = (e, id, index) => {
+    if (e.key === 'Enter') {
+      if (index === inputPlayers.length - 1) {
+        // Se siamo sull'ultimo input, aggiungiamo un nuovo campo
+        addPlayerInput();
+      } else {
+        // Altrimenti spostiamo il focus al campo successivo
+        const nextInput = document.getElementById(`player-input-${index + 1}`);
+        if (nextInput) nextInput.focus();
+      }
+    }
   };
   
   // Seleziona una stanza e prepara il gioco
@@ -144,6 +226,34 @@ const DrinkingGameApp = () => {
       
       // Resetta il contatore delle azioni
       setActionsCounter(0);
+      
+      // Resetta gli stati del buttafuori per la nuova partita
+      setBouncerUsed(prev => ({
+        ...prev,
+        [room.id]: false
+      }));
+      
+      setBouncerRound(prev => ({
+        ...prev,
+        [room.id]: Math.floor(Math.random() * 10) + 15 // Tra 15 e 25 round
+      }));
+      
+      setShowBouncerAction(false);
+      setBouncerPlayer(null);
+      
+      // Resetta gli stati del dito della verità per la nuova partita
+      setTruthFingerUsed(prev => ({
+        ...prev,
+        [room.id]: false
+      }));
+      
+      setTruthFingerRound(prev => ({
+        ...prev,
+        [room.id]: Math.floor(Math.random() * 10) + 30 // Tra 30 e 40 round
+      }));
+      
+      setShowTruthFingerAction(false);
+      setTruthFingerPlayer(null);
       
       // Se è la modalità Neon Roulette, combina azioni da tutte le altre stanze
       if (room.id === 'neonRoulette') {
@@ -268,17 +378,22 @@ const DrinkingGameApp = () => {
     }
   };
   
-  // Aggiunge un giocatore alla lista
-  const addPlayer = () => {
-    if (playerName.trim() && players.length < 15) {
-      setPlayers([...players, playerName.trim()]);
-      setPlayerName('');
-    }
+  // Funzione semplificata per continuare dopo l'azione del buttafuori
+  const nextTurnAfterBouncer = () => {
+    setShowBouncerAction(false);
+    setBouncerPlayer(null);
+    
+    // Prosegui con il turno normale
+    nextTurn(true); // true indica che stiamo proseguendo dopo l'azione del buttafuori
   };
   
-  // Rimuove un giocatore dalla lista
-  const removePlayer = (index) => {
-    setPlayers(players.filter((_, i) => i !== index));
+  // Funzione semplificata per continuare dopo l'azione del dito della verità
+  const nextTurnAfterTruthFinger = () => {
+    setShowTruthFingerAction(false);
+    setTruthFingerPlayer(null);
+    
+    // Prosegui con il turno normale
+    nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
   };
   
   // Funzione dedicata per aggiornare l'azione corrente
@@ -286,6 +401,52 @@ const DrinkingGameApp = () => {
     if (!selectedRoom) return;
     
     const roomId = selectedRoom.id;
+    
+    // Verifica se è tempo per l'azione del dito della verità
+    if (!truthFingerUsed[roomId] && actionsCounter >= truthFingerRound[roomId] && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
+      // È il momento di attivare l'azione del dito della verità
+      setTruthFingerUsed(prev => ({
+        ...prev,
+        [roomId]: true
+      }));
+      
+      // Il giocatore corrente sarà il giudice
+      setTruthFingerPlayer(players[currentPlayerIndex]);
+      setShowTruthFingerAction(true);
+      
+      // Imposta un'azione speciale per il dito della verità
+      setCurrentAction({ 
+        text: `${players[currentPlayerIndex]} inizia il gioco del DITO DELLA VERITÀ! Deve scegliere una caratteristica (es. "il più tirchio", "il più divertente") e tutti indicheranno un giocatore. Chi riceve più voti fa una penalità!` 
+      });
+      
+      return;
+    }
+    
+    // Verifica se è tempo per l'azione del buttafuori
+    if (!bouncerUsed[roomId] && actionsCounter >= bouncerRound[roomId] && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
+      // È il momento di attivare l'azione del buttafuori
+      setBouncerUsed(prev => ({
+        ...prev,
+        [roomId]: true
+      }));
+      
+      // Scegli casualmente un giocatore diverso da quello corrente come buttafuori
+      let bouncerIndex;
+      do {
+        bouncerIndex = Math.floor(Math.random() * players.length);
+      } while (bouncerIndex === currentPlayerIndex);
+      
+      setBouncerPlayer(players[bouncerIndex]);
+      setShowBouncerAction(true);
+      
+      // Imposta un'azione speciale per il buttafuori
+      setCurrentAction({ 
+        text: `${players[bouncerIndex]} è stato scelto come BUTTAFUORI del club! Può decidere se "lasciar passare" la prossima penitenza o far fare una penalità extra a un altro giocatore.` 
+      });
+      
+      return;
+    }
+    
     const currentPool = roomActionsPool[roomId];
     let index = currentActionIndex[roomId];
     
@@ -394,7 +555,6 @@ const DrinkingGameApp = () => {
           `? Se eviti la domanda ${penaltyCount} penalità`,
           `? Se non osi rispondere ${penaltyCount} penalità`,
           `? Il silenzio costa ${penaltyCount} penalità`,
-          `? Se taci sono ${penaltyCount} penalità`,
           `? Eludere la risposta comporta ${penaltyCount} penalità`
         ];
         
@@ -445,7 +605,7 @@ const DrinkingGameApp = () => {
   };
   
   // Passa al turno successivo
-  const nextTurn = () => {
+  const nextTurn = (afterSpecialAction = false) => {
     const roomId = selectedRoom.id;
     
     // Verifica se il numero massimo di azioni è stato raggiunto
@@ -455,11 +615,13 @@ const DrinkingGameApp = () => {
       return;
     }
     
-    // Incrementa l'indice per la prossima volta
-    setCurrentActionIndex(prev => ({
-      ...prev,
-      [roomId]: prev[roomId] + 1
-    }));
+    // Incrementa l'indice per la prossima volta, ma solo se non siamo in una fase speciale
+    if (!showBouncerAction && !showTruthFingerAction || afterSpecialAction) {
+      setCurrentActionIndex(prev => ({
+        ...prev,
+        [roomId]: prev[roomId] + 1
+      }));
+    }
     
     // Se c'è solo un giocatore, non cambia
     if (players.length <= 1) {
@@ -469,13 +631,17 @@ const DrinkingGameApp = () => {
       return;
     }
     
-    // Seleziona un giocatore casuale diverso da quello attuale
-    let nextPlayerIndex;
-    do {
-      nextPlayerIndex = Math.floor(Math.random() * players.length);
-    } while (nextPlayerIndex === currentPlayerIndex);
-    
-    setCurrentPlayerIndex(nextPlayerIndex);
+    // Se non siamo in un turno speciale o stiamo procedendo dopo un'azione speciale,
+    // seleziona un nuovo giocatore casuale
+    if ((!showBouncerAction && !showTruthFingerAction) || afterSpecialAction) {
+      // Seleziona un giocatore casuale diverso da quello attuale
+      let nextPlayerIndex;
+      do {
+        nextPlayerIndex = Math.floor(Math.random() * players.length);
+      } while (nextPlayerIndex === currentPlayerIndex);
+      
+      setCurrentPlayerIndex(nextPlayerIndex);
+    }
     
     // Piccolo timeout per assicurarsi che l'indice sia aggiornato prima di chiamare updateCurrentAction
     setTimeout(() => {
@@ -483,24 +649,6 @@ const DrinkingGameApp = () => {
     }, 50);
   };
   
-  // Gestisce il tasto Enter nel campo di input
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && playerName.trim()) {
-      addPlayer();
-    }
-  };
-  
-  // Resetta il gioco
-  const resetGame = () => {
-    setGameState('welcome');
-    setPlayers([]);
-    setCurrentPlayerIndex(0);
-    setCurrentAction(null);
-    setSelectedRoom(null);
-    setPreviousAction(null);
-    setActionsCounter(0);
-  };
-
   // Navigazione tra le schermate
   const goBack = () => {
     switch (gameState) {
@@ -520,21 +668,100 @@ const DrinkingGameApp = () => {
         break;
     }
   };
-
+  
+  // Resetta il gioco
+  const resetGame = () => {
+    setGameState('welcome');
+    setPlayers([]);
+    setInputPlayers([{ id: 1, name: '' }]);
+    setCurrentPlayerIndex(0);
+    setCurrentAction(null);
+    setSelectedRoom(null);
+    setPreviousAction(null);
+    setActionsCounter(0);
+    
+    // Resetta anche gli stati del buttafuori
+    setBouncerUsed({
+      redRoom: false,
+      darkRoom: false,
+      clash: false,
+      lounge: false,
+      neonRoulette: false
+    });
+    setBouncerRound({
+      redRoom: Math.floor(Math.random() * 10) + 15,
+      darkRoom: Math.floor(Math.random() * 10) + 15,
+      clash: Math.floor(Math.random() * 10) + 15,
+      lounge: Math.floor(Math.random() * 10) + 15,
+      neonRoulette: Math.floor(Math.random() * 10) + 15
+    });
+    setShowBouncerAction(false);
+    setBouncerPlayer(null);
+    
+    // Resetta anche gli stati del dito della verità
+    setTruthFingerUsed({
+      redRoom: false,
+      darkRoom: false,
+      clash: false,
+      lounge: false,
+      neonRoulette: false
+    });
+    setTruthFingerRound({
+      redRoom: Math.floor(Math.random() * 10) + 30,
+      darkRoom: Math.floor(Math.random() * 10) + 30,
+      clash: Math.floor(Math.random() * 10) + 30,
+      lounge: Math.floor(Math.random() * 10) + 30,
+      neonRoulette: Math.floor(Math.random() * 10) + 30
+    });
+    setShowTruthFingerAction(false);
+    setTruthFingerPlayer(null);
+  };
+  
   return (
     <div className="app-container">
       {/* Welcome Screen */}
       {gameState === 'welcome' && (
-        <div className="screen welcome-screen">
-          <div className="content-container">
-            <h1 className="app-title">{appName}</h1>
-            <p className="app-description">{appDescription}</p>
+        <div className="screen welcome-screen" style={{ 
+          backgroundColor: '#000000', 
+          color: '#FFFFFF',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          padding: '20px'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            maxWidth: '340px'
+          }}>
+            <h1 style={{ 
+              fontSize: '36px', 
+              marginBottom: '20px',
+              fontWeight: 'bold'
+            }}>{appName}</h1>
+            <p style={{ 
+              fontSize: '18px', 
+              marginBottom: '40px',
+              color: '#CCCCCC',
+              lineHeight: '1.5'
+            }}>{appDescription}</p>
             
             <button 
-              className="primary-button" 
               onClick={enterPlayerSetup}
+              style={{
+                width: '100%',
+                backgroundColor: '#3498db',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '16px',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
             >
-              Entra nel club
+              INIZIA
             </button>
           </div>
         </div>
@@ -542,53 +769,138 @@ const DrinkingGameApp = () => {
       
       {/* Player Setup Screen */}
       {gameState === 'playerSetup' && (
-        <div className="screen player-setup-screen">
-          <button className="back-button" onClick={goBack}>
-            ←
-          </button>
+        <div className="screen player-setup-screen" style={{ 
+          backgroundColor: '#000000', 
+          color: '#FFFFFF',
+          padding: '20px 0 0 0',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            padding: '10px 20px',
+            marginBottom: '30px'
+          }}>
+            <button 
+              onClick={goBack}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#FFFFFF',
+                fontSize: '24px',
+                position: 'absolute',
+                left: '20px',
+                cursor: 'pointer'
+              }}
+            >
+              ←
+            </button>
+            <h1 style={{ 
+              margin: 0, 
+              textAlign: 'center',
+              fontWeight: 'normal',
+              fontSize: '28px',
+              letterSpacing: '1px'
+            }}>
+              PLAYERS
+            </h1>
+          </div>
           
-          <div className="content-container">
-            <h1 className="screen-title">Chi vuole entrare?</h1>
-            
-            <h2 className="section-title">I membri</h2>
-            
-            <div className="player-input-container">
-              <input
-                type="text"
-                className="player-input"
-                placeholder="Inserisci il nome"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                onKeyPress={handleKeyPress}
-              />
-              <button 
-                className="icon-button add-button" 
-                onClick={addPlayer}
-              >
-                +
-              </button>
-            </div>
-            
-            <div className="players-list">
-              {players.map((player, index) => (
-                <div key={index} className="player-item">
-                  <span className="player-name">{player}</span>
-                  <button 
-                    className="icon-button remove-button"
-                    onClick={() => removePlayer(index)}
-                  >
-                    −
-                  </button>
-                </div>
-              ))}
-            </div>
+          <div style={{ 
+            flex: 1,
+            padding: '0 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'auto',
+            gap: '16px'
+          }}>
+            {inputPlayers.map((input, index) => (
+              <div key={input.id} style={{ 
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <input
+                  id={`player-input-${index}`}
+                  type="text"
+                  value={input.name}
+                  onChange={(e) => updatePlayerName(input.id, e.target.value)}
+                  onKeyPress={(e) => handleKeyPress(e, input.id, index)}
+                  placeholder="Enter player name"
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#1A1A1A',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '16px 20px',
+                    fontSize: '16px',
+                  }}
+                />
+                <button 
+                  onClick={() => removePlayerInput(input.id)}
+                  disabled={inputPlayers.length <= 1}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#808080',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    padding: '10px',
+                    opacity: inputPlayers.length <= 1 ? 0.5 : 1
+                  }}
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
             
             <button 
-              className="primary-button"
-              onClick={goToRoomSelection}
-              disabled={players.length < 2}
+              onClick={addPlayerInput}
+              disabled={inputPlayers.length >= 15}
+              style={{
+                margin: '20px 0',
+                backgroundColor: 'transparent',
+                color: '#FFFFFF',
+                border: '1px dashed #808080',
+                borderRadius: '10px',
+                padding: '15px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
             >
-              Siamo pronti
+              <span style={{ fontSize: '20px' }}>⊕</span> Add Player
+            </button>
+          </div>
+          
+          <div style={{ padding: '20px' }}>
+            <button 
+              onClick={startGame}
+              style={{
+                width: '100%',
+                backgroundColor: '#3498db',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '16px',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px'
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>▶</span> START
             </button>
           </div>
         </div>
@@ -596,71 +908,158 @@ const DrinkingGameApp = () => {
       
       {/* Room Selection Screen */}
       {gameState === 'roomSelection' && (
-        <div className="screen room-selection-screen">
-          <button className="back-button" onClick={goBack}>
-            ←
-          </button>
-          
-          <div className="content-container">
-            <div 
-              className="room-card" 
-              style={{ 
-                backgroundColor: 
-                  rooms[currentRoomIndex].color === '#1F2937' ? '#1F2937' :
-                  rooms[currentRoomIndex].color === '#D946EF' ? '#D946EF' : '#fff'
+        <div className="screen room-selection-screen" style={{ 
+          backgroundColor: '#000000', 
+          color: '#FFFFFF',
+          padding: '20px 0 0 0',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            padding: '10px 20px',
+            marginBottom: '20px'
+          }}>
+            <button 
+              onClick={goBack}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#FFFFFF',
+                fontSize: '24px',
+                position: 'absolute',
+                left: '20px',
+                cursor: 'pointer'
               }}
             >
-              <h1 
-                className="room-title" 
-                style={{ 
-                  color: 
-                    rooms[currentRoomIndex].color === '#1F2937' || 
-                    rooms[currentRoomIndex].color === '#D946EF' ? '#fff' : '#000' 
-                }}
-              >
-                {rooms[currentRoomIndex].name}
-              </h1>
+              ←
+            </button>
+            <h1 style={{ 
+              margin: 0, 
+              textAlign: 'center',
+              fontWeight: 'normal',
+              fontSize: '28px',
+              letterSpacing: '1px'
+            }}>
+              ROOMS
+            </h1>
+          </div>
+          
+          <div style={{ 
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '0 20px'
+          }}>
+            <div style={{
+              width: '300px',  // Larghezza fissa
+              height: '400px', // Altezza fissa
+              backgroundColor: rooms[currentRoomIndex].color,
+              borderRadius: '15px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '30px',
+              marginBottom: '25px'
+            }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <h2 style={{
+                  fontSize: '36px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  color: rooms[currentRoomIndex].color === '#1F2937' || 
+                         rooms[currentRoomIndex].color === '#DC2626' || 
+                         rooms[currentRoomIndex].color === '#D946EF' ? '#FFFFFF' : '#000000'
+                }}>
+                  {rooms[currentRoomIndex].name}
+                </h2>
+              </div>
               
-              <button 
-                className="primary-button"
-                onClick={() => selectRoom(rooms[currentRoomIndex])}
-              >
-                Entra
-              </button>
+              <div style={{ marginBottom: '40px' }}>
+                <button 
+                  onClick={() => selectRoom(rooms[currentRoomIndex])}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    color: '#000000',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '14px 40px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ENTRA
+                </button>
+              </div>
               
-              <p 
-                className="room-description" 
-                style={{ 
-                  color: 
-                    rooms[currentRoomIndex].color === '#1F2937' ? '#9CA3AF' :
-                    rooms[currentRoomIndex].color === '#D946EF' ? '#f5d0fe' : '#4B5563'
-                }}
-              >
-                {rooms[currentRoomIndex].description}
-              </p>
+              <div style={{ height: '60px', display: 'flex', alignItems: 'center' }}>
+                <p style={{
+                  fontSize: '16px',
+                  textAlign: 'center',
+                  color: rooms[currentRoomIndex].color === '#1F2937' ? '#9CA3AF' :
+                         rooms[currentRoomIndex].color === '#DC2626' ? 'rgba(255,255,255,0.8)' :
+                         rooms[currentRoomIndex].color === '#D946EF' ? '#f5d0fe' : 
+                         'rgba(0,0,0,0.7)'
+                }}>
+                  {rooms[currentRoomIndex].description}
+                </p>
+              </div>
             </div>
             
-            <div className="room-navigation">
+            <div style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              gap: '20px'
+            }}>
               <button 
-                className="nav-button"
                 onClick={() => setCurrentRoomIndex((prev) => (prev === 0 ? rooms.length - 1 : prev - 1))}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#AAAAAA',
+                  fontSize: '36px',
+                  cursor: 'pointer'
+                }}
               >
                 ‹
               </button>
               
-              <div className="room-indicators">
+              <div style={{ 
+                display: 'flex',
+                gap: '8px'
+              }}>
                 {rooms.map((_, index) => (
                   <div 
                     key={index}
-                    className={`room-indicator ${index === currentRoomIndex ? 'active' : ''}`}
                     onClick={() => setCurrentRoomIndex(index)}
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: index === currentRoomIndex ? '#FFFFFF' : '#555555',
+                      cursor: 'pointer'
+                    }}
                   ></div>
                 ))}
               </div>
               
               <button 
-                className="nav-button"
                 onClick={() => setCurrentRoomIndex((prev) => (prev === rooms.length - 1 ? 0 : prev + 1))}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#AAAAAA',
+                  fontSize: '36px',
+                  cursor: 'pointer'
+                }}
               >
                 ›
               </button>
@@ -671,25 +1070,133 @@ const DrinkingGameApp = () => {
       
       {/* Playing Screen */}
       {gameState === 'playing' && selectedRoom && (
-        <div className="screen playing-screen">
-          <button className="back-button" onClick={goBack}>
-            ←
-          </button>
+        <div className="screen playing-screen" style={{ 
+          backgroundColor: '#000000', 
+          color: '#FFFFFF',
+          padding: '20px 0 0 0',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            padding: '10px 20px',
+            marginBottom: '20px'
+          }}>
+            <button 
+              onClick={goBack}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#FFFFFF',
+                fontSize: '24px',
+                position: 'absolute',
+                left: '20px',
+                cursor: 'pointer'
+              }}
+            >
+              ←
+            </button>
+            <h1 style={{ 
+              margin: 0, 
+              textAlign: 'center',
+              fontWeight: 'normal',
+              fontSize: '28px',
+              letterSpacing: '1px'
+            }}>
+              {selectedRoom.name.toUpperCase()}
+            </h1>
+          </div>
           
-          <div className="content-container">
-            <h1 className="player-turn">Turno di {players[currentPlayerIndex]}</h1>
+          <div style={{ 
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '0 20px'
+          }}>
+            <h2 style={{
+              fontSize: '26px',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              margin: '10px 0 30px 0'
+            }}>
+              {players[currentPlayerIndex]}
+            </h2>
             
-            <div className="action-container">
+            <div style={{
+              backgroundColor: '#1A1A1A',
+              borderRadius: '15px',
+              padding: '30px 20px',
+              marginBottom: '30px',
+              minHeight: '180px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
               {currentAction && (
-                <p className="action-text">{currentAction.text}</p>
+                <p style={{
+                  fontSize: '20px',
+                  lineHeight: '1.4',
+                  textAlign: 'center'
+                }}>
+                  {currentAction.text}
+                </p>
+              )}
+              
+              {/* Messaggio semplificato quando appare il buttafuori */}
+              {showBouncerAction && bouncerPlayer && (
+                <p style={{ 
+                  marginTop: '15px', 
+                  fontSize: '16px', 
+                  color: '#AAAAAA',
+                  textAlign: 'center'
+                }}>
+                  {bouncerPlayer} è il buttafuori e sta decidendo...
+                </p>
+              )}
+              
+              {/* Messaggio semplificato quando appare il dito della verità */}
+              {showTruthFingerAction && truthFingerPlayer && (
+                <p style={{ 
+                  marginTop: '15px', 
+                  fontSize: '16px', 
+                  color: '#AAAAAA',
+                  textAlign: 'center'
+                }}>
+                  {truthFingerPlayer} sta scegliendo una caratteristica e tutti voteranno...
+                </p>
               )}
             </div>
-            
+          </div>
+          
+          <div style={{ padding: '20px' }}>
             <button 
-              className="primary-button next-button"
-              onClick={nextTurn}
+              onClick={() => {
+                if (showBouncerAction) {
+                  nextTurnAfterBouncer();
+                } else if (showTruthFingerAction) {
+                  nextTurnAfterTruthFinger();
+                } else {
+                  nextTurn();
+                }
+              }}
+              style={{
+                width: '100%',
+                backgroundColor: '#3498db',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '16px',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
             >
-              Prossima
+              NEXT
             </button>
           </div>
         </div>
@@ -701,76 +1208,116 @@ const DrinkingGameApp = () => {
           className="screen game-over-screen" 
           onClick={() => setGameState('roomSelection')}
           style={{
+            backgroundColor: '#000000',
+            color: '#FFFFFF',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            textAlign: 'center',
-            cursor: 'pointer',
-            background: 'linear-gradient(135deg, #1F2937 0%, #111827 100%)',
-            color: 'white'
+            height: '100vh',
+            padding: '20px',
+            cursor: 'pointer'
           }}
         >
-          <div className="content-container" style={{ padding: '30px' }}>
-            <h1 className="screen-title" style={{ fontSize: '42px', marginBottom: '20px' }}>
-              Partita Finita!
+          <div style={{
+            textAlign: 'center',
+            maxWidth: '340px'
+          }}>
+            <h1 style={{ 
+              fontSize: '36px', 
+              marginBottom: '30px',
+              fontWeight: 'bold'
+            }}>
+              PARTITA FINITA!
             </h1>
             
-            <p style={{ fontSize: '18px', marginBottom: '50px', opacity: 0.9 }}>
+            <p style={{ 
+              fontSize: '18px', 
+              marginBottom: '50px',
+              color: '#CCCCCC',
+              lineHeight: '1.5'
+            }}>
               Avete completato {MAX_ACTIONS_PER_GAME} azioni!
             </p>
             
-            <p style={{ fontSize: '18px', marginBottom: '20px' }}>
-              Tocca per tornare alla selezione delle modalità
-            </p>
-            
-            {/* Immagine del guanto che punta */}
-            <div 
-              style={{ 
-                width: '120px',
-                height: '120px',
-                margin: '10px auto 30px',
-                position: 'relative',
-                animation: 'float 2s infinite ease-in-out'
-              }}
-              className="glove-pointer"
-            >
+            <div style={{ 
+              width: '120px',
+              height: '120px',
+              margin: '0 auto 40px',
+              animation: 'float 2s infinite ease-in-out'
+            }}>
               <img 
                 src={pointingGlove} 
                 alt="Guanto che punta" 
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain'
+                  objectFit: 'contain',
+                  filter: 'brightness(0) invert(1)'
                 }}
               />
             </div>
+            
+            <p style={{ 
+              fontSize: '16px', 
+              color: '#3498db'
+            }}>
+              Tocca per tornare alla selezione delle stanze
+            </p>
           </div>
+          
+          {/* Add CSS animation for the floating effect */}
+          <style jsx="true">{`
+            @keyframes float {
+              0% { transform: translateY(0px); }
+              50% { transform: translateY(-10px); }
+              100% { transform: translateY(0px); }
+            }
+          `}</style>
         </div>
       )}
       
       {/* Loading Screen */}
       {isLoading && (
-        <div className="overlay-screen">
-          <div className="loader-container">
-            <div className="spinner"></div>
-            <p>Caricamento in corso...</p>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            color: '#FFFFFF'
+          }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: '3px solid rgba(255,255,255,0.3)',
+              borderTopColor: '#FFFFFF',
+              animation: 'spin 1s ease-in-out infinite',
+              marginBottom: '15px'
+            }}></div>
+            <p style={{
+              fontSize: '16px'
+            }}>Caricamento in corso...</p>
+            
+            <style jsx="true">{`
+              @keyframes spin {
+                to { transform: rotate(360deg); }
+              }
+            `}</style>
           </div>
         </div>
       )}
-      
-      {/* Add CSS animation for the floating effect */}
-      <style jsx="true">{`
-        @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-          100% { transform: translateY(0px); }
-        }
-        
-        .glove-pointer {
-          filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.3));
-        }
-      `}</style>
     </div>
   );
 };
