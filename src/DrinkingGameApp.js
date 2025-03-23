@@ -772,33 +772,34 @@ const DrinkingGameApp = () => {
         <div className="screen player-setup-screen" style={{ 
           backgroundColor: '#000000', 
           color: '#FFFFFF',
-          padding: '20px 0 0 0',
+          padding: '0',
           display: 'flex',
           flexDirection: 'column',
           height: '100vh'
         }}>
           <div style={{ 
-            display: 'flex', 
+            display: 'grid',
+            gridTemplateColumns: '50px 1fr 50px',
             alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            padding: '10px 20px',
-            marginBottom: '30px'
+            padding: '15px 0',
+            marginBottom: '20px'
           }}>
-            <button 
-              onClick={goBack}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#FFFFFF',
-                fontSize: '24px',
-                position: 'absolute',
-                left: '20px',
-                cursor: 'pointer'
-              }}
-            >
-              ←
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button 
+                onClick={goBack}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '5px'
+                }}
+              >
+                ←
+              </button>
+            </div>
+            
             <h1 style={{ 
               margin: 0, 
               textAlign: 'center',
@@ -808,21 +809,28 @@ const DrinkingGameApp = () => {
             }}>
               PLAYERS
             </h1>
+            
+            <div></div> {/* Colonna vuota a destra per equilibrio */}
           </div>
           
           <div style={{ 
             flex: 1,
-            padding: '0 20px',
+            padding: '0',
             display: 'flex',
             flexDirection: 'column',
+            alignItems: 'center',
             overflow: 'auto',
-            gap: '16px'
+            marginBottom: '80px'
           }}>
             {inputPlayers.map((input, index) => (
               <div key={input.id} style={{ 
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                width: '100%',
+                maxWidth: '340px',
+                marginBottom: '16px',
+                padding: '0 20px'
               }}>
                 <input
                   id={`player-input-${index}`}
@@ -863,7 +871,7 @@ const DrinkingGameApp = () => {
               onClick={addPlayerInput}
               disabled={inputPlayers.length >= 15}
               style={{
-                margin: '20px 0',
+                margin: '5px 0 20px 0',
                 backgroundColor: 'transparent',
                 color: '#FFFFFF',
                 border: '1px dashed #808080',
@@ -874,14 +882,21 @@ const DrinkingGameApp = () => {
                 justifyContent: 'center',
                 gap: '10px',
                 cursor: 'pointer',
-                fontSize: '16px'
+                fontSize: '16px',
+                width: '340px'
               }}
             >
               <span style={{ fontSize: '20px' }}>⊕</span> Add Player
             </button>
           </div>
           
-          <div style={{ padding: '20px' }}>
+          <div style={{ 
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'transparent'
+          }}>
             <button 
               onClick={startGame}
               style={{
@@ -889,7 +904,7 @@ const DrinkingGameApp = () => {
                 backgroundColor: '#3498db',
                 color: '#FFFFFF',
                 border: 'none',
-                borderRadius: '10px',
+                borderRadius: '0',
                 padding: '16px',
                 fontSize: '18px',
                 fontWeight: 'bold',
@@ -911,33 +926,34 @@ const DrinkingGameApp = () => {
         <div className="screen room-selection-screen" style={{ 
           backgroundColor: '#000000', 
           color: '#FFFFFF',
-          padding: '20px 0 0 0',
+          padding: '0',
           display: 'flex',
           flexDirection: 'column',
           height: '100vh'
         }}>
           <div style={{ 
-            display: 'flex', 
+            display: 'grid',
+            gridTemplateColumns: '50px 1fr 50px',
             alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            padding: '10px 20px',
+            padding: '15px 0',
             marginBottom: '20px'
           }}>
-            <button 
-              onClick={goBack}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#FFFFFF',
-                fontSize: '24px',
-                position: 'absolute',
-                left: '20px',
-                cursor: 'pointer'
-              }}
-            >
-              ←
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button 
+                onClick={goBack}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '5px'
+                }}
+              >
+                ←
+              </button>
+            </div>
+            
             <h1 style={{ 
               margin: 0, 
               textAlign: 'center',
@@ -947,6 +963,8 @@ const DrinkingGameApp = () => {
             }}>
               ROOMS
             </h1>
+            
+            <div></div> {/* Colonna vuota a destra per equilibrio */}
           </div>
           
           <div style={{ 
@@ -1079,27 +1097,28 @@ const DrinkingGameApp = () => {
           height: '100vh'
         }}>
           <div style={{ 
-            display: 'flex', 
+            display: 'grid',
+            gridTemplateColumns: '50px 1fr 50px',
             alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            padding: '10px 20px',
+            padding: '15px 0',
             marginBottom: '20px'
           }}>
-            <button 
-              onClick={goBack}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#FFFFFF',
-                fontSize: '24px',
-                position: 'absolute',
-                left: '20px',
-                cursor: 'pointer'
-              }}
-            >
-              ←
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button 
+                onClick={goBack}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '5px'
+                }}
+              >
+                ←
+              </button>
+            </div>
+            
             <h1 style={{ 
               margin: 0, 
               textAlign: 'center',
@@ -1109,13 +1128,16 @@ const DrinkingGameApp = () => {
             }}>
               {selectedRoom.name.toUpperCase()}
             </h1>
+            
+            <div></div> {/* Colonna vuota a destra per equilibrio */}
           </div>
           
           <div style={{ 
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            padding: '0 20px'
+            padding: '0 20px',
+            marginBottom: '80px' // Spazio per il pulsante fisso in basso
           }}>
             <h2 style={{
               fontSize: '26px',
@@ -1173,7 +1195,15 @@ const DrinkingGameApp = () => {
             </div>
           </div>
           
-          <div style={{ padding: '20px' }}>
+          <div style={{ 
+            padding: '0',
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'transparent',
+            zIndex: 10
+          }}>
             <button 
               onClick={() => {
                 if (showBouncerAction) {
@@ -1189,7 +1219,7 @@ const DrinkingGameApp = () => {
                 backgroundColor: '#3498db',
                 color: '#FFFFFF',
                 border: 'none',
-                borderRadius: '10px',
+                borderRadius: '0',
                 padding: '16px',
                 fontSize: '18px',
                 fontWeight: 'bold',
