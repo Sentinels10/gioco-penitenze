@@ -5,7 +5,7 @@ import backupActions from './backupActions.json';
 import pointingGlove from './assets/pointing-glove.png';
 
 const DrinkingGameApp = () => {
-  // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing', 'gameOver'
+  // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing', 'gameOver', 'paywall'
   const [gameState, setGameState] = useState('welcome');
   const [players, setPlayers] = useState([]);
   const [inputPlayers, setInputPlayers] = useState([{ id: 1, name: '' }]);
@@ -79,9 +79,21 @@ const DrinkingGameApp = () => {
   const [showTruthFingerAction, setShowTruthFingerAction] = useState(false);
   const [truthFingerPlayer, setTruthFingerPlayer] = useState(null);
   
+  // Nuovi stati per il paywall
+  const [hasPlayedFreeGame, setHasPlayedFreeGame] = useState(false);
+  const [hasPaid, setHasPaid] = useState(false);
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  
   // App name and description
-  const appName = "Furry Bones Club";
+  const appName = "FRIENZ";
   const appDescription = "Questo club è gestito da un AI. Lei formulerà domande sempre nuove e inaspettate.";
+  
+  // Opzioni di pagamento
+  const paymentOptions = [
+    { id: 'premium', name: 'Premium', price: '4.99', description: 'Sblocca tutte le stanze per sempre' },
+    { id: 'prive', name: 'Privè', price: '9.99', description: "L'AI ricorderà te e i tuoi amici, i vostri gusti, le vostre paure e vi farà domande sempre più personali" }
+  ];
   
   // Room definitions with their content types
   const rooms = [
@@ -140,6 +152,21 @@ const DrinkingGameApp = () => {
     ],
     neonRoulette: [] // Sarà popolato con azioni da tutte le altre stanze
   };
+
+  // Verifica lo stato del paywall quando il componente si monta
+  useEffect(() => {
+    // Recupera lo stato del pagamento da localStorage
+    const storedHasPaid = localStorage.getItem('hasPaid') === 'true';
+    const storedHasPlayedFreeGame = localStorage.getItem('hasPlayedFreeGame') === 'true';
+    
+    if (storedHasPaid) {
+      setHasPaid(true);
+    }
+    
+    if (storedHasPlayedFreeGame) {
+      setHasPlayedFreeGame(true);
+    }
+  }, []);
   
   // Effetto per caricare la prima domanda quando lo stato è 'playing'
   useEffect(() => {
@@ -153,7 +180,12 @@ const DrinkingGameApp = () => {
   
   // Enter the player setup screen
   const enterPlayerSetup = () => {
-    setGameState('playerSetup');
+    // Verifica se l'utente ha già giocato la partita gratuita e non ha pagato
+    if (hasPlayedFreeGame && !hasPaid) {
+      setGameState('paywall');
+    } else {
+      setGameState('playerSetup');
+    }
   };
   
   // Aggiunge un nuovo input box per un giocatore
@@ -610,7 +642,11 @@ const DrinkingGameApp = () => {
     
     // Verifica se il numero massimo di azioni è stato raggiunto
     if (actionsCounter >= MAX_ACTIONS_PER_GAME - 1) {
-      // Vai alla schermata di fine partita invece che direttamente alla selezione della stanza
+      // Segna che l'utente ha giocato la partita gratuita
+      setHasPlayedFreeGame(true);
+      localStorage.setItem('hasPlayedFreeGame', 'true');
+      
+      // Vai alla schermata di fine partita
       setGameState('gameOver');
       return;
     }
@@ -662,7 +698,15 @@ const DrinkingGameApp = () => {
         setGameState('roomSelection');
         break;
       case 'gameOver':
-        setGameState('roomSelection');
+        // Se l'utente ha già giocato e non ha pagato, mostra il paywall
+        if (hasPlayedFreeGame && !hasPaid) {
+          setGameState('paywall');
+        } else {
+          setGameState('roomSelection');
+        }
+        break;
+      case 'paywall':
+        setGameState('welcome');
         break;
       default:
         break;
@@ -717,6 +761,40 @@ const DrinkingGameApp = () => {
     setTruthFingerPlayer(null);
   };
   
+  // Seleziona un'opzione di pagamento
+  const selectPaymentOption = (option) => {
+    setSelectedPaymentOption(option);
+  };
+  
+  // Processa il pagamento
+  const processPayment = () => {
+    if (!selectedPaymentOption) return;
+    
+    setIsProcessingPayment(true);
+    
+    // Simulazione del processo di pagamento
+    setTimeout(() => {
+      // Imposta hasPaid a true e salva in localStorage
+      setHasPaid(true);
+      localStorage.setItem('hasPaid', 'true');
+      
+      setIsProcessingPayment(false);
+      setSelectedPaymentOption(null);
+      
+      // Vai alla schermata di setup giocatori
+      setGameState('playerSetup');
+    }, 2000);
+  };
+  
+  // Reimposta lo stato di gioco per test
+  const resetPaywallState = () => {
+    localStorage.removeItem('hasPaid');
+    localStorage.removeItem('hasPlayedFreeGame');
+    setHasPaid(false);
+    setHasPlayedFreeGame(false);
+    resetGame();
+  };
+  
   return (
     <div className="app-container">
       {/* Welcome Screen */}
@@ -763,6 +841,24 @@ const DrinkingGameApp = () => {
             >
               INIZIA
             </button>
+            
+            {/* Pulsante nascosto per reset (solo per testing) */}
+            <div style={{ marginTop: '20px', opacity: 0.5 }}>
+              <button
+                onClick={resetPaywallState}
+                style={{
+                  background: 'none',
+                  border: '1px solid #555',
+                  color: '#888',
+                  padding: '8px 16px',
+                  fontSize: '12px',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Reset (Solo Test)
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1236,7 +1332,14 @@ const DrinkingGameApp = () => {
       {gameState === 'gameOver' && (
         <div 
           className="screen game-over-screen" 
-          onClick={() => setGameState('roomSelection')}
+          onClick={() => {
+            // Se l'utente ha già giocato la partita gratuita e non ha pagato, mostra il paywall
+            if (hasPlayedFreeGame && !hasPaid) {
+              setGameState('paywall');
+            } else {
+              setGameState('roomSelection');
+            }
+          }}
           style={{
             backgroundColor: '#000000',
             color: '#FFFFFF',
@@ -1292,7 +1395,7 @@ const DrinkingGameApp = () => {
               fontSize: '16px', 
               color: '#3498db'
             }}>
-              Tocca per tornare alla selezione delle stanze
+              Tocca per {hasPlayedFreeGame && !hasPaid ? 'sbloccare altre partite' : 'tornare alla selezione delle stanze'}
             </p>
           </div>
           
@@ -1304,6 +1407,170 @@ const DrinkingGameApp = () => {
               100% { transform: translateY(0px); }
             }
           `}</style>
+        </div>
+      )}
+      
+      {/* Paywall Screen */}
+      {gameState === 'paywall' && (
+        <div className="screen paywall-screen" style={{ 
+          backgroundColor: '#000000', 
+          color: '#FFFFFF',
+          padding: '20px 0 0 0',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh'
+        }}>
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: '50px 1fr 50px',
+            alignItems: 'center',
+            padding: '15px 0',
+            marginBottom: '20px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button 
+                onClick={goBack}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '5px'
+                }}
+              >
+                ←
+              </button>
+            </div>
+            
+            <h1 style={{ 
+              margin: 0, 
+              textAlign: 'center',
+              fontWeight: 'normal',
+              fontSize: '28px',
+              letterSpacing: '1px'
+            }}>
+              SBLOCCA IL GIOCO
+            </h1>
+            
+            <div></div> {/* Colonna vuota a destra per equilibrio */}
+          </div>
+          
+          <div style={{ 
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '0 20px'
+          }}>
+            <div style={{
+              backgroundColor: '#1A1A1A',
+              borderRadius: '15px',
+              padding: '25px 20px',
+              marginBottom: '30px',
+              textAlign: 'center'
+            }}>
+              <h2 style={{
+                fontSize: '24px',
+                fontWeight: 'bold',
+                marginBottom: '15px'
+              }}>
+                Partita gratuita terminata!
+              </h2>
+              <p style={{
+                fontSize: '16px',
+                color: '#CCCCCC',
+                lineHeight: '1.5',
+                marginBottom: '20px'
+              }}>
+                Hai utilizzato la tua partita gratuita. Sblocca l'app per giocare illimitatamente con tutti i tuoi amici!
+              </p>
+              
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '15px',
+                marginTop: '25px'
+              }}>
+                {paymentOptions.map(option => (
+                  <div 
+                    key={option.id}
+                    onClick={() => selectPaymentOption(option)}
+                    style={{
+                      backgroundColor: selectedPaymentOption?.id === option.id ? '#3498db20' : '#2A2A2A',
+                      border: selectedPaymentOption?.id === option.id ? '2px solid #3498db' : '2px solid transparent',
+                      borderRadius: '10px',
+                      padding: '20px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '10px'
+                    }}>
+                      <h3 style={{
+                        fontSize: '18px',
+                        fontWeight: 'bold'
+                      }}>
+                        {option.name}
+                      </h3>
+                      <div style={{
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                        color: '#3498db'
+                      }}>
+                        €{option.price}
+                      </div>
+                    </div>
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#AAAAAA',
+                      textAlign: 'left'
+                    }}>
+                      {option.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <div style={{ 
+            padding: '0',
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'transparent',
+            zIndex: 10
+          }}>
+            <button 
+              onClick={processPayment}
+              disabled={!selectedPaymentOption || isProcessingPayment}
+              style={{
+                width: '100%',
+                backgroundColor: selectedPaymentOption ? '#3498db' : '#555555',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '0',
+                padding: '16px',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                cursor: selectedPaymentOption ? 'pointer' : 'not-allowed',
+                opacity: isProcessingPayment ? 0.7 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px'
+              }}
+            >
+              {isProcessingPayment ? 'ELABORAZIONE...' : 'ACQUISTA'}
+            </button>
+          </div>
         </div>
       )}
       
