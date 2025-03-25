@@ -79,6 +79,24 @@ const DrinkingGameApp = () => {
   const [showTruthFingerAction, setShowTruthFingerAction] = useState(false);
   const [truthFingerPlayer, setTruthFingerPlayer] = useState(null);
   
+  // Stato per la funzionalità dell'Infamata
+  const [infamataUsed, setInfamataUsed] = useState({
+    redRoom: false,
+    darkRoom: false,
+    clash: false,
+    lounge: false,
+    neonRoulette: false
+  });
+  const [infamataRound, setInfamataRound] = useState({
+    redRoom: Math.floor(Math.random() * 10) + 20, // Tra 20 e 30 round
+    darkRoom: Math.floor(Math.random() * 10) + 20,
+    clash: Math.floor(Math.random() * 10) + 20,
+    lounge: Math.floor(Math.random() * 10) + 20,
+    neonRoulette: Math.floor(Math.random() * 10) + 20
+  });
+  const [showInfamataAction, setShowInfamataAction] = useState(false);
+  const [infamataPlayer, setInfamataPlayer] = useState(null);
+  
   // Nuovi stati per il paywall
   const [hasPlayedFreeGame, setHasPlayedFreeGame] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
@@ -287,6 +305,20 @@ const DrinkingGameApp = () => {
       setShowTruthFingerAction(false);
       setTruthFingerPlayer(null);
       
+      // Resetta gli stati dell'Infamata per la nuova partita
+      setInfamataUsed(prev => ({
+        ...prev,
+        [room.id]: false
+      }));
+      
+      setInfamataRound(prev => ({
+        ...prev,
+        [room.id]: Math.floor(Math.random() * 10) + 20 // Tra 20 e 30 round
+      }));
+      
+      setShowInfamataAction(false);
+      setInfamataPlayer(null);
+      
       // Se è la modalità Neon Roulette, combina azioni da tutte le altre stanze
       if (room.id === 'neonRoulette') {
         // Preparazione degli array per le azioni da ciascuna stanza
@@ -428,6 +460,15 @@ const DrinkingGameApp = () => {
     nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
   };
   
+  // Funzione semplificata per continuare dopo l'azione dell'Infamata
+  const nextTurnAfterInfamata = () => {
+    setShowInfamataAction(false);
+    setInfamataPlayer(null);
+    
+    // Prosegui con il turno normale
+    nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
+  };
+  
   // Funzione dedicata per aggiornare l'azione corrente
   const updateCurrentAction = () => {
     if (!selectedRoom) return;
@@ -449,6 +490,26 @@ const DrinkingGameApp = () => {
       // Imposta un'azione speciale per il dito della verità
       setCurrentAction({ 
         text: `${players[currentPlayerIndex]} inizia il gioco del DITO DELLA VERITÀ! Deve scegliere una caratteristica (es. "il più tirchio", "il più divertente") e tutti indicheranno un giocatore. Chi riceve più voti fa una penalità!` 
+      });
+      
+      return;
+    }
+    
+    // Verifica se è tempo per l'azione dell'Infamata
+    if (!infamataUsed[roomId] && actionsCounter >= infamataRound[roomId] && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
+      // È il momento di attivare l'azione dell'Infamata
+      setInfamataUsed(prev => ({
+        ...prev,
+        [roomId]: true
+      }));
+      
+      // Il giocatore corrente avrà l'Infamata
+      setInfamataPlayer(players[currentPlayerIndex]);
+      setShowInfamataAction(true);
+      
+      // Imposta un'azione speciale per l'Infamata
+      setCurrentAction({ 
+        text: `INFAMATA! ${players[currentPlayerIndex]} ha a disposizione l'Infamata! Può usarla per assegnare la propria domanda o sfida a qualcun altro del gruppo.` 
       });
       
       return;
@@ -759,6 +820,24 @@ const DrinkingGameApp = () => {
     });
     setShowTruthFingerAction(false);
     setTruthFingerPlayer(null);
+    
+    // Resetta anche gli stati dell'Infamata
+    setInfamataUsed({
+      redRoom: false,
+      darkRoom: false,
+      clash: false,
+      lounge: false,
+      neonRoulette: false
+    });
+    setInfamataRound({
+      redRoom: Math.floor(Math.random() * 10) + 20,
+      darkRoom: Math.floor(Math.random() * 10) + 20,
+      clash: Math.floor(Math.random() * 10) + 20,
+      lounge: Math.floor(Math.random() * 10) + 20,
+      neonRoulette: Math.floor(Math.random() * 10) + 20
+    });
+    setShowInfamataAction(false);
+    setInfamataPlayer(null);
   };
   
   // Seleziona un'opzione di pagamento
@@ -1288,6 +1367,18 @@ const DrinkingGameApp = () => {
                   {truthFingerPlayer} sta scegliendo una caratteristica e tutti voteranno...
                 </p>
               )}
+              
+              {/* Messaggio semplificato quando appare l'Infamata */}
+              {showInfamataAction && infamataPlayer && (
+                <p style={{ 
+                  marginTop: '15px', 
+                  fontSize: '16px', 
+                  color: '#AAAAAA',
+                  textAlign: 'center'
+                }}>
+                  {infamataPlayer} sta decidendo a chi assegnare la domanda o sfida...
+                </p>
+              )}
             </div>
           </div>
           
@@ -1306,6 +1397,8 @@ const DrinkingGameApp = () => {
                   nextTurnAfterBouncer();
                 } else if (showTruthFingerAction) {
                   nextTurnAfterTruthFinger();
+                } else if (showInfamataAction) {
+                  nextTurnAfterInfamata();
                 } else {
                   nextTurn();
                 }
