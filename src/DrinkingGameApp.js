@@ -61,23 +61,23 @@ const DrinkingGameApp = () => {
   const [showBouncerAction, setShowBouncerAction] = useState(false);
   const [bouncerPlayer, setBouncerPlayer] = useState(null);
   
-  // Stato per la funzionalità del dito della verità
-  const [truthFingerUsed, setTruthFingerUsed] = useState({
+  // Stato per la funzionalità del puntare il dito
+  const [pointFingerUsed, setPointFingerUsed] = useState({
     redRoom: false,
     darkRoom: false,
     clash: false,
     lounge: false,
     neonRoulette: false
   });
-  const [truthFingerRound, setTruthFingerRound] = useState({
+  const [pointFingerRound, setPointFingerRound] = useState({
     redRoom: Math.floor(Math.random() * 10) + 30, // Tra 30 e 40 round
     darkRoom: Math.floor(Math.random() * 10) + 30,
     clash: Math.floor(Math.random() * 10) + 30,
     lounge: Math.floor(Math.random() * 10) + 30,
     neonRoulette: Math.floor(Math.random() * 10) + 30
   });
-  const [showTruthFingerAction, setShowTruthFingerAction] = useState(false);
-  const [truthFingerPlayer, setTruthFingerPlayer] = useState(null);
+  const [showPointFingerAction, setShowPointFingerAction] = useState(false);
+  const [pointFingerPlayer, setPointFingerPlayer] = useState(null);
   
   // Stato per la funzionalità dell'Infamata
   const [infamataUsed, setInfamataUsed] = useState({
@@ -96,6 +96,38 @@ const DrinkingGameApp = () => {
   });
   const [showInfamataAction, setShowInfamataAction] = useState(false);
   const [infamataPlayer, setInfamataPlayer] = useState(null);
+  
+  // MODIFICATO: Stato per la funzionalità "Obbligo o Verità"
+  const [truthOrDareUsed, setTruthOrDareUsed] = useState({
+    redRoom: false,
+    darkRoom: false,
+    clash: false,
+    lounge: false,
+    neonRoulette: false
+  });
+  const [truthOrDareRound, setTruthOrDareRound] = useState({
+    redRoom: Math.floor(Math.random() * 10) + 25, // Tra 25 e 35 round
+    darkRoom: Math.floor(Math.random() * 10) + 25,
+    clash: Math.floor(Math.random() * 10) + 25,
+    lounge: Math.floor(Math.random() * 10) + 25,
+    neonRoulette: Math.floor(Math.random() * 10) + 25
+  });
+  const [showTruthOrDareAction, setShowTruthOrDareAction] = useState(false);
+  
+  // NUOVO: Lista dei debiti assegnati
+  const [debtList, setDebtList] = useState([]);
+  
+  // NUOVO: Contatore per tracciare l'ultima azione speciale
+  const [lastSpecialGameRound, setLastSpecialGameRound] = useState({
+    redRoom: 0,
+    darkRoom: 0,
+    clash: 0,
+    lounge: 0,
+    neonRoulette: 0
+  });
+  
+  // NUOVO: Costante per l'intervallo minimo tra giochi speciali
+  const MIN_ACTIONS_BETWEEN_SPECIAL_GAMES = 5;
   
   // Nuovi stati per il paywall
   const [hasPlayedFreeGame, setHasPlayedFreeGame] = useState(false);
@@ -277,6 +309,21 @@ const DrinkingGameApp = () => {
       // Resetta il contatore delle azioni
       setActionsCounter(0);
       
+      // NUOVO: Resetta il contatore dell'ultima azione speciale
+      setLastSpecialGameRound(prev => ({
+        ...prev,
+        [room.id]: 0
+      }));
+      
+      // Distribuisci meglio i rounds per i giochi speciali
+      // Assicurati che ogni gioco speciale abbia un intervallo ragionevole dall'altro
+      const bouncer = Math.floor(Math.random() * 10) + 15; // Tra 15-25 round
+      
+      // Distribuisci gli altri giochi speciali con almeno MIN_ACTIONS_BETWEEN_SPECIAL_GAMES di distanza
+      const infamata = bouncer + MIN_ACTIONS_BETWEEN_SPECIAL_GAMES + Math.floor(Math.random() * 5); // Distanziato dal bouncer
+      const truthOrDare = infamata + MIN_ACTIONS_BETWEEN_SPECIAL_GAMES + Math.floor(Math.random() * 5); // Distanziato dall'infamata
+      const pointFinger = truthOrDare + MIN_ACTIONS_BETWEEN_SPECIAL_GAMES + Math.floor(Math.random() * 5); // Distanziato da truth or dare
+      
       // Resetta gli stati del buttafuori per la nuova partita
       setBouncerUsed(prev => ({
         ...prev,
@@ -285,25 +332,43 @@ const DrinkingGameApp = () => {
       
       setBouncerRound(prev => ({
         ...prev,
-        [room.id]: Math.floor(Math.random() * 10) + 15 // Tra 15 e 25 round
+        [room.id]: bouncer
       }));
       
       setShowBouncerAction(false);
       setBouncerPlayer(null);
       
-      // Resetta gli stati del dito della verità per la nuova partita
-      setTruthFingerUsed(prev => ({
+      // Resetta gli stati del puntare il dito per la nuova partita
+      setPointFingerUsed(prev => ({
         ...prev,
         [room.id]: false
       }));
       
-      setTruthFingerRound(prev => ({
+      setPointFingerRound(prev => ({
         ...prev,
-        [room.id]: Math.floor(Math.random() * 10) + 30 // Tra 30 e 40 round
+        [room.id]: pointFinger
       }));
       
-      setShowTruthFingerAction(false);
-      setTruthFingerPlayer(null);
+      setShowPointFingerAction(false);
+      setPointFingerPlayer(null);
+      
+      // MODIFICATO: Resetta gli stati per Obbligo o Verità
+      setTruthOrDareUsed(prev => ({
+        ...prev,
+        [room.id]: false
+      }));
+      
+      setTruthOrDareRound(prev => ({
+        ...prev,
+        [room.id]: truthOrDare
+      }));
+      
+      setShowTruthOrDareAction(false);
+      
+      // Resetta la lista dei debiti quando si inizia una nuova stanza
+      if (room.id !== selectedRoom?.id) {
+        setDebtList([]);
+      }
       
       // Resetta gli stati dell'Infamata per la nuova partita
       setInfamataUsed(prev => ({
@@ -313,7 +378,7 @@ const DrinkingGameApp = () => {
       
       setInfamataRound(prev => ({
         ...prev,
-        [room.id]: Math.floor(Math.random() * 10) + 20 // Tra 20 e 30 round
+        [room.id]: infamata
       }));
       
       setShowInfamataAction(false);
@@ -444,6 +509,14 @@ const DrinkingGameApp = () => {
   
   // Funzione semplificata per continuare dopo l'azione del buttafuori
   const nextTurnAfterBouncer = () => {
+    const roomId = selectedRoom.id;
+    
+    // NUOVO: Aggiorna il contatore dell'ultima azione speciale
+    setLastSpecialGameRound(prev => ({
+      ...prev,
+      [roomId]: actionsCounter
+    }));
+    
     setShowBouncerAction(false);
     setBouncerPlayer(null);
     
@@ -451,10 +524,34 @@ const DrinkingGameApp = () => {
     nextTurn(true); // true indica che stiamo proseguendo dopo l'azione del buttafuori
   };
   
-  // Funzione semplificata per continuare dopo l'azione del dito della verità
-  const nextTurnAfterTruthFinger = () => {
-    setShowTruthFingerAction(false);
-    setTruthFingerPlayer(null);
+  // Funzione semplificata per continuare dopo l'azione del puntare il dito
+  const nextTurnAfterPointFinger = () => {
+    const roomId = selectedRoom.id;
+    
+    // NUOVO: Aggiorna il contatore dell'ultima azione speciale
+    setLastSpecialGameRound(prev => ({
+      ...prev,
+      [roomId]: actionsCounter
+    }));
+    
+    setShowPointFingerAction(false);
+    setPointFingerPlayer(null);
+    
+    // Prosegui con il turno normale
+    nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
+  };
+  
+  // MODIFICATO: Funzione semplificata per continuare dopo l'azione di Obbligo o Verità
+  const nextTurnAfterTruthOrDare = () => {
+    const roomId = selectedRoom.id;
+    
+    // NUOVO: Aggiorna il contatore dell'ultima azione speciale
+    setLastSpecialGameRound(prev => ({
+      ...prev,
+      [roomId]: actionsCounter
+    }));
+    
+    setShowTruthOrDareAction(false);
     
     // Prosegui con il turno normale
     nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
@@ -462,6 +559,14 @@ const DrinkingGameApp = () => {
   
   // Funzione semplificata per continuare dopo l'azione dell'Infamata
   const nextTurnAfterInfamata = () => {
+    const roomId = selectedRoom.id;
+    
+    // NUOVO: Aggiorna il contatore dell'ultima azione speciale
+    setLastSpecialGameRound(prev => ({
+      ...prev,
+      [roomId]: actionsCounter
+    }));
+    
     setShowInfamataAction(false);
     setInfamataPlayer(null);
     
@@ -475,28 +580,54 @@ const DrinkingGameApp = () => {
     
     const roomId = selectedRoom.id;
     
-    // Verifica se è tempo per l'azione del dito della verità
-    if (!truthFingerUsed[roomId] && actionsCounter >= truthFingerRound[roomId] && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
-      // È il momento di attivare l'azione del dito della verità
-      setTruthFingerUsed(prev => ({
+    // NUOVO: Verifica se ci sono abbastanza azioni dall'ultima azione speciale
+    const actionsSinceLastSpecial = actionsCounter - lastSpecialGameRound[roomId];
+    const canShowSpecialGame = actionsSinceLastSpecial >= MIN_ACTIONS_BETWEEN_SPECIAL_GAMES;
+    
+    // MODIFICATO: Verifica se è tempo per Obbligo o Verità
+    if (!truthOrDareUsed[roomId] && actionsCounter >= truthOrDareRound[roomId] && 
+        actionsCounter < MAX_ACTIONS_PER_GAME - 1 && canShowSpecialGame) {
+      // È il momento di attivare l'azione di Obbligo o Verità
+      setTruthOrDareUsed(prev => ({
+        ...prev,
+        [roomId]: true
+      }));
+      
+      // Attiva la modalità speciale per Obbligo o Verità
+      setShowTruthOrDareAction(true);
+      
+      // Imposta un'azione speciale per Obbligo o Verità rivolta a tutti
+      setCurrentAction({ 
+        text: `OBBLIGO VERITA' O DEBITO: Se scegli Debito, EvitI la penalità ma ti viene assegnato un debito che potrà essere riscattato in qualsiasi momento da chi dirige il gioco (es. "Vai a prendermi da bere" o "Posta una storia imbarazzante").. Decidete in senso orario partendo dal giocatore corrente.` 
+      });
+      
+      return;
+    }
+    
+    // Verifica se è tempo per l'azione del puntare il dito
+    if (!pointFingerUsed[roomId] && actionsCounter >= pointFingerRound[roomId] && 
+        actionsCounter < MAX_ACTIONS_PER_GAME - 1 && canShowSpecialGame) {
+      // È il momento di attivare l'azione del puntare il dito
+      setPointFingerUsed(prev => ({
         ...prev,
         [roomId]: true
       }));
       
       // Il giocatore corrente sarà il giudice
-      setTruthFingerPlayer(players[currentPlayerIndex]);
-      setShowTruthFingerAction(true);
+      setPointFingerPlayer(players[currentPlayerIndex]);
+      setShowPointFingerAction(true);
       
-      // Imposta un'azione speciale per il dito della verità
+      // Imposta un'azione speciale per puntare il dito
       setCurrentAction({ 
-        text: `${players[currentPlayerIndex]} inizia il gioco del DITO DELLA VERITÀ! Deve scegliere una caratteristica (es. "il più tirchio", "il più divertente") e tutti indicheranno un giocatore. Chi riceve più voti fa una penalità!` 
+        text: `${players[currentPlayerIndex]} inizia il gioco del PUNTARE IL DITO! Deve scegliere una caratteristica (es. "il più tirchio", "il più divertente") e tutti indicheranno un giocatore. Chi riceve più voti fa una penalità!` 
       });
       
       return;
     }
     
     // Verifica se è tempo per l'azione dell'Infamata
-    if (!infamataUsed[roomId] && actionsCounter >= infamataRound[roomId] && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
+    if (!infamataUsed[roomId] && actionsCounter >= infamataRound[roomId] && 
+        actionsCounter < MAX_ACTIONS_PER_GAME - 1 && canShowSpecialGame) {
       // È il momento di attivare l'azione dell'Infamata
       setInfamataUsed(prev => ({
         ...prev,
@@ -516,7 +647,8 @@ const DrinkingGameApp = () => {
     }
     
     // Verifica se è tempo per l'azione del buttafuori
-    if (!bouncerUsed[roomId] && actionsCounter >= bouncerRound[roomId] && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
+    if (!bouncerUsed[roomId] && actionsCounter >= bouncerRound[roomId] && 
+        actionsCounter < MAX_ACTIONS_PER_GAME - 1 && canShowSpecialGame) {
       // È il momento di attivare l'azione del buttafuori
       setBouncerUsed(prev => ({
         ...prev,
@@ -586,6 +718,10 @@ const DrinkingGameApp = () => {
           setCurrentAction({ text: "Nessuna azione disponibile" });
         }
       }
+      
+      // Incrementa il contatore delle azioni (anche per il fallback)
+      setActionsCounter(prev => prev + 1);
+      
       return;
     }
     
@@ -646,9 +782,7 @@ const DrinkingGameApp = () => {
         const questionAlternatives = [
           `? Se non rispondi ${penaltyCount} penalità`,
           `? Se eviti la domanda ${penaltyCount} penalità`,
-          `? Se non osi rispondere ${penaltyCount} penalità`,
-          `? Il silenzio costa ${penaltyCount} penalità`,
-          `? Eludere la risposta comporta ${penaltyCount} penalità`
+          `? Il silenzio costa ${penaltyCount} penalità`
         ];
         
         // Scegli una formulazione casuale
@@ -713,7 +847,7 @@ const DrinkingGameApp = () => {
     }
     
     // Incrementa l'indice per la prossima volta, ma solo se non siamo in una fase speciale
-    if (!showBouncerAction && !showTruthFingerAction || afterSpecialAction) {
+    if ((!showBouncerAction && !showPointFingerAction && !showInfamataAction && !showTruthOrDareAction) || afterSpecialAction) {
       setCurrentActionIndex(prev => ({
         ...prev,
         [roomId]: prev[roomId] + 1
@@ -730,7 +864,7 @@ const DrinkingGameApp = () => {
     
     // Se non siamo in un turno speciale o stiamo procedendo dopo un'azione speciale,
     // seleziona un nuovo giocatore casuale
-    if ((!showBouncerAction && !showTruthFingerAction) || afterSpecialAction) {
+    if ((!showBouncerAction && !showPointFingerAction && !showInfamataAction && !showTruthOrDareAction) || afterSpecialAction) {
       // Seleziona un giocatore casuale diverso da quello attuale
       let nextPlayerIndex;
       do {
@@ -803,23 +937,43 @@ const DrinkingGameApp = () => {
     setShowBouncerAction(false);
     setBouncerPlayer(null);
     
-    // Resetta anche gli stati del dito della verità
-    setTruthFingerUsed({
+    // Resetta anche gli stati del puntare il dito
+    setPointFingerUsed({
       redRoom: false,
       darkRoom: false,
       clash: false,
       lounge: false,
       neonRoulette: false
     });
-    setTruthFingerRound({
+    setPointFingerRound({
       redRoom: Math.floor(Math.random() * 10) + 30,
       darkRoom: Math.floor(Math.random() * 10) + 30,
       clash: Math.floor(Math.random() * 10) + 30,
       lounge: Math.floor(Math.random() * 10) + 30,
       neonRoulette: Math.floor(Math.random() * 10) + 30
     });
-    setShowTruthFingerAction(false);
-    setTruthFingerPlayer(null);
+    setShowPointFingerAction(false);
+    setPointFingerPlayer(null);
+    
+    // Resetta anche gli stati di Obbligo o Verità
+    setTruthOrDareUsed({
+      redRoom: false,
+      darkRoom: false,
+      clash: false,
+      lounge: false,
+      neonRoulette: false
+    });
+    setTruthOrDareRound({
+      redRoom: Math.floor(Math.random() * 10) + 25,
+      darkRoom: Math.floor(Math.random() * 10) + 25,
+      clash: Math.floor(Math.random() * 10) + 25,
+      lounge: Math.floor(Math.random() * 10) + 25,
+      neonRoulette: Math.floor(Math.random() * 10) + 25
+    });
+    setShowTruthOrDareAction(false);
+    
+    // Resetta la lista dei debiti
+    setDebtList([]);
     
     // Resetta anche gli stati dell'Infamata
     setInfamataUsed({
@@ -838,6 +992,15 @@ const DrinkingGameApp = () => {
     });
     setShowInfamataAction(false);
     setInfamataPlayer(null);
+    
+    // NUOVO: Resetta il contatore dell'ultima azione speciale
+    setLastSpecialGameRound({
+      redRoom: 0,
+      darkRoom: 0,
+      clash: 0,
+      lounge: 0,
+      neonRoulette: 0
+    });
   };
   
   // Seleziona un'opzione di pagamento
@@ -1356,15 +1519,15 @@ const DrinkingGameApp = () => {
                 </p>
               )}
               
-              {/* Messaggio semplificato quando appare il dito della verità */}
-              {showTruthFingerAction && truthFingerPlayer && (
+              {/* Messaggio semplificato quando appare il puntare il dito */}
+              {showPointFingerAction && pointFingerPlayer && (
                 <p style={{ 
                   marginTop: '15px', 
                   fontSize: '16px', 
                   color: '#AAAAAA',
                   textAlign: 'center'
                 }}>
-                  {truthFingerPlayer} sta scegliendo una caratteristica e tutti voteranno...
+                  {pointFingerPlayer} sta scegliendo una caratteristica e tutti voteranno...
                 </p>
               )}
               
@@ -1377,6 +1540,18 @@ const DrinkingGameApp = () => {
                   textAlign: 'center'
                 }}>
                   {infamataPlayer} sta decidendo a chi assegnare la domanda o sfida...
+                </p>
+              )}
+              
+              {/* MODIFICATO: Messaggio per Obbligo o Verità */}
+              {showTruthOrDareAction && (
+                <p style={{ 
+                  marginTop: '15px', 
+                  fontSize: '16px', 
+                  color: '#AAAAAA',
+                  textAlign: 'center'
+                }}>
+                  Ogni giocatore deve decidere se preferisce rispondere a una domanda o fare un'azione!
                 </p>
               )}
             </div>
@@ -1395,10 +1570,13 @@ const DrinkingGameApp = () => {
               onClick={() => {
                 if (showBouncerAction) {
                   nextTurnAfterBouncer();
-                } else if (showTruthFingerAction) {
-                  nextTurnAfterTruthFinger();
+                } else if (showPointFingerAction) {
+                  nextTurnAfterPointFinger();
                 } else if (showInfamataAction) {
                   nextTurnAfterInfamata();
+                } else if (showTruthOrDareAction) {
+                  // MODIFICATO: Prosegui direttamente senza bottoni
+                  nextTurnAfterTruthOrDare();
                 } else {
                   nextTurn();
                 }
@@ -1664,6 +1842,36 @@ const DrinkingGameApp = () => {
               {isProcessingPayment ? 'ELABORAZIONE...' : 'ACQUISTA'}
             </button>
           </div>
+        </div>
+      )}
+      
+      {/* Interfaccia per i debiti */}
+      {gameState === 'playing' && debtList.length > 0 && (
+        <div style={{
+          position: 'fixed',
+          bottom: '70px',
+          right: '20px',
+          zIndex: 100
+        }}>
+          <button
+            onClick={() => alert(`Debiti attivi:\n${debtList.filter(d => d.status === 'active').map(d => `- ${d.player}: ${d.description}`).join('\n')}`)}
+            style={{
+              backgroundColor: '#EAB308',
+              color: 'black',
+              border: 'none',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '20px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+              cursor: 'pointer'
+            }}
+          >
+            💸
+          </button>
         </div>
       )}
       
