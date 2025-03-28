@@ -43,79 +43,32 @@ const DrinkingGameApp = () => {
     neonRoulette: 0
   });
   
-  // Stato per la funzionalità del buttafuori
-  const [bouncerUsed, setBouncerUsed] = useState({
-    redRoom: false,
-    darkRoom: false,
-    clash: false,
-    lounge: false,
-    neonRoulette: false
-  });
-  const [bouncerRound, setBouncerRound] = useState({
-    redRoom: Math.floor(Math.random() * 10) + 15, // Tra 15 e 25 round
-    darkRoom: Math.floor(Math.random() * 10) + 15,
-    clash: Math.floor(Math.random() * 10) + 15,
-    lounge: Math.floor(Math.random() * 10) + 15,
-    neonRoulette: Math.floor(Math.random() * 10) + 15
-  });
-  const [showBouncerAction, setShowBouncerAction] = useState(false);
-  const [bouncerPlayer, setBouncerPlayer] = useState(null);
+  // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
+  // Stato per tenere traccia di tutti i giochi speciali
+  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare'];
   
-  // Stato per la funzionalità del puntare il dito
-  const [pointFingerUsed, setPointFingerUsed] = useState({
-    redRoom: false,
-    darkRoom: false,
-    clash: false,
-    lounge: false,
-    neonRoulette: false
+  // Stato per tracciare quali giochi sono stati usati
+  const [specialGamesUsed, setSpecialGamesUsed] = useState({
+    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false },
+    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false },
+    clash: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false },
+    lounge: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false },
+    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false }
   });
-  const [pointFingerRound, setPointFingerRound] = useState({
-    redRoom: Math.floor(Math.random() * 10) + 30, // Tra 30 e 40 round
-    darkRoom: Math.floor(Math.random() * 10) + 30,
-    clash: Math.floor(Math.random() * 10) + 30,
-    lounge: Math.floor(Math.random() * 10) + 30,
-    neonRoulette: Math.floor(Math.random() * 10) + 30
-  });
-  const [showPointFingerAction, setShowPointFingerAction] = useState(false);
-  const [pointFingerPlayer, setPointFingerPlayer] = useState(null);
   
-  // Stato per la funzionalità dell'Infamata
-  const [infamataUsed, setInfamataUsed] = useState({
-    redRoom: false,
-    darkRoom: false,
-    clash: false,
-    lounge: false,
-    neonRoulette: false
+  // Stato per tracciare quando deve apparire ciascun gioco
+  const [specialGamesRound, setSpecialGamesRound] = useState({
+    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 },
+    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 },
+    clash: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 },
+    lounge: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 },
+    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 }
   });
-  const [infamataRound, setInfamataRound] = useState({
-    redRoom: Math.floor(Math.random() * 10) + 20, // Tra 20 e 30 round
-    darkRoom: Math.floor(Math.random() * 10) + 20,
-    clash: Math.floor(Math.random() * 10) + 20,
-    lounge: Math.floor(Math.random() * 10) + 20,
-    neonRoulette: Math.floor(Math.random() * 10) + 20
-  });
-  const [showInfamataAction, setShowInfamataAction] = useState(false);
-  const [infamataPlayer, setInfamataPlayer] = useState(null);
   
-  // MODIFICATO: Stato per la funzionalità "Obbligo o Verità"
-  const [truthOrDareUsed, setTruthOrDareUsed] = useState({
-    redRoom: false,
-    darkRoom: false,
-    clash: false,
-    lounge: false,
-    neonRoulette: false
-  });
-  const [truthOrDareRound, setTruthOrDareRound] = useState({
-    redRoom: Math.floor(Math.random() * 10) + 25, // Tra 25 e 35 round
-    darkRoom: Math.floor(Math.random() * 10) + 25,
-    clash: Math.floor(Math.random() * 10) + 25,
-    lounge: Math.floor(Math.random() * 10) + 25,
-    neonRoulette: Math.floor(Math.random() * 10) + 25
-  });
-  const [showTruthOrDareAction, setShowTruthOrDareAction] = useState(false);
-  
-  // NUOVO: Lista dei debiti assegnati
-  const [debtList, setDebtList] = useState([]);
+  // Stato per il gioco speciale attualmente in corso
+  const [activeSpecialGame, setActiveSpecialGame] = useState(null);
+  // Giocatore coinvolto nel gioco speciale (se presente)
+  const [specialGamePlayer, setSpecialGamePlayer] = useState(null);
   
   // NUOVO: Contatore per tracciare l'ultima azione speciale
   const [lastSpecialGameRound, setLastSpecialGameRound] = useState({
@@ -125,6 +78,9 @@ const DrinkingGameApp = () => {
     lounge: 0,
     neonRoulette: 0
   });
+  
+  // NUOVO: Lista dei debiti assegnati
+  const [debtList, setDebtList] = useState([]);
   
   // NUOVO: Costante per l'intervallo minimo tra giochi speciali
   const MIN_ACTIONS_BETWEEN_SPECIAL_GAMES = 5;
@@ -201,6 +157,99 @@ const DrinkingGameApp = () => {
       { text: "Se potessi viaggiare ovunque, dove andresti? Oppure 2 penalità" }
     ],
     neonRoulette: [] // Sarà popolato con azioni da tutte le altre stanze
+  };
+
+  // NUOVO: Funzione per distribuire i giochi speciali nella partita
+  const distributeSpecialGames = (maxActions) => {
+    const MIN_SPACING = 5; // Distanza minima tra i giochi speciali
+    
+    // Mescola l'array dei giochi per un ordine casuale
+    const shuffledGames = [...SPECIAL_GAMES].sort(() => Math.random() - 0.5);
+    
+    // Range disponibile per la distribuzione dei giochi
+    const minPosition = 10; // Iniziamo un po' dopo l'inizio della partita
+    const maxPosition = maxActions - 10; // Finiamo un po' prima della fine
+    const availableRange = maxPosition - minPosition;
+    
+    // Calcola la distribuzione ideale
+    const segmentSize = Math.floor(availableRange / SPECIAL_GAMES.length);
+    
+    // Crea le posizioni con un po' di randomicità ma mantieni la distanza minima
+    const positions = {};
+    
+    shuffledGames.forEach((game, index) => {
+      // Base position nel suo segmento
+      const segmentStart = minPosition + (index * segmentSize);
+      const segmentEnd = segmentStart + segmentSize - MIN_SPACING;
+      
+      // Aggiungi randomicità all'interno del segmento
+      positions[game] = segmentStart + Math.floor(Math.random() * (segmentEnd - segmentStart));
+    });
+    
+    return positions;
+  };
+
+  // NUOVO: Funzione helper per gestire i giochi speciali
+  const handleSpecialGame = (gameType) => {
+    if (!selectedRoom) return;
+    const roomId = selectedRoom.id;
+    
+    // Verifica che esista la sezione specialGames nel backupActions
+    if (!backupActions.specialGames || !backupActions.specialGames[gameType]) {
+      console.error(`Manca la sezione specialGames.${gameType} nel backupActions.json!`);
+      // Continua con il prossimo turno normale in caso di errore
+      nextTurn();
+      return;
+    }
+    
+    // Ottieni il testo del gioco dal backup
+    let actionText = backupActions.specialGames[gameType].text;
+    
+    // Gestisci i vari tipi di gioco
+    switch (gameType) {
+      case "bouncer":
+        // Scegli un giocatore diverso da quello corrente
+        let specialPlayerIndex;
+        do {
+          specialPlayerIndex = Math.floor(Math.random() * players.length);
+        } while (specialPlayerIndex === currentPlayerIndex);
+        
+        setSpecialGamePlayer(players[specialPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore
+        actionText = actionText.replace(/{player}/g, players[specialPlayerIndex]);
+        break;
+        
+      case "pointFinger":
+      case "infamata":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        break;
+    }
+    
+    // Imposta il gioco speciale attivo
+    setActiveSpecialGame(gameType);
+    
+    // Marca il gioco come usato
+    setSpecialGamesUsed(prev => ({
+      ...prev,
+      [roomId]: {
+        ...prev[roomId],
+        [gameType]: true
+      }
+    }));
+    
+    // Imposta l'azione corrente
+    setCurrentAction({ text: actionText });
+    
+    // Aggiorna il contatore dell'ultima azione speciale
+    setLastSpecialGameRound(prev => ({
+      ...prev,
+      [roomId]: actionsCounter
+    }));
   };
 
   // Verifica lo stato del paywall quando il componente si monta
@@ -309,80 +358,45 @@ const DrinkingGameApp = () => {
       // Resetta il contatore delle azioni
       setActionsCounter(0);
       
+      // Resetta lo stato dei giochi speciali
+      setActiveSpecialGame(null);
+      setSpecialGamePlayer(null);
+      
       // NUOVO: Resetta il contatore dell'ultima azione speciale
       setLastSpecialGameRound(prev => ({
         ...prev,
         [room.id]: 0
       }));
       
-      // Distribuisci meglio i rounds per i giochi speciali
-      // Assicurati che ogni gioco speciale abbia un intervallo ragionevole dall'altro
-      const bouncer = Math.floor(Math.random() * 10) + 15; // Tra 15-25 round
+      // Distribuisci i giochi speciali in modo uniforme ma casuale
+      const gamePositions = distributeSpecialGames(MAX_ACTIONS_PER_GAME);
       
-      // Distribuisci gli altri giochi speciali con almeno MIN_ACTIONS_BETWEEN_SPECIAL_GAMES di distanza
-      const infamata = bouncer + MIN_ACTIONS_BETWEEN_SPECIAL_GAMES + Math.floor(Math.random() * 5); // Distanziato dal bouncer
-      const truthOrDare = infamata + MIN_ACTIONS_BETWEEN_SPECIAL_GAMES + Math.floor(Math.random() * 5); // Distanziato dall'infamata
-      const pointFinger = truthOrDare + MIN_ACTIONS_BETWEEN_SPECIAL_GAMES + Math.floor(Math.random() * 5); // Distanziato da truth or dare
-      
-      // Resetta gli stati del buttafuori per la nuova partita
-      setBouncerUsed(prev => ({
+      // Resetta tutti gli stati dei giochi speciali
+      setSpecialGamesUsed(prev => ({
         ...prev,
-        [room.id]: false
+        [room.id]: {
+          bouncer: false,
+          pointFinger: false,
+          infamata: false,
+          truthOrDare: false
+        }
       }));
       
-      setBouncerRound(prev => ({
+      // Imposta i round per ogni gioco speciale
+      setSpecialGamesRound(prev => ({
         ...prev,
-        [room.id]: bouncer
+        [room.id]: {
+          bouncer: gamePositions.bouncer || 15,
+          pointFinger: gamePositions.pointFinger || 30,
+          infamata: gamePositions.infamata || 20,
+          truthOrDare: gamePositions.truthOrDare || 25
+        }
       }));
-      
-      setShowBouncerAction(false);
-      setBouncerPlayer(null);
-      
-      // Resetta gli stati del puntare il dito per la nuova partita
-      setPointFingerUsed(prev => ({
-        ...prev,
-        [room.id]: false
-      }));
-      
-      setPointFingerRound(prev => ({
-        ...prev,
-        [room.id]: pointFinger
-      }));
-      
-      setShowPointFingerAction(false);
-      setPointFingerPlayer(null);
-      
-      // MODIFICATO: Resetta gli stati per Obbligo o Verità
-      setTruthOrDareUsed(prev => ({
-        ...prev,
-        [room.id]: false
-      }));
-      
-      setTruthOrDareRound(prev => ({
-        ...prev,
-        [room.id]: truthOrDare
-      }));
-      
-      setShowTruthOrDareAction(false);
       
       // Resetta la lista dei debiti quando si inizia una nuova stanza
       if (room.id !== selectedRoom?.id) {
         setDebtList([]);
       }
-      
-      // Resetta gli stati dell'Infamata per la nuova partita
-      setInfamataUsed(prev => ({
-        ...prev,
-        [room.id]: false
-      }));
-      
-      setInfamataRound(prev => ({
-        ...prev,
-        [room.id]: infamata
-      }));
-      
-      setShowInfamataAction(false);
-      setInfamataPlayer(null);
       
       // Se è la modalità Neon Roulette, combina azioni da tutte le altre stanze
       if (room.id === 'neonRoulette') {
@@ -507,68 +521,20 @@ const DrinkingGameApp = () => {
     }
   };
   
-  // Funzione semplificata per continuare dopo l'azione del buttafuori
-  const nextTurnAfterBouncer = () => {
+  // Funzione semplificata per continuare dopo un'azione speciale
+  const nextTurnAfterSpecialGame = () => {
+    if (!selectedRoom) return;
     const roomId = selectedRoom.id;
     
-    // NUOVO: Aggiorna il contatore dell'ultima azione speciale
+    // Aggiorna il contatore dell'ultima azione speciale
     setLastSpecialGameRound(prev => ({
       ...prev,
       [roomId]: actionsCounter
     }));
     
-    setShowBouncerAction(false);
-    setBouncerPlayer(null);
-    
-    // Prosegui con il turno normale
-    nextTurn(true); // true indica che stiamo proseguendo dopo l'azione del buttafuori
-  };
-  
-  // Funzione semplificata per continuare dopo l'azione del puntare il dito
-  const nextTurnAfterPointFinger = () => {
-    const roomId = selectedRoom.id;
-    
-    // NUOVO: Aggiorna il contatore dell'ultima azione speciale
-    setLastSpecialGameRound(prev => ({
-      ...prev,
-      [roomId]: actionsCounter
-    }));
-    
-    setShowPointFingerAction(false);
-    setPointFingerPlayer(null);
-    
-    // Prosegui con il turno normale
-    nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
-  };
-  
-  // MODIFICATO: Funzione semplificata per continuare dopo l'azione di Obbligo o Verità
-  const nextTurnAfterTruthOrDare = () => {
-    const roomId = selectedRoom.id;
-    
-    // NUOVO: Aggiorna il contatore dell'ultima azione speciale
-    setLastSpecialGameRound(prev => ({
-      ...prev,
-      [roomId]: actionsCounter
-    }));
-    
-    setShowTruthOrDareAction(false);
-    
-    // Prosegui con il turno normale
-    nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
-  };
-  
-  // Funzione semplificata per continuare dopo l'azione dell'Infamata
-  const nextTurnAfterInfamata = () => {
-    const roomId = selectedRoom.id;
-    
-    // NUOVO: Aggiorna il contatore dell'ultima azione speciale
-    setLastSpecialGameRound(prev => ({
-      ...prev,
-      [roomId]: actionsCounter
-    }));
-    
-    setShowInfamataAction(false);
-    setInfamataPlayer(null);
+    // Resetta gli stati del gioco speciale
+    setActiveSpecialGame(null);
+    setSpecialGamePlayer(null);
     
     // Prosegui con il turno normale
     nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
@@ -580,96 +546,20 @@ const DrinkingGameApp = () => {
     
     const roomId = selectedRoom.id;
     
-    // NUOVO: Verifica se ci sono abbastanza azioni dall'ultima azione speciale
+    // Verifica se ci sono abbastanza azioni dall'ultima azione speciale
     const actionsSinceLastSpecial = actionsCounter - lastSpecialGameRound[roomId];
     const canShowSpecialGame = actionsSinceLastSpecial >= MIN_ACTIONS_BETWEEN_SPECIAL_GAMES;
     
-    // MODIFICATO: Verifica se è tempo per Obbligo o Verità
-    if (!truthOrDareUsed[roomId] && actionsCounter >= truthOrDareRound[roomId] && 
-        actionsCounter < MAX_ACTIONS_PER_GAME - 1 && canShowSpecialGame) {
-      // È il momento di attivare l'azione di Obbligo o Verità
-      setTruthOrDareUsed(prev => ({
-        ...prev,
-        [roomId]: true
-      }));
-      
-      // Attiva la modalità speciale per Obbligo o Verità
-      setShowTruthOrDareAction(true);
-      
-      // Imposta un'azione speciale per Obbligo o Verità rivolta a tutti
-      setCurrentAction({ 
-        text: `OBBLIGO VERITA' O DEBITO: Se scegli Debito, EvitI la penalità ma ti viene assegnato un debito che potrà essere riscattato in qualsiasi momento da chi dirige il gioco (es. "Vai a prendermi da bere" o "Posta una storia imbarazzante").. Decidete in senso orario partendo dal giocatore corrente.` 
-      });
-      
-      return;
-    }
-    
-    // Verifica se è tempo per l'azione del puntare il dito
-    if (!pointFingerUsed[roomId] && actionsCounter >= pointFingerRound[roomId] && 
-        actionsCounter < MAX_ACTIONS_PER_GAME - 1 && canShowSpecialGame) {
-      // È il momento di attivare l'azione del puntare il dito
-      setPointFingerUsed(prev => ({
-        ...prev,
-        [roomId]: true
-      }));
-      
-      // Il giocatore corrente sarà il giudice
-      setPointFingerPlayer(players[currentPlayerIndex]);
-      setShowPointFingerAction(true);
-      
-      // Imposta un'azione speciale per puntare il dito
-      setCurrentAction({ 
-        text: `${players[currentPlayerIndex]} inizia il gioco del PUNTARE IL DITO! Deve scegliere una caratteristica (es. "il più tirchio", "il più divertente") e tutti indicheranno un giocatore. Chi riceve più voti fa una penalità!` 
-      });
-      
-      return;
-    }
-    
-    // Verifica se è tempo per l'azione dell'Infamata
-    if (!infamataUsed[roomId] && actionsCounter >= infamataRound[roomId] && 
-        actionsCounter < MAX_ACTIONS_PER_GAME - 1 && canShowSpecialGame) {
-      // È il momento di attivare l'azione dell'Infamata
-      setInfamataUsed(prev => ({
-        ...prev,
-        [roomId]: true
-      }));
-      
-      // Il giocatore corrente avrà l'Infamata
-      setInfamataPlayer(players[currentPlayerIndex]);
-      setShowInfamataAction(true);
-      
-      // Imposta un'azione speciale per l'Infamata
-      setCurrentAction({ 
-        text: `INFAMATA! ${players[currentPlayerIndex]} ha a disposizione l'Infamata! Può usarla per assegnare la propria domanda o sfida a qualcun altro del gruppo.` 
-      });
-      
-      return;
-    }
-    
-    // Verifica se è tempo per l'azione del buttafuori
-    if (!bouncerUsed[roomId] && actionsCounter >= bouncerRound[roomId] && 
-        actionsCounter < MAX_ACTIONS_PER_GAME - 1 && canShowSpecialGame) {
-      // È il momento di attivare l'azione del buttafuori
-      setBouncerUsed(prev => ({
-        ...prev,
-        [roomId]: true
-      }));
-      
-      // Scegli casualmente un giocatore diverso da quello corrente come buttafuori
-      let bouncerIndex;
-      do {
-        bouncerIndex = Math.floor(Math.random() * players.length);
-      } while (bouncerIndex === currentPlayerIndex);
-      
-      setBouncerPlayer(players[bouncerIndex]);
-      setShowBouncerAction(true);
-      
-      // Imposta un'azione speciale per il buttafuori
-      setCurrentAction({ 
-        text: `${players[bouncerIndex]} è stato scelto come BUTTAFUORI del club! Può decidere se "lasciar passare" la prossima penitenza o far fare una penalità extra a un altro giocatore.` 
-      });
-      
-      return;
+    // Controlla se è il momento di mostrare un gioco speciale
+    if (canShowSpecialGame && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
+      // Verifica ogni tipo di gioco speciale
+      for (const gameType of SPECIAL_GAMES) {
+        // Verifica solo se il gioco non è già stato usato e se è il momento giusto
+        if (!specialGamesUsed[roomId][gameType] && actionsCounter >= specialGamesRound[roomId][gameType]) {
+          handleSpecialGame(gameType);
+          return;
+        }
+      }
     }
     
     const currentPool = roomActionsPool[roomId];
@@ -847,7 +737,7 @@ const DrinkingGameApp = () => {
     }
     
     // Incrementa l'indice per la prossima volta, ma solo se non siamo in una fase speciale
-    if ((!showBouncerAction && !showPointFingerAction && !showInfamataAction && !showTruthOrDareAction) || afterSpecialAction) {
+    if (!activeSpecialGame || afterSpecialAction) {
       setCurrentActionIndex(prev => ({
         ...prev,
         [roomId]: prev[roomId] + 1
@@ -864,7 +754,7 @@ const DrinkingGameApp = () => {
     
     // Se non siamo in un turno speciale o stiamo procedendo dopo un'azione speciale,
     // seleziona un nuovo giocatore casuale
-    if ((!showBouncerAction && !showPointFingerAction && !showInfamataAction && !showTruthOrDareAction) || afterSpecialAction) {
+    if (!activeSpecialGame || afterSpecialAction) {
       // Seleziona un giocatore casuale diverso da quello attuale
       let nextPlayerIndex;
       do {
@@ -919,79 +809,39 @@ const DrinkingGameApp = () => {
     setPreviousAction(null);
     setActionsCounter(0);
     
-    // Resetta anche gli stati del buttafuori
-    setBouncerUsed({
-      redRoom: false,
-      darkRoom: false,
-      clash: false,
-      lounge: false,
-      neonRoulette: false
-    });
-    setBouncerRound({
-      redRoom: Math.floor(Math.random() * 10) + 15,
-      darkRoom: Math.floor(Math.random() * 10) + 15,
-      clash: Math.floor(Math.random() * 10) + 15,
-      lounge: Math.floor(Math.random() * 10) + 15,
-      neonRoulette: Math.floor(Math.random() * 10) + 15
-    });
-    setShowBouncerAction(false);
-    setBouncerPlayer(null);
+    // Resetta gli stati dei giochi speciali
+    setActiveSpecialGame(null);
+    setSpecialGamePlayer(null);
     
-    // Resetta anche gli stati del puntare il dito
-    setPointFingerUsed({
-      redRoom: false,
-      darkRoom: false,
-      clash: false,
-      lounge: false,
-      neonRoulette: false
-    });
-    setPointFingerRound({
-      redRoom: Math.floor(Math.random() * 10) + 30,
-      darkRoom: Math.floor(Math.random() * 10) + 30,
-      clash: Math.floor(Math.random() * 10) + 30,
-      lounge: Math.floor(Math.random() * 10) + 30,
-      neonRoulette: Math.floor(Math.random() * 10) + 30
-    });
-    setShowPointFingerAction(false);
-    setPointFingerPlayer(null);
+    // Resetta tutti gli stati di giochi usati e round
+    const resetUsedGames = {};
+    const resetGameRounds = {};
     
-    // Resetta anche gli stati di Obbligo o Verità
-    setTruthOrDareUsed({
-      redRoom: false,
-      darkRoom: false,
-      clash: false,
-      lounge: false,
-      neonRoulette: false
+    // Resetta per ogni stanza e ogni tipo di gioco
+    rooms.forEach(room => {
+      resetUsedGames[room.id] = SPECIAL_GAMES.reduce((acc, game) => {
+        acc[game] = false;
+        return acc;
+      }, {});
+      
+      resetGameRounds[room.id] = SPECIAL_GAMES.reduce((acc, game, index) => {
+        // Valori di default se non abbiamo posizioni specifiche
+        const defaultPositions = {
+          bouncer: 15,
+          pointFinger: 30,
+          infamata: 20,
+          truthOrDare: 25
+        };
+        acc[game] = defaultPositions[game] || 10 + (index * 10);
+        return acc;
+      }, {});
     });
-    setTruthOrDareRound({
-      redRoom: Math.floor(Math.random() * 10) + 25,
-      darkRoom: Math.floor(Math.random() * 10) + 25,
-      clash: Math.floor(Math.random() * 10) + 25,
-      lounge: Math.floor(Math.random() * 10) + 25,
-      neonRoulette: Math.floor(Math.random() * 10) + 25
-    });
-    setShowTruthOrDareAction(false);
+    
+    setSpecialGamesUsed(resetUsedGames);
+    setSpecialGamesRound(resetGameRounds);
     
     // Resetta la lista dei debiti
     setDebtList([]);
-    
-    // Resetta anche gli stati dell'Infamata
-    setInfamataUsed({
-      redRoom: false,
-      darkRoom: false,
-      clash: false,
-      lounge: false,
-      neonRoulette: false
-    });
-    setInfamataRound({
-      redRoom: Math.floor(Math.random() * 10) + 20,
-      darkRoom: Math.floor(Math.random() * 10) + 20,
-      clash: Math.floor(Math.random() * 10) + 20,
-      lounge: Math.floor(Math.random() * 10) + 20,
-      neonRoulette: Math.floor(Math.random() * 10) + 20
-    });
-    setShowInfamataAction(false);
-    setInfamataPlayer(null);
     
     // NUOVO: Resetta il contatore dell'ultima azione speciale
     setLastSpecialGameRound({
@@ -1035,6 +885,21 @@ const DrinkingGameApp = () => {
     setHasPaid(false);
     setHasPlayedFreeGame(false);
     resetGame();
+  };
+  
+  // Funzione helper per ottenere il messaggio appropriato per il gioco speciale corrente
+  const getSpecialGameMessage = () => {
+    if (!activeSpecialGame || !specialGamePlayer) return null;
+    
+    // Messaggi per ciascun tipo di gioco
+    const messages = {
+      bouncer: `${specialGamePlayer} è il buttafuori e sta decidendo...`,
+      pointFinger: `${specialGamePlayer} sta scegliendo una caratteristica e tutti voteranno...`,
+      infamata: `${specialGamePlayer} sta decidendo a chi assegnare la domanda o sfida...`,
+      truthOrDare: `Ogni giocatore deve decidere se preferisce rispondere a una domanda o fare un'azione!`
+    };
+    
+    return messages[activeSpecialGame] || null;
   };
   
   return (
@@ -1260,169 +1125,177 @@ const DrinkingGameApp = () => {
       )}
       
       {/* Room Selection Screen */}
-      {gameState === 'roomSelection' && (
-        <div className="screen room-selection-screen" style={{ 
-          backgroundColor: '#000000', 
-          color: '#FFFFFF',
-          padding: '0',
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100vh'
-        }}>
-          <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: '50px 1fr 50px',
-            alignItems: 'center',
-            padding: '15px 0',
-            marginBottom: '20px'
+{gameState === 'roomSelection' && (
+  <div className="screen room-selection-screen" style={{ 
+    backgroundColor: '#000000', 
+    color: '#FFFFFF',
+    padding: '0',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    overflowY: 'auto'  // Aggiungi scrolling verticale
+  }}>
+    <div style={{ 
+      display: 'grid',
+      gridTemplateColumns: '50px 1fr 50px',
+      alignItems: 'center',
+      padding: '15px 0',
+      marginBottom: '10px'  // Ridotto da 20px
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <button 
+          onClick={goBack}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#FFFFFF',
+            fontSize: '24px',
+            cursor: 'pointer',
+            padding: '5px'
+          }}
+        >
+          ←
+        </button>
+      </div>
+      
+      <h1 style={{ 
+        margin: 0, 
+        textAlign: 'center',
+        fontWeight: 'normal',
+        fontSize: '28px',
+        letterSpacing: '1px'
+      }}>
+        ROOMS
+      </h1>
+      
+      <div></div>
+    </div>
+    
+    <div style={{ 
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '0 20px',
+      minHeight: '450px',  // Altezza minima per garantire spazio sufficiente
+      marginBottom: '20px' // Aggiunto spazio sotto
+    }}>
+      <div style={{
+        width: '300px',
+        height: 'auto',  // Cambiato da 400px fissi ad auto
+        minHeight: '300px', // Altezza minima invece che fissa
+        maxHeight: '70vh',  // Massimo 70% dell'altezza viewport
+        backgroundColor: rooms[currentRoomIndex].color,
+        borderRadius: '15px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '30px',
+        marginBottom: '15px'  // Ridotto da 25px
+      }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <h2 style={{
+            fontSize: '36px',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            color: rooms[currentRoomIndex].color === '#1F2937' || 
+                  rooms[currentRoomIndex].color === '#DC2626' || 
+                  rooms[currentRoomIndex].color === '#D946EF' ? '#FFFFFF' : '#000000'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button 
-                onClick={goBack}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#FFFFFF',
-                  fontSize: '24px',
-                  cursor: 'pointer',
-                  padding: '5px'
-                }}
-              >
-                ←
-              </button>
-            </div>
-            
-            <h1 style={{ 
-              margin: 0, 
-              textAlign: 'center',
-              fontWeight: 'normal',
-              fontSize: '28px',
-              letterSpacing: '1px'
-            }}>
-              ROOMS
-            </h1>
-            
-            <div></div> {/* Colonna vuota a destra per equilibrio */}
-          </div>
-          
-          <div style={{ 
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '0 20px'
-          }}>
-            <div style={{
-              width: '300px',  // Larghezza fissa
-              height: '400px', // Altezza fissa
-              backgroundColor: rooms[currentRoomIndex].color,
-              borderRadius: '15px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '30px',
-              marginBottom: '25px'
-            }}>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <h2 style={{
-                  fontSize: '36px',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                  color: rooms[currentRoomIndex].color === '#1F2937' || 
-                         rooms[currentRoomIndex].color === '#DC2626' || 
-                         rooms[currentRoomIndex].color === '#D946EF' ? '#FFFFFF' : '#000000'
-                }}>
-                  {rooms[currentRoomIndex].name}
-                </h2>
-              </div>
-              
-              <div style={{ marginBottom: '40px' }}>
-                <button 
-                  onClick={() => selectRoom(rooms[currentRoomIndex])}
-                  style={{
-                    backgroundColor: '#FFFFFF',
-                    color: '#000000',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '14px 40px',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ENTRA
-                </button>
-              </div>
-              
-              <div style={{ height: '60px', display: 'flex', alignItems: 'center' }}>
-                <p style={{
-                  fontSize: '16px',
-                  textAlign: 'center',
-                  color: rooms[currentRoomIndex].color === '#1F2937' ? '#9CA3AF' :
-                         rooms[currentRoomIndex].color === '#DC2626' ? 'rgba(255,255,255,0.8)' :
-                         rooms[currentRoomIndex].color === '#D946EF' ? '#f5d0fe' : 
-                         'rgba(0,0,0,0.7)'
-                }}>
-                  {rooms[currentRoomIndex].description}
-                </p>
-              </div>
-            </div>
-            
-            <div style={{ 
-              display: 'flex',
-              alignItems: 'center',
-              gap: '20px'
-            }}>
-              <button 
-                onClick={() => setCurrentRoomIndex((prev) => (prev === 0 ? rooms.length - 1 : prev - 1))}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#AAAAAA',
-                  fontSize: '36px',
-                  cursor: 'pointer'
-                }}
-              >
-                ‹
-              </button>
-              
-              <div style={{ 
-                display: 'flex',
-                gap: '8px'
-              }}>
-                {rooms.map((_, index) => (
-                  <div 
-                    key={index}
-                    onClick={() => setCurrentRoomIndex(index)}
-                    style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor: index === currentRoomIndex ? '#FFFFFF' : '#555555',
-                      cursor: 'pointer'
-                    }}
-                  ></div>
-                ))}
-              </div>
-              
-              <button 
-                onClick={() => setCurrentRoomIndex((prev) => (prev === rooms.length - 1 ? 0 : prev + 1))}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#AAAAAA',
-                  fontSize: '36px',
-                  cursor: 'pointer'
-                }}
-              >
-                ›
-              </button>
-            </div>
-          </div>
+            {rooms[currentRoomIndex].name}
+          </h2>
         </div>
-      )}
+        
+        <div style={{ marginBottom: '20px' }}>  {/* Ridotto da 40px */}
+          <button 
+            onClick={() => selectRoom(rooms[currentRoomIndex])}
+            style={{
+              backgroundColor: '#FFFFFF',
+              color: '#000000',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '14px 40px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            ENTRA
+          </button>
+        </div>
+        
+        <div style={{ minHeight: '40px', display: 'flex', alignItems: 'center' }}> {/* Cambiato da height a minHeight */}
+          <p style={{
+            fontSize: '16px',
+            textAlign: 'center',
+            color: rooms[currentRoomIndex].color === '#1F2937' ? '#9CA3AF' :
+                  rooms[currentRoomIndex].color === '#DC2626' ? 'rgba(255,255,255,0.8)' :
+                  rooms[currentRoomIndex].color === '#D946EF' ? '#f5d0fe' : 
+                  'rgba(0,0,0,0.7)'
+          }}>
+            {rooms[currentRoomIndex].description}
+          </p>
+        </div>
+      </div>
+      
+      <div style={{ 
+        display: 'flex',
+        alignItems: 'center',
+        gap: '20px',
+        marginBottom: '20px'  // Aggiunto spazio sotto
+      }}>
+        <button 
+          onClick={() => setCurrentRoomIndex((prev) => (prev === 0 ? rooms.length - 1 : prev - 1))}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#AAAAAA',
+            fontSize: '36px',
+            cursor: 'pointer',
+            padding: '10px'  // Aumentata l'area di tocco
+          }}
+        >
+          ‹
+        </button>
+        
+        <div style={{ 
+          display: 'flex',
+          gap: '8px'
+        }}>
+          {rooms.map((_, index) => (
+            <div 
+              key={index}
+              onClick={() => setCurrentRoomIndex(index)}
+              style={{
+                width: '10px',  // Ingrandito per facilitare il tocco
+                height: '10px',
+                borderRadius: '50%',
+                backgroundColor: index === currentRoomIndex ? '#FFFFFF' : '#555555',
+                cursor: 'pointer'
+              }}
+            ></div>
+          ))}
+        </div>
+        
+        <button 
+          onClick={() => setCurrentRoomIndex((prev) => (prev === rooms.length - 1 ? 0 : prev + 1))}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#AAAAAA',
+            fontSize: '36px',
+            cursor: 'pointer',
+            padding: '10px'  // Aumentata l'area di tocco
+          }}
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       
       {/* Playing Screen */}
       {gameState === 'playing' && selectedRoom && (
@@ -1507,51 +1380,15 @@ const DrinkingGameApp = () => {
                 </p>
               )}
               
-              {/* Messaggio semplificato quando appare il buttafuori */}
-              {showBouncerAction && bouncerPlayer && (
+              {/* Messaggio unificato per i giochi speciali attivi */}
+              {activeSpecialGame && (
                 <p style={{ 
                   marginTop: '15px', 
                   fontSize: '16px', 
                   color: '#AAAAAA',
                   textAlign: 'center'
                 }}>
-                  {bouncerPlayer} è il buttafuori e sta decidendo...
-                </p>
-              )}
-              
-              {/* Messaggio semplificato quando appare il puntare il dito */}
-              {showPointFingerAction && pointFingerPlayer && (
-                <p style={{ 
-                  marginTop: '15px', 
-                  fontSize: '16px', 
-                  color: '#AAAAAA',
-                  textAlign: 'center'
-                }}>
-                  {pointFingerPlayer} sta scegliendo una caratteristica e tutti voteranno...
-                </p>
-              )}
-              
-              {/* Messaggio semplificato quando appare l'Infamata */}
-              {showInfamataAction && infamataPlayer && (
-                <p style={{ 
-                  marginTop: '15px', 
-                  fontSize: '16px', 
-                  color: '#AAAAAA',
-                  textAlign: 'center'
-                }}>
-                  {infamataPlayer} sta decidendo a chi assegnare la domanda o sfida...
-                </p>
-              )}
-              
-              {/* MODIFICATO: Messaggio per Obbligo o Verità */}
-              {showTruthOrDareAction && (
-                <p style={{ 
-                  marginTop: '15px', 
-                  fontSize: '16px', 
-                  color: '#AAAAAA',
-                  textAlign: 'center'
-                }}>
-                  Ogni giocatore deve decidere se preferisce rispondere a una domanda o fare un'azione!
+                  {getSpecialGameMessage()}
                 </p>
               )}
             </div>
@@ -1568,15 +1405,8 @@ const DrinkingGameApp = () => {
           }}>
             <button 
               onClick={() => {
-                if (showBouncerAction) {
-                  nextTurnAfterBouncer();
-                } else if (showPointFingerAction) {
-                  nextTurnAfterPointFinger();
-                } else if (showInfamataAction) {
-                  nextTurnAfterInfamata();
-                } else if (showTruthOrDareAction) {
-                  // MODIFICATO: Prosegui direttamente senza bottoni
-                  nextTurnAfterTruthOrDare();
+                if (activeSpecialGame) {
+                  nextTurnAfterSpecialGame();
                 } else {
                   nextTurn();
                 }

@@ -1,4 +1,18 @@
 {
+  "specialGames": {
+  "bouncer": {
+    "text": "{player} è stato scelto come BUTTAFUORI del club! Può decidere se \"lasciar passare\" la prossima penitenza o far fare una penalità extra a un altro giocatore."
+  },
+  "pointFinger": {
+    "text": "{player} inizia il gioco del PUNTARE IL DITO! Deve scegliere una caratteristica (es. \"il più tirchio\", \"il più divertente\") e tutti indicheranno un giocatore. Chi riceve più voti fa una penalità!"
+  },
+  "infamata": {
+    "text": "INFAMATA! {player} ha a disposizione l'Infamata! Può usarla per assegnare la propria domanda o sfida a qualcun altro del gruppo."
+  },
+  "truthOrDare": {
+    "text": "OBBLIGO VERITA' O DEBITO: Se scegli Debito, eviti la penalità ma ti viene assegnato un debito che potrà essere riscattato in qualsiasi momento da chi dirige il gioco (es. \"Vai a prendermi da bere\" o \"Posta una storia imbarazzante\").. Decidete in senso orario partendo dal giocatore corrente."
+  }
+},
   "redRoom": [
     { "text": "Accarezza in modo provocante l'interno coscia di {playerB} per 15 secondi oppure 4 penalità" },
     { "text": "Dai un bacio con la lingua a {playerB} per 10 secondi oppure 4 penalità" },
