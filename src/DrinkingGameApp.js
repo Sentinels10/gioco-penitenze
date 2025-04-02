@@ -45,24 +45,24 @@ const DrinkingGameApp = () => {
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
   // Stato per tenere traccia di tutti i giochi speciali
-  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso'];
+  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy'];
   
   // Stato per tracciare quali giochi sono stati usati
   const [specialGamesUsed, setSpecialGamesUsed] = useState({
-    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false },
-    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false },
-    clash: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false },
-    lounge: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false },
-    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false }
+    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
+    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
+    clash: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
+    lounge: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
+    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false }
   });
   
   // Stato per tracciare quando deve apparire ciascun gioco
   const [specialGamesRound, setSpecialGamesRound] = useState({
-    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 },
-    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 },
-    clash: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 },
-    lounge: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 },
-    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 }
+    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
+    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
+    clash: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
+    lounge: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
+    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 }
   });
   
   // Stato per il gioco speciale attualmente in corso
@@ -100,6 +100,10 @@ const DrinkingGameApp = () => {
     truth: [],
     dare: []
   });
+  
+  // Nuovo stato per il gioco Cringe or Classy
+  const [cringeOrClassyState, setCringeOrClassyState] = useState(null); // "voting", "result"
+  const [cringeOrClassyResult, setCringeOrClassyResult] = useState(null);
   
   // App name and description
   const appName = "FRIENZ";
@@ -267,11 +271,17 @@ const DrinkingGameApp = () => {
       case "pointFinger":
       case "infamata":
       case "ilPezzoGrosso":
+      case "cringeOrClassy":
         // Il giocatore corrente sarà il protagonista
         setSpecialGamePlayer(players[currentPlayerIndex]);
         
         // Sostituisci {player} con il nome del giocatore corrente
         actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Imposta direttamente il risultato casuale senza fase di votazione
+        const isClassy = Math.random() > 0.5;
+        setCringeOrClassyResult(isClassy ? 'classy' : 'cringe');
+        setCringeOrClassyState("result"); // Passa direttamente allo stato result
         break;
       
       case "truthOrDare":
@@ -438,6 +448,8 @@ const DrinkingGameApp = () => {
       // Resetta lo stato dei giochi speciali
       setActiveSpecialGame(null);
       setSpecialGamePlayer(null);
+      setCringeOrClassyState(null);
+      setCringeOrClassyResult(null);
       
       // NUOVO: Resetta il contatore dell'ultima azione speciale
       setLastSpecialGameRound(prev => ({
@@ -456,7 +468,8 @@ const DrinkingGameApp = () => {
           pointFinger: false,
           infamata: false,
           truthOrDare: false,
-          ilPezzoGrosso: false
+          ilPezzoGrosso: false,
+          cringeOrClassy: false
         }
       }));
       
@@ -468,7 +481,8 @@ const DrinkingGameApp = () => {
           pointFinger: gamePositions.pointFinger || 30,
           infamata: gamePositions.infamata || 20,
           truthOrDare: gamePositions.truthOrDare || 25,
-          ilPezzoGrosso: gamePositions.ilPezzoGrosso || 35
+          ilPezzoGrosso: gamePositions.ilPezzoGrosso || 35,
+          cringeOrClassy: gamePositions.cringeOrClassy || 40
         }
       }));
       
@@ -644,6 +658,8 @@ const DrinkingGameApp = () => {
     setCurrentTruthDareChoice(null);
     setTruthDareContent(null);
     setTruthDareState(null);
+    setCringeOrClassyState(null);
+    setCringeOrClassyResult(null);
     
     // Prosegui con il turno normale
     nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
@@ -940,7 +956,8 @@ const DrinkingGameApp = () => {
           pointFinger: 30,
           infamata: 20,
           truthOrDare: 25,
-          ilPezzoGrosso: 35
+          ilPezzoGrosso: 35,
+          cringeOrClassy: 40
         };
         acc[game] = defaultPositions[game] || 10 + (index * 10);
         return acc;
@@ -967,6 +984,10 @@ const DrinkingGameApp = () => {
     setCurrentTruthDareChoice(null);
     setTruthDareContent(null);
     setTruthDareState(null);
+    
+    // Resetta gli stati del gioco Cringe or Classy
+    setCringeOrClassyState(null);
+    setCringeOrClassyResult(null);
   };
   
   // Seleziona un'opzione di pagamento
@@ -1018,7 +1039,8 @@ const DrinkingGameApp = () => {
           currentTruthDareChoice === "truth" ? "Verità" :
           currentTruthDareChoice === "dare" ? "Obbligo" :
           "Debito"}!`,
-      ilPezzoGrosso: `${specialGamePlayer} deve fare un'affermazione e tutti voteranno se è vero o falso...`
+      ilPezzoGrosso: `${specialGamePlayer} deve fare un'affermazione e tutti voteranno se è vero o falso...`,
+      cringeOrClassy: `${specialGamePlayer} deve confessare una sua passione segreta`
     };
     
     return messages[activeSpecialGame] || null;
@@ -1514,6 +1536,10 @@ const DrinkingGameApp = () => {
                 </p>
               )}
               
+              {/* Rimuovi completamente qualsiasi messaggio o indicazione per Cringe or Classy */}
+              
+              {/* Nessun messaggio di risultato per Cringe or Classy */}
+              
               {/* Pulsanti per la scelta Obbligo/Verità/Debito */}
               {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" && (
                 <div style={{
@@ -1637,6 +1663,9 @@ const DrinkingGameApp = () => {
                     // Prosegui al prossimo giocatore o termina il gioco
                     nextTurnAfterSpecialGame();
                   }
+                } else if (activeSpecialGame === "cringeOrClassy") {
+                  // Prosegui al prossimo turno
+                  nextTurnAfterSpecialGame();
                 } else if (activeSpecialGame) {
                   nextTurnAfterSpecialGame();
                 } else {
@@ -1645,18 +1674,24 @@ const DrinkingGameApp = () => {
               }}
               style={{
                 width: '100%',
-                backgroundColor: activeSpecialGame === "truthOrDare" && truthDareState === "choosing" 
-                  ? '#AAAAAA' // disabilitato visivamente se non è stata fatta una scelta
-                  : '#3498db',
+                backgroundColor: 
+                  (activeSpecialGame === "truthOrDare" && truthDareState === "choosing")
+                    ? '#AAAAAA' // disabilitato visivamente se il gioco è in corso
+                    : '#3498db',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '0',
                 padding: '16px',
                 fontSize: '18px',
                 fontWeight: 'bold',
-                cursor: activeSpecialGame === "truthOrDare" && truthDareState === "choosing"
-                  ? 'not-allowed'
-                  : 'pointer'
+                cursor: 
+                  (activeSpecialGame === "truthOrDare" && truthDareState === "choosing")
+                    ? 'not-allowed'
+                    : 'pointer',
+                opacity:
+                  (activeSpecialGame === "truthOrDare" && truthDareState === "choosing")
+                    ? 0.5
+                    : 1
               }}
             >
               {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" 

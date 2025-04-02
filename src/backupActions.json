@@ -14,7 +14,10 @@
   },
   "ilPezzoGrosso": {
       "text": "{player} è IL PEZZO GROSSO! Deve fare un'affermazione \"Io sono il più...\" (es. \"Io sono il più festaiolo\"). Tutti votano segretamente se è Vero o Falso. Se la maggioranza non è d'accordo, {player} subisce una penalità!"
-  }
+  },
+  "cringeOrClassy": {
+  "text": "{player} è stato scelto per CRINGE OR CLASSY! Deve confessare una sua passione segreta e il gruppo voterà se è cringe o classy. Se è cringe, {player} esegue una penitenza; se è classy, sceglie chi deve fare la prossima."
+}
 },
 "truthDareGame": {
     "truth": [
