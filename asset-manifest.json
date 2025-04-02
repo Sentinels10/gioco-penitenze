@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/gioco-penitenze/static/css/main.cbadf274.css",
-    "main.js": "/gioco-penitenze/static/js/main.db47047f.js",
+    "main.js": "/gioco-penitenze/static/js/main.df7b5d00.js",
     "static/media/pointing-glove.png": "/gioco-penitenze/static/media/pointing-glove.4b192411e05edabdfad5.png",
     "index.html": "/gioco-penitenze/index.html",
     "main.cbadf274.css.map": "/gioco-penitenze/static/css/main.cbadf274.css.map",
-    "main.db47047f.js.map": "/gioco-penitenze/static/js/main.db47047f.js.map"
+    "main.df7b5d00.js.map": "/gioco-penitenze/static/js/main.df7b5d00.js.map"
   },
   "entrypoints": [
     "static/css/main.cbadf274.css",
-    "static/js/main.db47047f.js"
+    "static/js/main.df7b5d00.js"
   ]
 }
