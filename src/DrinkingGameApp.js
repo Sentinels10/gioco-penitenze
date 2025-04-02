@@ -91,6 +91,16 @@ const DrinkingGameApp = () => {
   const [selectedPaymentOption, setSelectedPaymentOption] = useState(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
+  // Nuovi stati per il gioco Obbligo Verità Debito
+  const [truthDarePlayers, setTruthDarePlayers] = useState([]);
+  const [currentTruthDareChoice, setCurrentTruthDareChoice] = useState(null);
+  const [truthDareContent, setTruthDareContent] = useState(null);
+  const [truthDareState, setTruthDareState] = useState(null); // "choosing", "executing", "completed"
+  const [truthDareContentPool, setTruthDareContentPool] = useState({
+    truth: [],
+    dare: []
+  });
+  
   // App name and description
   const appName = "FRIENZ";
   const appDescription = "Questo club è gestito da un AI. Lei formulerà domande sempre nuove e inaspettate.";
@@ -157,6 +167,40 @@ const DrinkingGameApp = () => {
       { text: "Se potessi viaggiare ovunque, dove andresti? Oppure 2 penalità" }
     ],
     neonRoulette: [] // Sarà popolato con azioni da tutte le altre stanze
+  };
+
+  // Nuova funzione per gestire la scelta di Obbligo/Verità/Debito
+  const handleTruthDareChoice = (choice) => {
+    setCurrentTruthDareChoice(choice);
+    
+    if (choice === "truth" || choice === "dare") {
+      // Seleziona un contenuto casuale dal pool appropriato
+      const pool = truthDareContentPool[choice];
+      if (pool && pool.length > 0) {
+        const randomIndex = Math.floor(Math.random() * pool.length);
+        const content = pool[randomIndex];
+        setTruthDareContent(content);
+      } else {
+        // Fallback in caso di pool vuoto
+        setTruthDareContent(choice === "truth" 
+          ? "Rispondi a una domanda personale che ti verrà fatta dal gruppo"
+          : "Esegui un'azione che ti verrà assegnata dal gruppo");
+      }
+    } else {
+      // Per "debt" non mostriamo contenuto
+      setTruthDareContent(null);
+      
+      // Opzionale: aggiungi il debito alla lista dei debiti
+      const newDebt = {
+        player: specialGamePlayer,
+        status: 'active',
+        description: `Debito assegnato durante il gioco Obbligo Verità Debito`
+      };
+      setDebtList([...debtList, newDebt]);
+    }
+    
+    // Cambia lo stato del gioco
+    setTruthDareState("executing");
   };
 
   // NUOVO: Funzione per distribuire i giochi speciali nella partita
@@ -228,6 +272,38 @@ const DrinkingGameApp = () => {
         
         // Sostituisci {player} con il nome del giocatore corrente
         actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        break;
+      
+      case "truthOrDare":
+        // Crea una lista di tutti gli indici dei giocatori da processare
+        const playerIndices = Array.from({ length: players.length }, (_, i) => i);
+        
+        // Imposta il giocatore corrente come primo e poi mescola il resto
+        const currentFirst = [currentPlayerIndex];
+        const remainingPlayers = playerIndices.filter(idx => idx !== currentPlayerIndex);
+        const shuffledRemaining = remainingPlayers.sort(() => Math.random() - 0.5);
+        
+        // Combina per avere il giocatore attuale per primo e poi tutti gli altri
+        setTruthDarePlayers([...currentFirst, ...shuffledRemaining]);
+        
+        // Imposta lo stato iniziale del gioco
+        setTruthDareState("choosing");
+        setCurrentTruthDareChoice(null);
+        setTruthDareContent(null);
+        
+        // Carica il pool di contenuti per verità e obblighi
+        if (backupActions.truthDareGame) {
+          setTruthDareContentPool({
+            truth: [...backupActions.truthDareGame.truth || []].sort(() => Math.random() - 0.5),
+            dare: [...backupActions.truthDareGame.dare || []].sort(() => Math.random() - 0.5)
+          });
+        }
+        
+        // Il giocatore corrente sarà il primo a giocare
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = "OBBLIGO VERITÀ O DEBITO: È il turno di " + players[currentPlayerIndex] + ". Se scegli Debito, eviti la penalità ma ti viene assegnato un debito che potrà essere riscattato in qualsiasi momento da chi dirige il gioco (es. \"Vai a prendermi da bere\" o \"Posta una storia imbarazzante\"). Scegli una delle opzioni!";
         break;
     }
     
@@ -524,10 +600,36 @@ const DrinkingGameApp = () => {
     }
   };
   
-  // Funzione semplificata per continuare dopo un'azione speciale
+  // Funzione per continuare dopo un'azione speciale
   const nextTurnAfterSpecialGame = () => {
     if (!selectedRoom) return;
     const roomId = selectedRoom.id;
+    
+    // Se è in corso il gioco Obbligo Verità Debito
+    if (activeSpecialGame === "truthOrDare") {
+      // Rimuovi il primo giocatore dalla lista (quello che ha appena giocato)
+      if (truthDarePlayers.length > 0) {
+        const updatedPlayers = [...truthDarePlayers];
+        updatedPlayers.shift();
+        setTruthDarePlayers(updatedPlayers);
+        
+        // Se ci sono ancora giocatori da processare
+        if (updatedPlayers.length > 0) {
+          const nextPlayerIndex = updatedPlayers[0];
+          setSpecialGamePlayer(players[nextPlayerIndex]);
+          setCurrentTruthDareChoice(null);
+          setTruthDareContent(null);
+          setTruthDareState("choosing");
+          setCurrentAction({ 
+            text: "OBBLIGO VERITÀ O DEBITO: È il turno di " + players[nextPlayerIndex] + ". Scegli una delle opzioni!" 
+          });
+          return;
+        }
+      }
+      
+      // Se tutti i giocatori hanno giocato, termina il gioco speciale
+      setTruthDareState("completed");
+    }
     
     // Aggiorna il contatore dell'ultima azione speciale
     setLastSpecialGameRound(prev => ({
@@ -538,6 +640,10 @@ const DrinkingGameApp = () => {
     // Resetta gli stati del gioco speciale
     setActiveSpecialGame(null);
     setSpecialGamePlayer(null);
+    setTruthDarePlayers([]);
+    setCurrentTruthDareChoice(null);
+    setTruthDareContent(null);
+    setTruthDareState(null);
     
     // Prosegui con il turno normale
     nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
@@ -855,6 +961,12 @@ const DrinkingGameApp = () => {
       lounge: 0,
       neonRoulette: 0
     });
+    
+    // Resetta gli stati del gioco Obbligo Verità Debito
+    setTruthDarePlayers([]);
+    setCurrentTruthDareChoice(null);
+    setTruthDareContent(null);
+    setTruthDareState(null);
   };
   
   // Seleziona un'opzione di pagamento
@@ -900,7 +1012,12 @@ const DrinkingGameApp = () => {
       bouncer: `${specialGamePlayer} è il buttafuori e sta decidendo...`,
       pointFinger: `${specialGamePlayer} sta scegliendo una caratteristica e tutti voteranno...`,
       infamata: `${specialGamePlayer} sta decidendo a chi assegnare la domanda o sfida...`,
-      truthOrDare: `Ogni giocatore deve decidere se preferisce rispondere a una domanda o fare un'azione!`,
+      truthOrDare: truthDareState === "choosing" 
+        ? `${specialGamePlayer} deve scegliere tra Verità, Obbligo o Debito!`
+        : `${specialGamePlayer} ha scelto ${
+          currentTruthDareChoice === "truth" ? "Verità" :
+          currentTruthDareChoice === "dare" ? "Obbligo" :
+          "Debito"}!`,
       ilPezzoGrosso: `${specialGamePlayer} deve fare un'affermazione e tutti voteranno se è vero o falso...`
     };
     
@@ -1396,6 +1513,108 @@ const DrinkingGameApp = () => {
                   {getSpecialGameMessage()}
                 </p>
               )}
+              
+              {/* Pulsanti per la scelta Obbligo/Verità/Debito */}
+              {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" && (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '15px',
+                  marginTop: '20px'
+                }}>
+                  <p style={{ fontSize: '16px', color: '#AAAAAA' }}>
+                    Seleziona un'opzione:
+                  </p>
+                  <div style={{
+                    display: 'flex',
+                    gap: '10px',
+                    justifyContent: 'center'
+                  }}>
+                    <button
+                      onClick={() => handleTruthDareChoice("truth")}
+                      style={{
+                        backgroundColor: '#E74C3C',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '12px 20px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      VERITÀ
+                    </button>
+                    <button
+                      onClick={() => handleTruthDareChoice("dare")}
+                      style={{
+                        backgroundColor: '#3498DB',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '12px 20px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      OBBLIGO
+                    </button>
+                    <button
+                      onClick={() => handleTruthDareChoice("debt")}
+                      style={{
+                        backgroundColor: '#2ECC71',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '12px 20px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      DEBITO
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Mostra il contenuto della scelta */}
+              {activeSpecialGame === "truthOrDare" && truthDareState === "executing" && (
+                <div style={{
+                  marginTop: '20px',
+                  padding: '15px',
+                  backgroundColor: currentTruthDareChoice === "truth" ? '#E74C3C20' :
+                                currentTruthDareChoice === "dare" ? '#3498DB20' :
+                                '#2ECC7120',
+                  borderRadius: '10px',
+                  textAlign: 'center'
+                }}>
+                  <h3 style={{
+                    marginBottom: '10px',
+                    color: currentTruthDareChoice === "truth" ? '#E74C3C' :
+                        currentTruthDareChoice === "dare" ? '#3498DB' :
+                        '#2ECC71'
+                  }}>
+                    {currentTruthDareChoice === "truth" ? "VERITÀ" :
+                    currentTruthDareChoice === "dare" ? "OBBLIGO" :
+                    "DEBITO"}
+                  </h3>
+                  
+                  {truthDareContent && (
+                    <p style={{ fontSize: '18px' }}>
+                      {truthDareContent}
+                    </p>
+                  )}
+                  
+                  {currentTruthDareChoice === "debt" && (
+                    <p style={{ fontSize: '16px', color: '#AAAAAA', marginTop: '10px' }}>
+                      Hai scelto di prendere un debito! Il gruppo deciderà quando riscattarlo.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           
@@ -1410,7 +1629,15 @@ const DrinkingGameApp = () => {
           }}>
             <button 
               onClick={() => {
-                if (activeSpecialGame) {
+                if (activeSpecialGame === "truthOrDare") {
+                  if (truthDareState === "choosing") {
+                    // Se il giocatore non ha fatto una scelta, non fare nulla
+                    return;
+                  } else if (truthDareState === "executing") {
+                    // Prosegui al prossimo giocatore o termina il gioco
+                    nextTurnAfterSpecialGame();
+                  }
+                } else if (activeSpecialGame) {
                   nextTurnAfterSpecialGame();
                 } else {
                   nextTurn();
@@ -1418,17 +1645,23 @@ const DrinkingGameApp = () => {
               }}
               style={{
                 width: '100%',
-                backgroundColor: '#3498db',
+                backgroundColor: activeSpecialGame === "truthOrDare" && truthDareState === "choosing" 
+                  ? '#AAAAAA' // disabilitato visivamente se non è stata fatta una scelta
+                  : '#3498db',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '0',
                 padding: '16px',
                 fontSize: '18px',
                 fontWeight: 'bold',
-                cursor: 'pointer'
+                cursor: activeSpecialGame === "truthOrDare" && truthDareState === "choosing"
+                  ? 'not-allowed'
+                  : 'pointer'
               }}
             >
-              NEXT
+              {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" 
+                ? "SCEGLI UN'OPZIONE" 
+                : "NEXT"}
             </button>
           </div>
         </div>
