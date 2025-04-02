@@ -45,24 +45,24 @@ const DrinkingGameApp = () => {
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
   // Stato per tenere traccia di tutti i giochi speciali
-  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare'];
+  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso'];
   
   // Stato per tracciare quali giochi sono stati usati
   const [specialGamesUsed, setSpecialGamesUsed] = useState({
-    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false },
-    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false },
-    clash: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false },
-    lounge: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false },
-    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false }
+    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false },
+    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false },
+    clash: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false },
+    lounge: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false },
+    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false }
   });
   
   // Stato per tracciare quando deve apparire ciascun gioco
   const [specialGamesRound, setSpecialGamesRound] = useState({
-    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 },
-    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 },
-    clash: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 },
-    lounge: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 },
-    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25 }
+    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 },
+    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 },
+    clash: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 },
+    lounge: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 },
+    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35 }
   });
   
   // Stato per il gioco speciale attualmente in corso
@@ -222,6 +222,7 @@ const DrinkingGameApp = () => {
         
       case "pointFinger":
       case "infamata":
+      case "ilPezzoGrosso":
         // Il giocatore corrente sarà il protagonista
         setSpecialGamePlayer(players[currentPlayerIndex]);
         
@@ -378,7 +379,8 @@ const DrinkingGameApp = () => {
           bouncer: false,
           pointFinger: false,
           infamata: false,
-          truthOrDare: false
+          truthOrDare: false,
+          ilPezzoGrosso: false
         }
       }));
       
@@ -389,7 +391,8 @@ const DrinkingGameApp = () => {
           bouncer: gamePositions.bouncer || 15,
           pointFinger: gamePositions.pointFinger || 30,
           infamata: gamePositions.infamata || 20,
-          truthOrDare: gamePositions.truthOrDare || 25
+          truthOrDare: gamePositions.truthOrDare || 25,
+          ilPezzoGrosso: gamePositions.ilPezzoGrosso || 35
         }
       }));
       
@@ -830,7 +833,8 @@ const DrinkingGameApp = () => {
           bouncer: 15,
           pointFinger: 30,
           infamata: 20,
-          truthOrDare: 25
+          truthOrDare: 25,
+          ilPezzoGrosso: 35
         };
         acc[game] = defaultPositions[game] || 10 + (index * 10);
         return acc;
@@ -896,7 +900,8 @@ const DrinkingGameApp = () => {
       bouncer: `${specialGamePlayer} è il buttafuori e sta decidendo...`,
       pointFinger: `${specialGamePlayer} sta scegliendo una caratteristica e tutti voteranno...`,
       infamata: `${specialGamePlayer} sta decidendo a chi assegnare la domanda o sfida...`,
-      truthOrDare: `Ogni giocatore deve decidere se preferisce rispondere a una domanda o fare un'azione!`
+      truthOrDare: `Ogni giocatore deve decidere se preferisce rispondere a una domanda o fare un'azione!`,
+      ilPezzoGrosso: `${specialGamePlayer} deve fare un'affermazione e tutti voteranno se è vero o falso...`
     };
     
     return messages[activeSpecialGame] || null;

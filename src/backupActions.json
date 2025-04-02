@@ -11,6 +11,9 @@
   },
   "truthOrDare": {
     "text": "OBBLIGO VERITA' O DEBITO: Se scegli Debito, eviti la penalità ma ti viene assegnato un debito che potrà essere riscattato in qualsiasi momento da chi dirige il gioco (es. \"Vai a prendermi da bere\" o \"Posta una storia imbarazzante\").. Decidete in senso orario partendo dal giocatore corrente."
+  },
+  "ilPezzoGrosso": {
+      "text": "{player} è IL PEZZO GROSSO! Deve fare un'affermazione \"Io sono il più...\" (es. \"Io sono il più festaiolo\"). Tutti votano segretamente se è Vero o Falso. Se la maggioranza non è d'accordo, {player} subisce una penalità!"
   }
 },
   "redRoom": [
