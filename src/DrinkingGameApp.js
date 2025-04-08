@@ -29,8 +29,8 @@ const DrinkingGameApp = () => {
   const [roomActionsPool, setRoomActionsPool] = useState({
     redRoom: [],
     darkRoom: [],
-    clash: [],
-    lounge: [],
+    coppie: [],
+    party: [],
     neonRoulette: []
   });
   
@@ -38,10 +38,17 @@ const DrinkingGameApp = () => {
   const [currentActionIndex, setCurrentActionIndex] = useState({
     redRoom: 0,
     darkRoom: 0,
-    clash: 0,
-    lounge: 0,
+    coppie: 0,
+    party: 0,
     neonRoulette: 0
   });
+  
+  // Stato per le azioni di gruppo
+  const [groupActionsPool, setGroupActionsPool] = useState([]);
+  // Indici per quando devono apparire le azioni di gruppo
+  const [groupActionPositions, setGroupActionPositions] = useState([]);
+  // Contatore per le azioni di gruppo mostrate
+  const [groupActionsShown, setGroupActionsShown] = useState(0);
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
   // Stato per tenere traccia di tutti i giochi speciali
@@ -51,8 +58,8 @@ const DrinkingGameApp = () => {
   const [specialGamesUsed, setSpecialGamesUsed] = useState({
     redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
     darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
-    clash: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
-    lounge: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
+    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
+    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
     neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false }
   });
   
@@ -60,8 +67,8 @@ const DrinkingGameApp = () => {
   const [specialGamesRound, setSpecialGamesRound] = useState({
     redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
     darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
-    clash: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
-    lounge: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
+    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
+    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
     neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 }
   });
   
@@ -75,7 +82,7 @@ const DrinkingGameApp = () => {
     redRoom: 0,
     darkRoom: 0,
     clash: 0,
-    lounge: 0,
+    party: 0,
     neonRoulette: 0
   });
   
@@ -115,39 +122,39 @@ const DrinkingGameApp = () => {
     { id: 'prive', name: 'Privè', price: '9.99', description: "L'AI ricorderà te e i tuoi amici, i vostri gusti, le vostre paure e vi farà domande sempre più personali" }
   ];
   
-  // Room definitions with their content types
-  const rooms = [
-    { 
-      id: 'redRoom', 
-      name: 'Red Room', 
-      description: 'Domande piccanti e provocanti',
-      color: '#DC2626'
-    },
-    { 
-      id: 'darkRoom', 
-      name: 'Dark Room', 
-      description: 'Non entrare se hai qualcosa da nascondere',
-      color: '#1F2937'
-    },
-    { 
-      id: 'clash', 
-      name: 'Sfide', 
-      description: 'Sfide uno contro uno',
-      color: '#EAB308'
-    },
-    { 
-      id: 'lounge', 
-      name: 'Lounge', 
-      description: 'Domande leggere e rilassanti',
-      color: '#2563EB'
-    },
-    { 
-      id: 'neonRoulette', 
-      name: 'Neon Roulette', 
-      description: 'Mix casuale di tutte le modalità',
-      color: '#D946EF'  // Colore viola/magenta per un effetto neon
-    }
-  ];
+// Room definitions with their content types
+const rooms = [
+  { 
+    id: 'party', 
+    name: 'Party', 
+    description: 'Domande divertenti per animare la festa',
+    color: '#2563EB'
+  },
+  { 
+    id: 'redRoom', 
+    name: 'Red Room', 
+    description: 'Domande piccanti e provocanti',
+    color: '#DC2626'
+  },
+  { 
+    id: 'darkRoom', 
+    name: 'Dark Room', 
+    description: 'Non entrare se hai qualcosa da nascondere',
+    color: '#1F2937'
+  },
+  { 
+    id: 'coppie', 
+    name: 'Coppie', 
+    description: 'Domande e sfide romantiche per innamorati',
+    color: '#EAB308'
+  },
+  { 
+    id: 'neonRoulette', 
+    name: 'Neon Roulette', 
+    description: 'Mix casuale di tutte le modalità',
+    color: '#D946EF'  // Colore viola/magenta per un effetto neon
+  }
+];
   
   // Fallback room content
   const roomContent = {
@@ -161,11 +168,12 @@ const DrinkingGameApp = () => {
       { text: "Confessa la cosa peggiore che hai fatto di nascosto oppure 6 penalità" },
       { text: "Mostra l'ultimo messaggio privato che hai inviato oppure 5 penalità" }
     ],
-    clash: [
-      { text: "Sfida: Tu e il giocatore alla tua destra dovete mantenere il contatto visivo per 30 secondi senza ridere. Se perdete, entrambi fate 5 penalità" },
-      { text: "Sfida: Chi riesce a stare più a lungo in equilibrio su una gamba sola tra te e un giocatore a scelta. Il perdente fa 6 penalità" }
+    coppie: [
+      { text: "Guarda negli occhi il tuo partner per 30 secondi, poi digli cosa ami di più del suo sguardo oppure 3 penalità" },
+      { text: "Completa questa frase rivolto al tuo partner: 'Mi fai sentire speciale quando tu...' oppure 3 penalità" },
+      { text: "Racconta al tuo partner qual è stato il momento in cui hai capito che era la persona giusta per te oppure 3 penalità" }
     ],
-    lounge: [
+    party: [
       { text: "Racconta qual è il tuo film preferito e perché oppure 2 penalità" },
       { text: "Condividi un ricordo d'infanzia felice oppure 3 penalità" },
       { text: "Se potessi viaggiare ovunque, dove andresti? Oppure 2 penalità" }
@@ -491,13 +499,38 @@ const DrinkingGameApp = () => {
         setDebtList([]);
       }
       
+      // Carica le azioni di gruppo dal backup
+      if (backupActions.groupActions && backupActions.groupActions.length > 0) {
+        // Mescola le azioni di gruppo e seleziona fino a 10 per questa partita
+        const shuffledGroupActions = [...backupActions.groupActions]
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 10);
+        
+        setGroupActionsPool(shuffledGroupActions);
+        
+        // Determina in quali posizioni dovrebbero apparire le azioni di gruppo
+        // Garantisce che almeno 2 azioni di gruppo appaiano durante la partita
+        const maxPosition = MAX_ACTIONS_PER_GAME - 5; // Evita che appaiano alla fine
+        
+        // Posizione per la prima azione di gruppo (tra il 20% e il 40% delle azioni)
+        const firstPosition = Math.floor(MAX_ACTIONS_PER_GAME * 0.2) + 
+                             Math.floor(Math.random() * (MAX_ACTIONS_PER_GAME * 0.2));
+        
+        // Posizione per la seconda azione di gruppo (tra il 60% e l'80% delle azioni)
+        const secondPosition = Math.floor(MAX_ACTIONS_PER_GAME * 0.6) + 
+                              Math.floor(Math.random() * (MAX_ACTIONS_PER_GAME * 0.2));
+        
+        setGroupActionPositions([firstPosition, secondPosition]);
+        setGroupActionsShown(0);
+      }
+      
       // Se è la modalità Neon Roulette, combina azioni da tutte le altre stanze
       if (room.id === 'neonRoulette') {
         // Preparazione degli array per le azioni da ciascuna stanza
         let redRoomActions = [];
         let darkRoomActions = [];
-        let clashActions = [];
-        let loungeActions = [];
+        let coppieActions = [];
+        let partyActions = [];
         
         // Raccogli azioni dal file backup per ogni stanza
         if (backupActions.redRoom && backupActions.redRoom.length > 0) {
@@ -508,12 +541,12 @@ const DrinkingGameApp = () => {
           darkRoomActions = [...backupActions.darkRoom];
         }
         
-        if (backupActions.clash && backupActions.clash.length > 0) {
-          clashActions = [...backupActions.clash];
+        if (backupActions.coppie && backupActions.coppie.length > 0) {
+          coppieActions = [...backupActions.coppie];
         }
         
-        if (backupActions.lounge && backupActions.lounge.length > 0) {
-          loungeActions = [...backupActions.lounge];
+        if (backupActions.party && backupActions.party.length > 0) {
+          partyActions = [...backupActions.party];
         }
         
         // Se qualche categoria ha poche o nessuna azione, usa il fallback
@@ -525,19 +558,19 @@ const DrinkingGameApp = () => {
           darkRoomActions = [...darkRoomActions, ...roomContent.darkRoom];
         }
         
-        if (clashActions.length < 5 && roomContent.clash) {
-          clashActions = [...clashActions, ...roomContent.clash];
+        if (coppieActions.length < 5 && roomContent.coppie) {
+          coppieActions = [...coppieActions, ...roomContent.coppie];
         }
         
-        if (loungeActions.length < 5 && roomContent.lounge) {
-          loungeActions = [...loungeActions, ...roomContent.lounge];
+        if (partyActions.length < 5 && roomContent.party) {
+          partyActions = [...partyActions, ...roomContent.party];
         }
         
         // Mescola ciascun gruppo di azioni separatamente
         redRoomActions = redRoomActions.sort(() => Math.random() - 0.5);
         darkRoomActions = darkRoomActions.sort(() => Math.random() - 0.5);
-        clashActions = clashActions.sort(() => Math.random() - 0.5);
-        loungeActions = loungeActions.sort(() => Math.random() - 0.5);
+        coppieActions = coppieActions.sort(() => Math.random() - 0.5);
+        partyActions = partyActions.sort(() => Math.random() - 0.5);
         
         // Calcola quante azioni prendere da ciascuna categoria per un totale di circa 100
         const maxPerCategory = 25; // 25 azioni per categoria = 100 totali
@@ -545,15 +578,15 @@ const DrinkingGameApp = () => {
         // Prendi un numero bilanciato di azioni da ciascuna categoria
         const selectedRedRoomActions = redRoomActions.slice(0, Math.min(maxPerCategory, redRoomActions.length));
         const selectedDarkRoomActions = darkRoomActions.slice(0, Math.min(maxPerCategory, darkRoomActions.length));
-        const selectedClashActions = clashActions.slice(0, Math.min(maxPerCategory, clashActions.length));
-        const selectedLoungeActions = loungeActions.slice(0, Math.min(maxPerCategory, loungeActions.length));
+        const selectedCoppieActions = coppieActions.slice(0, Math.min(maxPerCategory, coppieActions.length));
+        const selectedPartyActions = partyActions.slice(0, Math.min(maxPerCategory, partyActions.length));
         
         // Combina tutte le azioni selezionate
         const combinedActions = [
           ...selectedRedRoomActions,
           ...selectedDarkRoomActions,
-          ...selectedClashActions,
-          ...selectedLoungeActions
+          ...selectedCoppieActions,
+          ...selectedPartyActions
         ];
         
         // Mescola le azioni combinate
@@ -562,8 +595,8 @@ const DrinkingGameApp = () => {
         console.log("Neon Roulette stats:");
         console.log(`Red Room: ${selectedRedRoomActions.length} azioni`);
         console.log(`Dark Room: ${selectedDarkRoomActions.length} azioni`);
-        console.log(`Clash: ${selectedClashActions.length} azioni`);
-        console.log(`Lounge: ${selectedLoungeActions.length} azioni`);
+        console.log(`Coppie: ${selectedCoppieActions.length} azioni`);
+        console.log(`Party: ${selectedPartyActions.length} azioni`);
         console.log(`Totale: ${shuffledActions.length} azioni`);
         
         // Aggiorna il pool di azioni per la Neon Roulette
@@ -670,6 +703,32 @@ const DrinkingGameApp = () => {
     if (!selectedRoom) return;
     
     const roomId = selectedRoom.id;
+
+    // Verifica se è il momento di mostrare un'azione di gruppo
+    if (groupActionsPool.length > 0 && 
+        groupActionPositions.includes(actionsCounter) && 
+        groupActionsShown < 2) {
+      
+      // Seleziona un'azione di gruppo casuale
+      const randomIndex = Math.floor(Math.random() * groupActionsPool.length);
+      const groupAction = groupActionsPool[randomIndex];
+      
+      // Rimuovi questa azione dal pool per evitare duplicati
+      const updatedPool = [...groupActionsPool];
+      updatedPool.splice(randomIndex, 1);
+      setGroupActionsPool(updatedPool);
+      
+      // Imposta l'azione di gruppo come azione corrente
+      setCurrentAction({ text: groupAction.text });
+      
+      // Incrementa il contatore di azioni di gruppo mostrate
+      setGroupActionsShown(prev => prev + 1);
+      
+      // Incrementa il contatore delle azioni
+      setActionsCounter(prev => prev + 1);
+      
+      return;
+    }
     
     // Verifica se ci sono abbastanza azioni dall'ultima azione speciale
     const actionsSinceLastSpecial = actionsCounter - lastSpecialGameRound[roomId];
@@ -698,22 +757,22 @@ const DrinkingGameApp = () => {
       if (roomId === 'neonRoulette') {
         let redRoomFallback = roomContent.redRoom || [];
         let darkRoomFallback = roomContent.darkRoom || [];
-        let clashFallback = roomContent.clash || [];
-        let loungeFallback = roomContent.lounge || [];
+        let coppieFallback = roomContent.coppie || [];
+        let partyFallback = roomContent.party || [];
         
         // Prendi fino a 5 azioni da ciascuna categoria
         const maxPerCategory = 5;
         redRoomFallback = redRoomFallback.slice(0, Math.min(maxPerCategory, redRoomFallback.length));
         darkRoomFallback = darkRoomFallback.slice(0, Math.min(maxPerCategory, darkRoomFallback.length));
-        clashFallback = clashFallback.slice(0, Math.min(maxPerCategory, clashFallback.length));
-        loungeFallback = loungeFallback.slice(0, Math.min(maxPerCategory, loungeFallback.length));
+        coppieFallback = coppieFallback.slice(0, Math.min(maxPerCategory, coppieFallback.length));
+        partyFallback = partyFallback.slice(0, Math.min(maxPerCategory, partyFallback.length));
         
         // Combina e mescola
         const fallbackPool = [
           ...redRoomFallback, 
           ...darkRoomFallback, 
-          ...clashFallback, 
-          ...loungeFallback
+          ...coppieFallback, 
+          ...partyFallback
         ].sort(() => Math.random() - 0.5);
         
         if (fallbackPool.length > 0) {
@@ -975,7 +1034,7 @@ const DrinkingGameApp = () => {
       redRoom: 0,
       darkRoom: 0,
       clash: 0,
-      lounge: 0,
+      party: 0,
       neonRoulette: 0
     });
     
@@ -988,6 +1047,11 @@ const DrinkingGameApp = () => {
     // Resetta gli stati del gioco Cringe or Classy
     setCringeOrClassyState(null);
     setCringeOrClassyResult(null);
+    
+    // Resetta le azioni di gruppo
+    setGroupActionsPool([]);
+    setGroupActionPositions([]);
+    setGroupActionsShown(0);
   };
   
   // Seleziona un'opzione di pagamento
@@ -1500,7 +1564,13 @@ const DrinkingGameApp = () => {
               textAlign: 'center',
               margin: '10px 0 30px 0'
             }}>
-              {players[currentPlayerIndex]}
+              {activeSpecialGame === "pointFinger" ? "PUNTARE IL DITO" : 
+               activeSpecialGame === "bouncer" ? "BUTTAFUORI" :
+               activeSpecialGame === "infamata" ? "INFAMATA" :
+               activeSpecialGame === "truthOrDare" ? "OBBLIGO VERITÀ O DEBITO" :
+               activeSpecialGame === "ilPezzoGrosso" ? "IL PEZZO GROSSO" :
+               activeSpecialGame === "cringeOrClassy" ? "CRINGE OR CLASSY" :
+               players[currentPlayerIndex]}
             </h2>
             
             <div style={{
