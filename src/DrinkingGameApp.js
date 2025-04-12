@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import backupActions from './backupActions.json';
+import translations from './translations';
+
 // Importa l'immagine del guanto che punta
 import pointingGlove from './assets/pointing-glove.png';
 
 const DrinkingGameApp = () => {
-  // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing', 'gameOver', 'paywall'
+  // Stato per la lingua selezionata (default: italiano)
+  const [language, setLanguage] = useState('it');
+  // Riferimento alle traduzioni nella lingua corrente
+  const t = translations[language];
+  
+  // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing', 'gameOver', 'paywall', 'languageSelection'
   const [gameState, setGameState] = useState('welcome');
   const [players, setPlayers] = useState([]);
   const [inputPlayers, setInputPlayers] = useState([{ id: 1, name: '' }]);
@@ -112,246 +118,12 @@ const DrinkingGameApp = () => {
   const [cringeOrClassyState, setCringeOrClassyState] = useState(null); // "voting", "result"
   const [cringeOrClassyResult, setCringeOrClassyResult] = useState(null);
   
-  // App name and description
-  const appName = "FRIENZ";
-  const appDescription = "Questo club è gestito da un AI. Lei formulerà domande sempre nuove e inaspettate.";
-  
-  // Opzioni di pagamento
-  const paymentOptions = [
-    { id: 'premium', name: 'Premium', price: '4.99', description: 'Sblocca tutte le stanze per sempre' },
-    { id: 'prive', name: 'Privè', price: '9.99', description: "L'AI ricorderà te e i tuoi amici, i vostri gusti, le vostre paure e vi farà domande sempre più personali" }
-  ];
-  
-// Room definitions with their content types
-const rooms = [
-  { 
-    id: 'party', 
-    name: 'Party', 
-    description: 'Domande divertenti per animare la festa',
-    color: '#2563EB'
-  },
-  { 
-    id: 'redRoom', 
-    name: 'Red Room', 
-    description: 'Domande piccanti e provocanti',
-    color: '#DC2626'
-  },
-  { 
-    id: 'darkRoom', 
-    name: 'Dark Room', 
-    description: 'Non entrare se hai qualcosa da nascondere',
-    color: '#1F2937'
-  },
-  { 
-    id: 'coppie', 
-    name: 'Coppie', 
-    description: 'Domande e sfide romantiche per innamorati',
-    color: '#EAB308'
-  },
-  { 
-    id: 'neonRoulette', 
-    name: 'Neon Roulette', 
-    description: 'Mix casuale di tutte le modalità',
-    color: '#D946EF'  // Colore viola/magenta per un effetto neon
-  }
-];
-  
-  // Fallback room content
-  const roomContent = {
-    redRoom: [
-      { text: "Raccontaci la tua più grande fantasia sessuale oppure 5 penalità" },
-      { text: "Indica chi è la persona più attraente in questa stanza e spiega perché oppure 4 penalità" },
-      { text: "Racconta la cosa più intima che hai fatto in un luogo pubblico oppure 3 penalità" }
-    ],
-    darkRoom: [
-      { text: "Rivela un segreto oscuro che non hai mai detto a nessuno oppure 5 penalità" },
-      { text: "Confessa la cosa peggiore che hai fatto di nascosto oppure 6 penalità" },
-      { text: "Mostra l'ultimo messaggio privato che hai inviato oppure 5 penalità" }
-    ],
-    coppie: [
-      { text: "Guarda negli occhi il tuo partner per 30 secondi, poi digli cosa ami di più del suo sguardo oppure 3 penalità" },
-      { text: "Completa questa frase rivolto al tuo partner: 'Mi fai sentire speciale quando tu...' oppure 3 penalità" },
-      { text: "Racconta al tuo partner qual è stato il momento in cui hai capito che era la persona giusta per te oppure 3 penalità" }
-    ],
-    party: [
-      { text: "Racconta qual è il tuo film preferito e perché oppure 2 penalità" },
-      { text: "Condividi un ricordo d'infanzia felice oppure 3 penalità" },
-      { text: "Se potessi viaggiare ovunque, dove andresti? Oppure 2 penalità" }
-    ],
-    neonRoulette: [] // Sarà popolato con azioni da tutte le altre stanze
-  };
-
-  // Nuova funzione per gestire la scelta di Obbligo/Verità/Debito
-  const handleTruthDareChoice = (choice) => {
-    setCurrentTruthDareChoice(choice);
-    
-    if (choice === "truth" || choice === "dare") {
-      // Seleziona un contenuto casuale dal pool appropriato
-      const pool = truthDareContentPool[choice];
-      if (pool && pool.length > 0) {
-        const randomIndex = Math.floor(Math.random() * pool.length);
-        const content = pool[randomIndex];
-        setTruthDareContent(content);
-      } else {
-        // Fallback in caso di pool vuoto
-        setTruthDareContent(choice === "truth" 
-          ? "Rispondi a una domanda personale che ti verrà fatta dal gruppo"
-          : "Esegui un'azione che ti verrà assegnata dal gruppo");
-      }
-    } else {
-      // Per "debt" non mostriamo contenuto
-      setTruthDareContent(null);
-      
-      // Opzionale: aggiungi il debito alla lista dei debiti
-      const newDebt = {
-        player: specialGamePlayer,
-        status: 'active',
-        description: `Debito assegnato durante il gioco Obbligo Verità Debito`
-      };
-      setDebtList([...debtList, newDebt]);
-    }
-    
-    // Cambia lo stato del gioco
-    setTruthDareState("executing");
-  };
-
-  // NUOVO: Funzione per distribuire i giochi speciali nella partita
-  const distributeSpecialGames = (maxActions) => {
-    const MIN_SPACING = 5; // Distanza minima tra i giochi speciali
-    
-    // Mescola l'array dei giochi per un ordine casuale
-    const shuffledGames = [...SPECIAL_GAMES].sort(() => Math.random() - 0.5);
-    
-    // Range disponibile per la distribuzione dei giochi
-    const minPosition = 10; // Iniziamo un po' dopo l'inizio della partita
-    const maxPosition = maxActions - 10; // Finiamo un po' prima della fine
-    const availableRange = maxPosition - minPosition;
-    
-    // Calcola la distribuzione ideale
-    const segmentSize = Math.floor(availableRange / SPECIAL_GAMES.length);
-    
-    // Crea le posizioni con un po' di randomicità ma mantieni la distanza minima
-    const positions = {};
-    
-    shuffledGames.forEach((game, index) => {
-      // Base position nel suo segmento
-      const segmentStart = minPosition + (index * segmentSize);
-      const segmentEnd = segmentStart + segmentSize - MIN_SPACING;
-      
-      // Aggiungi randomicità all'interno del segmento
-      positions[game] = segmentStart + Math.floor(Math.random() * (segmentEnd - segmentStart));
-    });
-    
-    return positions;
-  };
-
-  // NUOVO: Funzione helper per gestire i giochi speciali
-  const handleSpecialGame = (gameType) => {
-    if (!selectedRoom) return;
-    const roomId = selectedRoom.id;
-    
-    // Verifica che esista la sezione specialGames nel backupActions
-    if (!backupActions.specialGames || !backupActions.specialGames[gameType]) {
-      console.error(`Manca la sezione specialGames.${gameType} nel backupActions.json!`);
-      // Continua con il prossimo turno normale in caso di errore
-      nextTurn();
-      return;
-    }
-    
-    // Ottieni il testo del gioco dal backup
-    let actionText = backupActions.specialGames[gameType].text;
-    
-    // Gestisci i vari tipi di gioco
-    switch (gameType) {
-      case "bouncer":
-        // Scegli un giocatore diverso da quello corrente
-        let specialPlayerIndex;
-        do {
-          specialPlayerIndex = Math.floor(Math.random() * players.length);
-        } while (specialPlayerIndex === currentPlayerIndex);
-        
-        setSpecialGamePlayer(players[specialPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore
-        actionText = actionText.replace(/{player}/g, players[specialPlayerIndex]);
-        break;
-        
-      case "pointFinger":
-      case "infamata":
-      case "ilPezzoGrosso":
-      case "cringeOrClassy":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Imposta direttamente il risultato casuale senza fase di votazione
-        const isClassy = Math.random() > 0.5;
-        setCringeOrClassyResult(isClassy ? 'classy' : 'cringe');
-        setCringeOrClassyState("result"); // Passa direttamente allo stato result
-        break;
-      
-      case "truthOrDare":
-        // Crea una lista di tutti gli indici dei giocatori da processare
-        const playerIndices = Array.from({ length: players.length }, (_, i) => i);
-        
-        // Imposta il giocatore corrente come primo e poi mescola il resto
-        const currentFirst = [currentPlayerIndex];
-        const remainingPlayers = playerIndices.filter(idx => idx !== currentPlayerIndex);
-        const shuffledRemaining = remainingPlayers.sort(() => Math.random() - 0.5);
-        
-        // Combina per avere il giocatore attuale per primo e poi tutti gli altri
-        setTruthDarePlayers([...currentFirst, ...shuffledRemaining]);
-        
-        // Imposta lo stato iniziale del gioco
-        setTruthDareState("choosing");
-        setCurrentTruthDareChoice(null);
-        setTruthDareContent(null);
-        
-        // Carica il pool di contenuti per verità e obblighi
-        if (backupActions.truthDareGame) {
-          setTruthDareContentPool({
-            truth: [...backupActions.truthDareGame.truth || []].sort(() => Math.random() - 0.5),
-            dare: [...backupActions.truthDareGame.dare || []].sort(() => Math.random() - 0.5)
-          });
-        }
-        
-        // Il giocatore corrente sarà il primo a giocare
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = "OBBLIGO VERITÀ O DEBITO: È il turno di " + players[currentPlayerIndex] + ". Se scegli Debito, eviti la penalità ma ti viene assegnato un debito che potrà essere riscattato in qualsiasi momento da chi dirige il gioco (es. \"Vai a prendermi da bere\" o \"Posta una storia imbarazzante\"). Scegli una delle opzioni!";
-        break;
-    }
-    
-    // Imposta il gioco speciale attivo
-    setActiveSpecialGame(gameType);
-    
-    // Marca il gioco come usato
-    setSpecialGamesUsed(prev => ({
-      ...prev,
-      [roomId]: {
-        ...prev[roomId],
-        [gameType]: true
-      }
-    }));
-    
-    // Imposta l'azione corrente
-    setCurrentAction({ text: actionText });
-    
-    // Aggiorna il contatore dell'ultima azione speciale
-    setLastSpecialGameRound(prev => ({
-      ...prev,
-      [roomId]: actionsCounter
-    }));
-  };
-
   // Verifica lo stato del paywall quando il componente si monta
   useEffect(() => {
     // Recupera lo stato del pagamento da localStorage
     const storedHasPaid = localStorage.getItem('hasPaid') === 'true';
     const storedHasPlayedFreeGame = localStorage.getItem('hasPlayedFreeGame') === 'true';
+    const storedLanguage = localStorage.getItem('language');
     
     if (storedHasPaid) {
       setHasPaid(true);
@@ -359,6 +131,10 @@ const rooms = [
     
     if (storedHasPlayedFreeGame) {
       setHasPlayedFreeGame(true);
+    }
+    
+    if (storedLanguage && translations[storedLanguage]) {
+      setLanguage(storedLanguage);
     }
   }, []);
   
@@ -372,7 +148,33 @@ const rooms = [
     }
   }, [gameState, selectedRoom]);
   
-  // Enter the player setup screen
+  // Funzione per cambiare la lingua dell'app
+  const changeLanguage = (newLanguage) => {
+    if (translations[newLanguage]) {
+      setLanguage(newLanguage);
+      localStorage.setItem('language', newLanguage);
+      
+      // Se si stava visualizzando una stanza, aggiorna la selezione
+      if (selectedRoom && currentRoomIndex >= 0) {
+        // Trova l'indice della stanza con lo stesso ID nella nuova lingua
+        const roomId = selectedRoom.id;
+        const newRooms = translations[newLanguage].rooms;
+        const newRoomIndex = newRooms.findIndex(room => room.id === roomId);
+        
+        if (newRoomIndex >= 0) {
+          setCurrentRoomIndex(newRoomIndex);
+          setSelectedRoom(newRooms[newRoomIndex]);
+        }
+      }
+    }
+  };
+  
+  // Funzione per aprire il selettore di lingua
+  const openLanguageSelector = () => {
+    setGameState('languageSelection');
+  };
+  
+  // Mostra la schermata di setup giocatori
   const enterPlayerSetup = () => {
     // Verifica se l'utente ha già giocato la partita gratuita e non ha pagato
     if (hasPlayedFreeGame && !hasPaid) {
@@ -416,7 +218,7 @@ const rooms = [
       .map(input => input.name.trim());
     
     if (validPlayers.length < 2) {
-      alert("Inserisci almeno 2 giocatori per iniziare!");
+      alert(t.notEnoughPlayersError);
       return;
     }
     
@@ -438,12 +240,52 @@ const rooms = [
     }
   };
   
+  // Carica il file backupActions nella lingua corrente
+  const loadBackupActions = async () => {
+    try {
+      // Determina il nome del file in base alla lingua corrente
+      const backupActionsFileName = `backupActions_${language}.json`;
+      
+      // Percorso alla cartella che contiene i file backupActions
+      const folderPath = './actions'; // Sostituisci 'data' con il nome della tua cartella
+      
+      // Carica dinamicamente il file corretto in base alla lingua
+      let backupActionsModule;
+      
+      // Gestione dei diversi percorsi in base alla lingua
+      if (language === 'it') {
+        backupActionsModule = await import(`${folderPath}/backupActions_it.json`);
+      } else {
+        // Default to English if the language is not Italian
+        backupActionsModule = await import(`${folderPath}/backupActions_en.json`);
+      }
+      
+      console.log(`Caricato con successo: ${folderPath}/${backupActionsFileName}`);
+      return backupActionsModule.default;
+    } catch (error) {
+      console.error(`Errore nel caricamento del file backupActions_${language}.json:`, error);
+      console.log('Tentativo di caricare il file di backup dalla directory principale...');
+      
+      // Fallback: prova a caricare dalla directory principale
+      try {
+        const backupActionsModule = await import(`./backupActions.json`);
+        return backupActionsModule.default;
+      } catch (fallbackError) {
+        console.error('Errore anche nel caricamento del file di fallback:', fallbackError);
+        return {}; // Restituisce un oggetto vuoto se non può caricare nessun file
+      }
+    }
+  };
+  
   // Seleziona una stanza e prepara il gioco
   const selectRoom = async (room) => {
     setSelectedRoom(room);
     setIsLoading(true);
     
     try {
+      // Carica il file backupActions nella lingua corrente
+      const backupActions = await loadBackupActions();
+      
       // Simulazione caricamento
       for (let i = 0; i <= 100; i += 10) {
         setLoadingProgress(i);
@@ -550,6 +392,14 @@ const rooms = [
         }
         
         // Se qualche categoria ha poche o nessuna azione, usa il fallback
+        // Nota: Il roomContent è ora sostituito con traduzioni
+        const roomContent = {
+          redRoom: { text: t.noActionAvailable },
+          darkRoom: { text: t.noActionAvailable },
+          coppie: { text: t.noActionAvailable },
+          party: { text: t.noActionAvailable }
+        };
+        
         if (redRoomActions.length < 5 && roomContent.redRoom) {
           redRoomActions = [...redRoomActions, ...roomContent.redRoom];
         }
@@ -592,12 +442,12 @@ const rooms = [
         // Mescola le azioni combinate
         const shuffledActions = combinedActions.sort(() => Math.random() - 0.5);
         
-        console.log("Neon Roulette stats:");
-        console.log(`Red Room: ${selectedRedRoomActions.length} azioni`);
-        console.log(`Dark Room: ${selectedDarkRoomActions.length} azioni`);
-        console.log(`Coppie: ${selectedCoppieActions.length} azioni`);
-        console.log(`Party: ${selectedPartyActions.length} azioni`);
-        console.log(`Totale: ${shuffledActions.length} azioni`);
+        console.log(t.logMessages.neonRouletteStats);
+        console.log(t.logMessages.redRoomStats.replace('{count}', selectedRedRoomActions.length));
+        console.log(t.logMessages.darkRoomStats.replace('{count}', selectedDarkRoomActions.length));
+        console.log(t.logMessages.coppieStats.replace('{count}', selectedCoppieActions.length));
+        console.log(t.logMessages.partyStats.replace('{count}', selectedPartyActions.length));
+        console.log(t.logMessages.totalStats.replace('{count}', shuffledActions.length));
         
         // Aggiorna il pool di azioni per la Neon Roulette
         setRoomActionsPool(prev => ({
@@ -647,6 +497,36 @@ const rooms = [
     }
   };
   
+  // NUOVO: Funzione per distribuire i giochi speciali nella partita
+  const distributeSpecialGames = (maxActions) => {
+    const MIN_SPACING = 5; // Distanza minima tra i giochi speciali
+    
+    // Mescola l'array dei giochi per un ordine casuale
+    const shuffledGames = [...SPECIAL_GAMES].sort(() => Math.random() - 0.5);
+    
+    // Range disponibile per la distribuzione dei giochi
+    const minPosition = 10; // Iniziamo un po' dopo l'inizio della partita
+    const maxPosition = maxActions - 10; // Finiamo un po' prima della fine
+    const availableRange = maxPosition - minPosition;
+    
+    // Calcola la distribuzione ideale
+    const segmentSize = Math.floor(availableRange / SPECIAL_GAMES.length);
+    
+    // Crea le posizioni con un po' di randomicità ma mantieni la distanza minima
+    const positions = {};
+    
+    shuffledGames.forEach((game, index) => {
+      // Base position nel suo segmento
+      const segmentStart = minPosition + (index * segmentSize);
+      const segmentEnd = segmentStart + segmentSize - MIN_SPACING;
+      
+      // Aggiungi randomicità all'interno del segmento
+      positions[game] = segmentStart + Math.floor(Math.random() * (segmentEnd - segmentStart));
+    });
+    
+    return positions;
+  };
+  
   // Funzione per continuare dopo un'azione speciale
   const nextTurnAfterSpecialGame = () => {
     if (!selectedRoom) return;
@@ -668,7 +548,7 @@ const rooms = [
           setTruthDareContent(null);
           setTruthDareState("choosing");
           setCurrentAction({ 
-            text: "OBBLIGO VERITÀ O DEBITO: È il turno di " + players[nextPlayerIndex] + ". Scegli una delle opzioni!" 
+            text: t.truthDareNextPlayerIntro.replace('{player}', players[nextPlayerIndex])
           });
           return;
         }
@@ -698,11 +578,153 @@ const rooms = [
     nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
   };
   
+  // Nuova funzione per gestire la scelta di Obbligo/Verità/Debito
+  const handleTruthDareChoice = (choice) => {
+    setCurrentTruthDareChoice(choice);
+    
+    if (choice === "truth" || choice === "dare") {
+      // Seleziona un contenuto casuale dal pool appropriato
+      const pool = truthDareContentPool[choice];
+      if (pool && pool.length > 0) {
+        const randomIndex = Math.floor(Math.random() * pool.length);
+        const content = pool[randomIndex];
+        setTruthDareContent(content);
+      } else {
+        // Fallback in caso di pool vuoto
+        setTruthDareContent(choice === "truth" 
+          ? "Rispondi a una domanda personale che ti verrà fatta dal gruppo"
+          : "Esegui un'azione che ti verrà assegnata dal gruppo");
+      }
+    } else {
+      // Per "debt" non mostriamo contenuto
+      setTruthDareContent(null);
+      
+      // Opzionale: aggiungi il debito alla lista dei debiti
+      const newDebt = {
+        player: specialGamePlayer,
+        status: 'active',
+        description: t.debts.debtDescription
+      };
+      setDebtList([...debtList, newDebt]);
+    }
+    
+    // Cambia lo stato del gioco
+    setTruthDareState("executing");
+  };
+  
+  // NUOVO: Funzione helper per gestire i giochi speciali
+  const handleSpecialGame = async (gameType) => {
+    if (!selectedRoom) return;
+    const roomId = selectedRoom.id;
+    
+    // Carica le azioni dal file corretto
+    const backupActions = await loadBackupActions();
+    
+    // Verifica che esista la sezione specialGames nel backupActions
+    if (!backupActions.specialGames || !backupActions.specialGames[gameType]) {
+      console.error(t.logMessages.missingSpecialGame.replace('{type}', gameType));
+      // Continua con il prossimo turno normale in caso di errore
+      nextTurn();
+      return;
+    }
+    
+    // Ottieni il testo del gioco dal backup
+    let actionText = backupActions.specialGames[gameType].text;
+    
+    // Gestisci i vari tipi di gioco
+    switch (gameType) {
+      case "bouncer":
+        // Scegli un giocatore diverso da quello corrente
+        let specialPlayerIndex;
+        do {
+          specialPlayerIndex = Math.floor(Math.random() * players.length);
+        } while (specialPlayerIndex === currentPlayerIndex);
+        
+        setSpecialGamePlayer(players[specialPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore
+        actionText = actionText.replace(/{player}/g, players[specialPlayerIndex]);
+        break;
+        
+      case "pointFinger":
+      case "infamata":
+      case "ilPezzoGrosso":
+      case "cringeOrClassy":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Imposta direttamente il risultato casuale senza fase di votazione
+        const isClassy = Math.random() > 0.5;
+        setCringeOrClassyResult(isClassy ? 'classy' : 'cringe');
+        setCringeOrClassyState("result"); // Passa direttamente allo stato result
+        break;
+      
+      case "truthOrDare":
+        // Crea una lista di tutti gli indici dei giocatori da processare
+        const playerIndices = Array.from({ length: players.length }, (_, i) => i);
+        
+        // Imposta il giocatore corrente come primo e poi mescola il resto
+        const currentFirst = [currentPlayerIndex];
+        const remainingPlayers = playerIndices.filter(idx => idx !== currentPlayerIndex);
+        const shuffledRemaining = remainingPlayers.sort(() => Math.random() - 0.5);
+        
+        // Combina per avere il giocatore attuale per primo e poi tutti gli altri
+        setTruthDarePlayers([...currentFirst, ...shuffledRemaining]);
+        
+        // Imposta lo stato iniziale del gioco
+        setTruthDareState("choosing");
+        setCurrentTruthDareChoice(null);
+        setTruthDareContent(null);
+        
+        // Carica il pool di contenuti per verità e obblighi
+        if (backupActions.truthDareGame) {
+          setTruthDareContentPool({
+            truth: [...backupActions.truthDareGame.truth || []].sort(() => Math.random() - 0.5),
+            dare: [...backupActions.truthDareGame.dare || []].sort(() => Math.random() - 0.5)
+          });
+        }
+        
+        // Il giocatore corrente sarà il primo a giocare
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = t.truthDareIntro.replace('{player}', players[currentPlayerIndex]);
+        break;
+    }
+    
+    // Imposta il gioco speciale attivo
+    setActiveSpecialGame(gameType);
+    
+    // Marca il gioco come usato
+    setSpecialGamesUsed(prev => ({
+      ...prev,
+      [roomId]: {
+        ...prev[roomId],
+        [gameType]: true
+      }
+    }));
+    
+    // Imposta l'azione corrente
+    setCurrentAction({ text: actionText });
+    
+    // Aggiorna il contatore dell'ultima azione speciale
+    setLastSpecialGameRound(prev => ({
+      ...prev,
+      [roomId]: actionsCounter
+    }));
+  };
+  
   // Funzione dedicata per aggiornare l'azione corrente
-  const updateCurrentAction = () => {
+  const updateCurrentAction = async () => {
     if (!selectedRoom) return;
     
     const roomId = selectedRoom.id;
+    
+    // Carica le azioni dal file di backup
+    const backupActions = await loadBackupActions();
 
     // Verifica se è il momento di mostrare un'azione di gruppo
     if (groupActionsPool.length > 0 && 
@@ -751,46 +773,27 @@ const rooms = [
     
     // Se non ci sono azioni nel pool, usa quelle predefinite
     if (!currentPool || currentPool.length === 0) {
-      console.log("Nessuna azione nel pool, uso il fallback");
+      console.log(t.logMessages.noActionsInPool);
       
       // Per Neon Roulette, raccogliamo azioni dal fallback di tutte le stanze in modo bilanciato
       if (roomId === 'neonRoulette') {
-        let redRoomFallback = roomContent.redRoom || [];
-        let darkRoomFallback = roomContent.darkRoom || [];
-        let coppieFallback = roomContent.coppie || [];
-        let partyFallback = roomContent.party || [];
+        // Crea un pool di fallback per ogni stanza
+        const fallbackTexts = [
+          { text: t.noActionAvailable },
+          { text: t.noActionAvailable },
+          { text: t.noActionAvailable }
+        ];
         
-        // Prendi fino a 5 azioni da ciascuna categoria
-        const maxPerCategory = 5;
-        redRoomFallback = redRoomFallback.slice(0, Math.min(maxPerCategory, redRoomFallback.length));
-        darkRoomFallback = darkRoomFallback.slice(0, Math.min(maxPerCategory, darkRoomFallback.length));
-        coppieFallback = coppieFallback.slice(0, Math.min(maxPerCategory, coppieFallback.length));
-        partyFallback = partyFallback.slice(0, Math.min(maxPerCategory, partyFallback.length));
-        
-        // Combina e mescola
-        const fallbackPool = [
-          ...redRoomFallback, 
-          ...darkRoomFallback, 
-          ...coppieFallback, 
-          ...partyFallback
-        ].sort(() => Math.random() - 0.5);
-        
-        if (fallbackPool.length > 0) {
-          const randomIndex = Math.floor(Math.random() * fallbackPool.length);
-          setCurrentAction({ text: fallbackPool[randomIndex].text });
+        if (fallbackTexts.length > 0) {
+          const randomIndex = Math.floor(Math.random() * fallbackTexts.length);
+          setCurrentAction({ text: fallbackTexts[randomIndex].text });
         } else {
-          setCurrentAction({ text: "Nessuna azione disponibile" });
+          setCurrentAction({ text: t.noActionAvailable });
         }
       } 
       // Per altre stanze, usa il fallback normale
       else {
-        const fallbackPool = roomContent[roomId] || [];
-        if (fallbackPool.length > 0) {
-          const randomIndex = Math.floor(Math.random() * fallbackPool.length);
-          setCurrentAction({ text: fallbackPool[randomIndex].text });
-        } else {
-          setCurrentAction({ text: "Nessuna azione disponibile" });
-        }
+        setCurrentAction({ text: t.noActionAvailable });
       }
       
       // Incrementa il contatore delle azioni (anche per il fallback)
@@ -852,15 +855,10 @@ const rooms = [
       if (match) {
         const penaltyCount = match[1];
         
-        // Array di possibili formulazioni per domande
-        const questionAlternatives = [
-          `? Se non rispondi ${penaltyCount} penalità`,
-          `? Se eviti la domanda ${penaltyCount} penalità`,
-          `? Il silenzio costa ${penaltyCount} penalità`
-        ];
-        
         // Scegli una formulazione casuale
-        const randomQuestionAlt = questionAlternatives[Math.floor(Math.random() * questionAlternatives.length)];
+        const randomQuestionAlt = t.penaltyAlternatives.questions[
+          Math.floor(Math.random() * t.penaltyAlternatives.questions.length)
+        ].replace('{count}', penaltyCount);
         
         // Sostituisci tutto ciò che viene dopo ? fino a "penalità" con la nuova formulazione
         actionText = actionText.replace(/\?(.*?)(\d+)\s*penal(i|i)t(à|a)/i, randomQuestionAlt);
@@ -874,21 +872,10 @@ const rooms = [
       if (match) {
         const penaltyCount = match[2]; // Il secondo gruppo è il numero
         
-        // Array di possibili formulazioni
-        const alternatives = [
-          `se ti rifiuti ${penaltyCount} penalità`,
-          `se non lo fai ${penaltyCount} penalità`,
-          `altrimenti sono ${penaltyCount} penalità`,
-          `in caso contrario ${penaltyCount} penalità`,
-          `o saranno ${penaltyCount} penalità`,
-          `o riceverai ${penaltyCount} penalità`,
-          `se non hai coraggio ${penaltyCount} penalità`,
-          `o dovrai fare ${penaltyCount} penalità`,
-          `rifiutare costa ${penaltyCount} penalità`
-        ];
-        
         // Scegli una formulazione casuale
-        const randomAlt = alternatives[Math.floor(Math.random() * alternatives.length)];
+        const randomAlt = t.penaltyAlternatives.statements[
+          Math.floor(Math.random() * t.penaltyAlternatives.statements.length)
+        ].replace('{count}', penaltyCount);
         
         // Sostituisci "oppure X penalità" con la nuova formulazione
         actionText = actionText.replace(penaltyRegex, ` ${randomAlt}`);
@@ -977,6 +964,9 @@ const rooms = [
       case 'paywall':
         setGameState('welcome');
         break;
+      case 'languageSelection':
+        setGameState('welcome');
+        break;
       default:
         break;
     }
@@ -1002,7 +992,7 @@ const rooms = [
     const resetGameRounds = {};
     
     // Resetta per ogni stanza e ogni tipo di gioco
-    rooms.forEach(room => {
+    t.rooms.forEach(room => {
       resetUsedGames[room.id] = SPECIAL_GAMES.reduce((acc, game) => {
         acc[game] = false;
         return acc;
@@ -1093,21 +1083,17 @@ const rooms = [
     if (!activeSpecialGame || !specialGamePlayer) return null;
     
     // Messaggi per ciascun tipo di gioco
-    const messages = {
-      bouncer: `${specialGamePlayer} è il buttafuori e sta decidendo...`,
-      pointFinger: `${specialGamePlayer} sta scegliendo una caratteristica e tutti voteranno...`,
-      infamata: `${specialGamePlayer} sta decidendo a chi assegnare la domanda o sfida...`,
-      truthOrDare: truthDareState === "choosing" 
-        ? `${specialGamePlayer} deve scegliere tra Verità, Obbligo o Debito!`
-        : `${specialGamePlayer} ha scelto ${
-          currentTruthDareChoice === "truth" ? "Verità" :
-          currentTruthDareChoice === "dare" ? "Obbligo" :
-          "Debito"}!`,
-      ilPezzoGrosso: `${specialGamePlayer} deve fare un'affermazione e tutti voteranno se è vero o falso...`,
-      cringeOrClassy: `${specialGamePlayer} deve confessare una sua passione segreta`
-    };
+    if (activeSpecialGame === "truthOrDare") {
+      if (truthDareState === "choosing") {
+        return t.specialGames.truthOrDare.choosing.replace('{player}', specialGamePlayer);
+      } else {
+        const choiceKey = currentTruthDareChoice || 'truth';
+        return t.specialGames.truthOrDare[choiceKey].replace('{player}', specialGamePlayer);
+      }
+    }
     
-    return messages[activeSpecialGame] || null;
+    // Per gli altri giochi
+    return t.specialGames[activeSpecialGame]?.replace('{player}', specialGamePlayer) || null;
   };
   
   return (
@@ -1132,13 +1118,13 @@ const rooms = [
               fontSize: '36px', 
               marginBottom: '20px',
               fontWeight: 'bold'
-            }}>{appName}</h1>
+            }}>{t.appName}</h1>
             <p style={{ 
               fontSize: '18px', 
               marginBottom: '40px',
               color: '#CCCCCC',
               lineHeight: '1.5'
-            }}>{appDescription}</p>
+            }}>{t.appDescription}</p>
             
             <button 
               onClick={enterPlayerSetup}
@@ -1151,10 +1137,28 @@ const rooms = [
                 padding: '16px',
                 fontSize: '18px',
                 fontWeight: 'bold',
+                cursor: 'pointer',
+                marginBottom: '15px'
+              }}
+            >
+              {t.startButton}
+            </button>
+            
+            <button 
+              onClick={openLanguageSelector}
+              style={{
+                width: '100%',
+                backgroundColor: 'transparent',
+                color: '#FFFFFF',
+                border: '1px solid #3498db',
+                borderRadius: '10px',
+                padding: '16px',
+                fontSize: '18px',
+                fontWeight: 'bold',
                 cursor: 'pointer'
               }}
             >
-              INIZIA
+              {language === 'it' ? '🇮🇹 Italiano' : '🇬🇧 English'} - {language === 'it' ? 'Cambia lingua' : 'Change language'}
             </button>
             
             {/* Pulsante nascosto per reset (solo per testing) */}
@@ -1171,9 +1175,179 @@ const rooms = [
                   cursor: 'pointer'
                 }}
               >
-                Reset (Solo Test)
+                {t.resetButton}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Language Selection Screen */}
+      {gameState === 'languageSelection' && (
+        <div className="screen language-selection-screen" style={{ 
+          backgroundColor: '#000000', 
+          color: '#FFFFFF',
+          padding: '20px 0 0 0',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh'
+        }}>
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: '50px 1fr 50px',
+            alignItems: 'center',
+            padding: '15px 0',
+            marginBottom: '20px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button 
+                onClick={goBack}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '5px'
+                }}
+              >
+                ←
+              </button>
+            </div>
+            
+            <h1 style={{ 
+              margin: 0, 
+              textAlign: 'center',
+              fontWeight: 'normal',
+              fontSize: '28px',
+              letterSpacing: '1px'
+            }}>
+              {language === 'it' ? 'LINGUA' : 'LANGUAGE'}
+            </h1>
+            
+            <div></div>
+          </div>
+          
+          <div style={{ 
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '0 20px',
+            marginBottom: '20px'
+          }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '15px',
+              marginTop: '20px'
+            }}>
+              <button 
+                onClick={() => changeLanguage('it')}
+                style={{
+                  backgroundColor: language === 'it' ? '#3498db' : '#2A2A2A',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: '15px',
+                  cursor: 'pointer'
+                }}
+              >
+                <span style={{ fontSize: '24px' }}>🇮🇹</span>
+                <div style={{
+                  textAlign: 'left',
+                  flex: 1
+                }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    color: '#FFFFFF',
+                    margin: 0,
+                    marginBottom: '5px'
+                  }}>
+                    Italiano
+                  </h3>
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#AAAAAA',
+                    margin: 0
+                  }}>
+                    Gioca in Italiano
+                  </p>
+                </div>
+                {language === 'it' && (
+                  <span style={{ fontSize: '24px', color: '#FFFFFF' }}>✓</span>
+                )}
+              </button>
+              
+              <button 
+                onClick={() => changeLanguage('en')}
+                style={{
+                  backgroundColor: language === 'en' ? '#3498db' : '#2A2A2A',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: '15px',
+                  cursor: 'pointer'
+                }}
+              >
+                <span style={{ fontSize: '24px' }}>🇬🇧</span>
+                <div style={{
+                  textAlign: 'left',
+                  flex: 1
+                }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    color: '#FFFFFF',
+                    margin: 0,
+                    marginBottom: '5px'
+                  }}>
+                    English
+                  </h3>
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#AAAAAA',
+                    margin: 0
+                  }}>
+                    Play in English
+                  </p>
+                </div>
+                {language === 'en' && (
+                  <span style={{ fontSize: '24px', color: '#FFFFFF' }}>✓</span>
+                )}
+              </button>
+            </div>
+          </div>
+          
+          <div style={{ 
+            padding: '0',
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'transparent',
+            zIndex: 10
+          }}>
+            <button 
+              onClick={goBack}
+              style={{
+                width: '100%',
+                backgroundColor: '#3498db',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '0',
+                padding: '16px',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              {language === 'it' ? 'CONFERMA' : 'CONFIRM'}
+            </button>
           </div>
         </div>
       )}
@@ -1218,7 +1392,7 @@ const rooms = [
               fontSize: '28px',
               letterSpacing: '1px'
             }}>
-              PLAYERS
+              {t.playersScreenTitle}
             </h1>
             
             <div></div> {/* Colonna vuota a destra per equilibrio */}
@@ -1249,7 +1423,7 @@ const rooms = [
                   value={input.name}
                   onChange={(e) => updatePlayerName(input.id, e.target.value)}
                   onKeyPress={(e) => handleKeyPress(e, input.id, index)}
-                  placeholder="Enter player name"
+                  placeholder={t.playerInputPlaceholder}
                   style={{
                     flex: 1,
                     backgroundColor: '#1A1A1A',
@@ -1297,7 +1471,7 @@ const rooms = [
                 width: '340px'
               }}
             >
-              <span style={{ fontSize: '20px' }}>⊕</span> Add Player
+              <span style={{ fontSize: '20px' }}>⊕</span> {t.addPlayerLabel}
             </button>
           </div>
           
@@ -1326,184 +1500,184 @@ const rooms = [
                 gap: '10px'
               }}
             >
-              <span style={{ fontSize: '20px' }}>▶</span> START
+              <span style={{ fontSize: '20px' }}>▶</span> {t.startGameButton}
             </button>
           </div>
         </div>
       )}
       
       {/* Room Selection Screen */}
-{gameState === 'roomSelection' && (
-  <div className="screen room-selection-screen" style={{ 
-    backgroundColor: '#000000', 
-    color: '#FFFFFF',
-    padding: '0',
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    overflowY: 'auto'  // Aggiungi scrolling verticale
-  }}>
-    <div style={{ 
-      display: 'grid',
-      gridTemplateColumns: '50px 1fr 50px',
-      alignItems: 'center',
-      padding: '15px 0',
-      marginBottom: '10px'  // Ridotto da 20px
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <button 
-          onClick={goBack}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#FFFFFF',
-            fontSize: '24px',
-            cursor: 'pointer',
-            padding: '5px'
-          }}
-        >
-          ←
-        </button>
-      </div>
-      
-      <h1 style={{ 
-        margin: 0, 
-        textAlign: 'center',
-        fontWeight: 'normal',
-        fontSize: '28px',
-        letterSpacing: '1px'
-      }}>
-        ROOMS
-      </h1>
-      
-      <div></div>
-    </div>
-    
-    <div style={{ 
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '0 20px',
-      minHeight: '450px',  // Altezza minima per garantire spazio sufficiente
-      marginBottom: '20px' // Aggiunto spazio sotto
-    }}>
-      <div style={{
-        width: '300px',
-        height: 'auto',  // Cambiato da 400px fissi ad auto
-        minHeight: '300px', // Altezza minima invece che fissa
-        maxHeight: '70vh',  // Massimo 70% dell'altezza viewport
-        backgroundColor: rooms[currentRoomIndex].color,
-        borderRadius: '15px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '30px',
-        marginBottom: '15px'  // Ridotto da 25px
-      }}>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <h2 style={{
-            fontSize: '36px',
-            fontWeight: 'bold',
-            textAlign: 'center',
-            color: rooms[currentRoomIndex].color === '#1F2937' || 
-                  rooms[currentRoomIndex].color === '#DC2626' || 
-                  rooms[currentRoomIndex].color === '#D946EF' ? '#FFFFFF' : '#000000'
-          }}>
-            {rooms[currentRoomIndex].name}
-          </h2>
-        </div>
-        
-        <div style={{ marginBottom: '20px' }}>  {/* Ridotto da 40px */}
-          <button 
-            onClick={() => selectRoom(rooms[currentRoomIndex])}
-            style={{
-              backgroundColor: '#FFFFFF',
-              color: '#000000',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '14px 40px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            ENTRA
-          </button>
-        </div>
-        
-        <div style={{ minHeight: '40px', display: 'flex', alignItems: 'center' }}> {/* Cambiato da height a minHeight */}
-          <p style={{
-            fontSize: '16px',
-            textAlign: 'center',
-            color: rooms[currentRoomIndex].color === '#1F2937' ? '#9CA3AF' :
-                  rooms[currentRoomIndex].color === '#DC2626' ? 'rgba(255,255,255,0.8)' :
-                  rooms[currentRoomIndex].color === '#D946EF' ? '#f5d0fe' : 
-                  'rgba(0,0,0,0.7)'
-          }}>
-            {rooms[currentRoomIndex].description}
-          </p>
-        </div>
-      </div>
-      
-      <div style={{ 
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px',
-        marginBottom: '20px'  // Aggiunto spazio sotto
-      }}>
-        <button 
-          onClick={() => setCurrentRoomIndex((prev) => (prev === 0 ? rooms.length - 1 : prev - 1))}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#AAAAAA',
-            fontSize: '36px',
-            cursor: 'pointer',
-            padding: '10px'  // Aumentata l'area di tocco
-          }}
-        >
-          ‹
-        </button>
-        
-        <div style={{ 
+      {gameState === 'roomSelection' && (
+        <div className="screen room-selection-screen" style={{ 
+          backgroundColor: '#000000', 
+          color: '#FFFFFF',
+          padding: '0',
           display: 'flex',
-          gap: '8px'
+          flexDirection: 'column',
+          height: '100vh',
+          overflowY: 'auto'
         }}>
-          {rooms.map((_, index) => (
-            <div 
-              key={index}
-              onClick={() => setCurrentRoomIndex(index)}
-              style={{
-                width: '10px',  // Ingrandito per facilitare il tocco
-                height: '10px',
-                borderRadius: '50%',
-                backgroundColor: index === currentRoomIndex ? '#FFFFFF' : '#555555',
-                cursor: 'pointer'
-              }}
-            ></div>
-          ))}
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: '50px 1fr 50px',
+            alignItems: 'center',
+            padding: '15px 0',
+            marginBottom: '10px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button 
+                onClick={goBack}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '5px'
+                }}
+              >
+                ←
+              </button>
+            </div>
+            
+            <h1 style={{ 
+              margin: 0, 
+              textAlign: 'center',
+              fontWeight: 'normal',
+              fontSize: '28px',
+              letterSpacing: '1px'
+            }}>
+              {t.roomsScreenTitle}
+            </h1>
+            
+            <div></div>
+          </div>
+          
+          <div style={{ 
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '0 20px',
+            minHeight: '450px',
+            marginBottom: '20px'
+          }}>
+            <div style={{
+              width: '300px',
+              height: 'auto',
+              minHeight: '300px',
+              maxHeight: '70vh',
+              backgroundColor: t.rooms[currentRoomIndex].color,
+              borderRadius: '15px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '30px',
+              marginBottom: '15px'
+            }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <h2 style={{
+                  fontSize: '36px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  color: t.rooms[currentRoomIndex].color === '#1F2937' || 
+                        t.rooms[currentRoomIndex].color === '#DC2626' || 
+                        t.rooms[currentRoomIndex].color === '#D946EF' ? '#FFFFFF' : '#000000'
+                }}>
+                  {t.rooms[currentRoomIndex].name}
+                </h2>
+              </div>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <button 
+                  onClick={() => selectRoom(t.rooms[currentRoomIndex])}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    color: '#000000',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '14px 40px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t.enterButton}
+                </button>
+              </div>
+              
+              <div style={{ minHeight: '40px', display: 'flex', alignItems: 'center' }}>
+                <p style={{
+                  fontSize: '16px',
+                  textAlign: 'center',
+                  color: t.rooms[currentRoomIndex].color === '#1F2937' ? '#9CA3AF' :
+                        t.rooms[currentRoomIndex].color === '#DC2626' ? 'rgba(255,255,255,0.8)' :
+                        t.rooms[currentRoomIndex].color === '#D946EF' ? '#f5d0fe' : 
+                        'rgba(0,0,0,0.7)'
+                }}>
+                  {t.rooms[currentRoomIndex].description}
+                </p>
+              </div>
+            </div>
+            
+            <div style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              gap: '20px',
+              marginBottom: '20px'
+            }}>
+              <button 
+                onClick={() => setCurrentRoomIndex((prev) => (prev === 0 ? t.rooms.length - 1 : prev - 1))}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#AAAAAA',
+                  fontSize: '36px',
+                  cursor: 'pointer',
+                  padding: '10px'
+                }}
+              >
+                ‹
+              </button>
+              
+              <div style={{ 
+                display: 'flex',
+                gap: '8px'
+              }}>
+                {t.rooms.map((_, index) => (
+                  <div 
+                    key={index}
+                    onClick={() => setCurrentRoomIndex(index)}
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      backgroundColor: index === currentRoomIndex ? '#FFFFFF' : '#555555',
+                      cursor: 'pointer'
+                    }}
+                  ></div>
+                ))}
+              </div>
+              
+              <button 
+                onClick={() => setCurrentRoomIndex((prev) => (prev === t.rooms.length - 1 ? 0 : prev + 1))}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#AAAAAA',
+                  fontSize: '36px',
+                  cursor: 'pointer',
+                  padding: '10px'
+                }}
+              >
+                ›
+              </button>
+            </div>
+          </div>
         </div>
-        
-        <button 
-          onClick={() => setCurrentRoomIndex((prev) => (prev === rooms.length - 1 ? 0 : prev + 1))}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#AAAAAA',
-            fontSize: '36px',
-            cursor: 'pointer',
-            padding: '10px'  // Aumentata l'area di tocco
-          }}
-        >
-          ›
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
       
       {/* Playing Screen */}
       {gameState === 'playing' && selectedRoom && (
@@ -1556,7 +1730,7 @@ const rooms = [
             display: 'flex',
             flexDirection: 'column',
             padding: '0 20px',
-            marginBottom: '80px' // Spazio per il pulsante fisso in basso
+            marginBottom: '80px'
           }}>
             <h2 style={{
               fontSize: '26px',
@@ -1564,13 +1738,7 @@ const rooms = [
               textAlign: 'center',
               margin: '10px 0 30px 0'
             }}>
-              {activeSpecialGame === "pointFinger" ? "PUNTARE IL DITO" : 
-               activeSpecialGame === "bouncer" ? "BUTTAFUORI" :
-               activeSpecialGame === "infamata" ? "INFAMATA" :
-               activeSpecialGame === "truthOrDare" ? "OBBLIGO VERITÀ O DEBITO" :
-               activeSpecialGame === "ilPezzoGrosso" ? "IL PEZZO GROSSO" :
-               activeSpecialGame === "cringeOrClassy" ? "CRINGE OR CLASSY" :
-               players[currentPlayerIndex]}
+              {activeSpecialGame ? t.specialGamesTitles[activeSpecialGame] : players[currentPlayerIndex]}
             </h2>
             
             <div style={{
@@ -1606,10 +1774,6 @@ const rooms = [
                 </p>
               )}
               
-              {/* Rimuovi completamente qualsiasi messaggio o indicazione per Cringe or Classy */}
-              
-              {/* Nessun messaggio di risultato per Cringe or Classy */}
-              
               {/* Pulsanti per la scelta Obbligo/Verità/Debito */}
               {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" && (
                 <div style={{
@@ -1620,7 +1784,7 @@ const rooms = [
                   marginTop: '20px'
                 }}>
                   <p style={{ fontSize: '16px', color: '#AAAAAA' }}>
-                    Seleziona un'opzione:
+                    {t.truthDareOptions.selectOption}
                   </p>
                   <div style={{
                     display: 'flex',
@@ -1640,7 +1804,7 @@ const rooms = [
                         cursor: 'pointer'
                       }}
                     >
-                      VERITÀ
+                      {t.truthDareOptions.truth}
                     </button>
                     <button
                       onClick={() => handleTruthDareChoice("dare")}
@@ -1655,7 +1819,7 @@ const rooms = [
                         cursor: 'pointer'
                       }}
                     >
-                      OBBLIGO
+                      {t.truthDareOptions.dare}
                     </button>
                     <button
                       onClick={() => handleTruthDareChoice("debt")}
@@ -1670,7 +1834,7 @@ const rooms = [
                         cursor: 'pointer'
                       }}
                     >
-                      DEBITO
+                      {t.truthDareOptions.debt}
                     </button>
                   </div>
                 </div>
@@ -1693,9 +1857,9 @@ const rooms = [
                         currentTruthDareChoice === "dare" ? '#3498DB' :
                         '#2ECC71'
                   }}>
-                    {currentTruthDareChoice === "truth" ? "VERITÀ" :
-                    currentTruthDareChoice === "dare" ? "OBBLIGO" :
-                    "DEBITO"}
+                    {currentTruthDareChoice === "truth" ? t.truthDareOptions.truth :
+                    currentTruthDareChoice === "dare" ? t.truthDareOptions.dare :
+                    t.truthDareOptions.debt}
                   </h3>
                   
                   {truthDareContent && (
@@ -1706,7 +1870,7 @@ const rooms = [
                   
                   {currentTruthDareChoice === "debt" && (
                     <p style={{ fontSize: '16px', color: '#AAAAAA', marginTop: '10px' }}>
-                      Hai scelto di prendere un debito! Il gruppo deciderà quando riscattarlo.
+                      {t.truthDareOptions.debtExplanation}
                     </p>
                   )}
                 </div>
@@ -1765,8 +1929,8 @@ const rooms = [
               }}
             >
               {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" 
-                ? "SCEGLI UN'OPZIONE" 
-                : "NEXT"}
+                ? t.truthDareOptions.chooseOption
+                : t.nextButton}
             </button>
           </div>
         </div>
@@ -1805,7 +1969,7 @@ const rooms = [
               marginBottom: '30px',
               fontWeight: 'bold'
             }}>
-              PARTITA FINITA!
+              {t.gameOverMessage}
             </h1>
             
             <p style={{ 
@@ -1814,7 +1978,7 @@ const rooms = [
               color: '#CCCCCC',
               lineHeight: '1.5'
             }}>
-              Avete completato {MAX_ACTIONS_PER_GAME} azioni!
+              {t.actionsCompletedMessage.replace('{count}', MAX_ACTIONS_PER_GAME)}
             </p>
             
             <div style={{ 
@@ -1839,7 +2003,12 @@ const rooms = [
               fontSize: '16px', 
               color: '#3498db'
             }}>
-              Tocca per {hasPlayedFreeGame && !hasPaid ? 'sbloccare altre partite' : 'tornare alla selezione delle stanze'}
+              {t.tapToContinueMessage.replace(
+                '{action}', 
+                hasPlayedFreeGame && !hasPaid 
+                  ? t.unlockMoreGamesMessage 
+                  : t.returnToRoomsMessage
+              )}
             </p>
           </div>
           
@@ -1894,7 +2063,7 @@ const rooms = [
               fontSize: '28px',
               letterSpacing: '1px'
             }}>
-              SBLOCCA IL GIOCO
+              {t.unlockGameTitle}
             </h1>
             
             <div></div> {/* Colonna vuota a destra per equilibrio */}
@@ -1918,7 +2087,7 @@ const rooms = [
                 fontWeight: 'bold',
                 marginBottom: '15px'
               }}>
-                Partita gratuita terminata!
+                {t.freeGameEndedTitle}
               </h2>
               <p style={{
                 fontSize: '16px',
@@ -1926,7 +2095,7 @@ const rooms = [
                 lineHeight: '1.5',
                 marginBottom: '20px'
               }}>
-                Hai utilizzato la tua partita gratuita. Sblocca l'app per giocare illimitatamente con tutti i tuoi amici!
+                {t.freeGameEndedMessage}
               </p>
               
               <div style={{
@@ -1935,7 +2104,7 @@ const rooms = [
                 gap: '15px',
                 marginTop: '25px'
               }}>
-                {paymentOptions.map(option => (
+                {t.paymentOptions.map(option => (
                   <div 
                     key={option.id}
                     onClick={() => selectPaymentOption(option)}
@@ -2012,7 +2181,7 @@ const rooms = [
                 gap: '10px'
               }}
             >
-              {isProcessingPayment ? 'ELABORAZIONE...' : 'ACQUISTA'}
+              {isProcessingPayment ? t.processingPayment : t.purchaseButton}
             </button>
           </div>
         </div>
@@ -2027,7 +2196,7 @@ const rooms = [
           zIndex: 100
         }}>
           <button
-            onClick={() => alert(`Debiti attivi:\n${debtList.filter(d => d.status === 'active').map(d => `- ${d.player}: ${d.description}`).join('\n')}`)}
+            onClick={() => alert(`${t.debts.activeDebtsTitle}\n${debtList.filter(d => d.status === 'active').map(d => `- ${d.player}: ${d.description}`).join('\n')}`)}
             style={{
               backgroundColor: '#EAB308',
               color: 'black',
@@ -2043,7 +2212,7 @@ const rooms = [
               cursor: 'pointer'
             }}
           >
-            💸
+            {t.debts.buttonLabel}
           </button>
         </div>
       )}
@@ -2079,7 +2248,7 @@ const rooms = [
             }}></div>
             <p style={{
               fontSize: '16px'
-            }}>Caricamento in corso...</p>
+            }}>{t.loadingMessage}</p>
             
             <style jsx="true">{`
               @keyframes spin {

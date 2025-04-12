@@ -1,7 +1,7 @@
 {
   "specialGames": {
   "bouncer": {
-    "text": "{player} è stato scelto come BUTTAFUORI del club! Può decidere se \"lasciar passare\" la prossima penitenza o far fare una penalità extra a un altro giocatore."
+    "text": "{player} è stato scelto come BUTTAFUORI del club! Può decidere se \"lasciar passare\" la penitenza o “espellere” un giocatore (farlo bere, fargli fare una sola penitenza extra)."
   },
   "pointFinger": {
     "text": "{player} inizia il gioco del PUNTARE IL DITO! Deve scegliere una caratteristica (es. \"il più tirchio\", \"il più divertente\") e tutti indicheranno un giocatore. Chi riceve più voti fa una penalità!"
