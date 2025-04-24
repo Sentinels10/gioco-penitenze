@@ -11,7 +11,7 @@ const useGameLogic = () => {
   // Riferimento alle traduzioni nella lingua corrente
   const t = translations[language];
   
-  // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing', 'gameOver', 'paywall', 'languageSelection'
+  // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing', 'gameOver', 'paywall', 'languageSelection', 'leaderboard'
   const [gameState, setGameState] = useState('welcome');
   const [players, setPlayers] = useState([]);
   const [inputPlayers, setInputPlayers] = useState([{ id: 1, name: '' }]);
@@ -23,6 +23,9 @@ const useGameLogic = () => {
   const [actionsCounter, setActionsCounter] = useState(0);
   // Costante per il numero massimo di azioni per partita
   const MAX_ACTIONS_PER_GAME = 50;
+  
+  // NUOVO: Sistema di punteggio
+  const [playerPenalties, setPlayerPenalties] = useState({});
   
   // State for the loading
   const [isLoading, setIsLoading] = useState(false);
@@ -223,6 +226,14 @@ const useGameLogic = () => {
     }
     
     setPlayers(validPlayers);
+    
+    // NUOVO: Inizializza i punteggi per tutti i giocatori a 0
+    const initialPenalties = {};
+    validPlayers.forEach(player => {
+      initialPenalties[player] = 0;
+    });
+    setPlayerPenalties(initialPenalties);
+    
     setGameState('roomSelection');
   };
   
@@ -892,6 +903,25 @@ const useGameLogic = () => {
     setActionsCounter(prev => prev + 1);
   };
   
+  // NUOVO: Funzione per gestire il pulsante "Fatto"
+  const handleDone = () => {
+    // Passa al turno successivo senza aggiungere penalità
+    nextTurn();
+  };
+  
+  // NUOVO: Funzione per gestire il pulsante "Paga"
+  const handlePay = () => {
+    // Aggiungi una penalità al giocatore corrente
+    const currentPlayer = players[currentPlayerIndex];
+    setPlayerPenalties(prev => ({
+      ...prev,
+      [currentPlayer]: (prev[currentPlayer] || 0) + 1
+    }));
+    
+    // Passa al turno successivo
+    nextTurn();
+  };
+  
   // Passa al turno successivo
   const nextTurn = (afterSpecialAction = false) => {
     const roomId = selectedRoom.id;
@@ -902,8 +932,8 @@ const useGameLogic = () => {
       setHasPlayedFreeGame(true);
       localStorage.setItem('hasPlayedFreeGame', 'true');
       
-      // Vai alla schermata di fine partita
-      setGameState('gameOver');
+      // NUOVO: Vai alla schermata della leaderboard invece che al game over
+      setGameState('leaderboard');
       return;
     }
     
@@ -941,6 +971,12 @@ const useGameLogic = () => {
     }, 50);
   };
   
+  // NUOVO: Funzione per terminare il gioco dopo aver visualizzato la leaderboard
+  const endGame = () => {
+    // Vai alla schermata di game over
+    setGameState('gameOver');
+  };
+  
   // Navigazione tra le schermate
   const goBack = () => {
     switch (gameState) {
@@ -952,6 +988,9 @@ const useGameLogic = () => {
         break;
       case 'playing':
         setGameState('roomSelection');
+        break;
+      case 'leaderboard': // NUOVO: Gestisci il ritorno dalla leaderboard
+        setGameState('gameOver');
         break;
       case 'gameOver':
         // Se l'utente ha già giocato e non ha pagato, mostra il paywall
@@ -982,6 +1021,9 @@ const useGameLogic = () => {
     setSelectedRoom(null);
     setPreviousAction(null);
     setActionsCounter(0);
+    
+    // NUOVO: Resetta il contatore delle penalità
+    setPlayerPenalties({});
     
     // Resetta gli stati dei giochi speciali
     setActiveSpecialGame(null);
@@ -1096,6 +1138,13 @@ const useGameLogic = () => {
     return t.specialGames[activeSpecialGame]?.replace('{player}', specialGamePlayer) || null;
   };
 
+  // NUOVO: Ottieni la leaderboard ordinata per numero di penalità
+  const getLeaderboard = () => {
+    return Object.entries(playerPenalties)
+      .sort(([, penaltiesA], [, penaltiesB]) => penaltiesB - penaltiesA)
+      .map(([player, penalties]) => ({ player, penalties }));
+  };
+
   // Export everything that will be needed by the UI component
   return {
     // Constants
@@ -1127,6 +1176,7 @@ const useGameLogic = () => {
     truthDareState,
     cringeOrClassyState,
     cringeOrClassyResult,
+    playerPenalties, // NUOVO: Espone il contatore delle penalità
     
     // Functions
     changeLanguage,
@@ -1147,6 +1197,10 @@ const useGameLogic = () => {
     processPayment,
     resetPaywallState,
     getSpecialGameMessage,
+    handleDone, // NUOVO: Funzione per il pulsante "Fatto"
+    handlePay, // NUOVO: Funzione per il pulsante "Paga"
+    getLeaderboard, // NUOVO: Funzione per ottenere la leaderboard
+    endGame, // NUOVO: Funzione per terminare il gioco dopo la leaderboard
     
     // Additional state setters that need to be exposed
     setCurrentRoomIndex,

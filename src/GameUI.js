@@ -40,6 +40,9 @@ const GameUI = (props) => {
     selectedPaymentOption,
     isProcessingPayment,
     
+    // NUOVO: Sistema di punteggio
+    playerPenalties,
+    
     // Funzioni
     changeLanguage,
     openLanguageSelector,
@@ -55,7 +58,13 @@ const GameUI = (props) => {
     handleTruthDareChoice,
     goBack,
     resetPaywallState,
-    getSpecialGameMessage
+    getSpecialGameMessage,
+    
+    // NUOVO: Funzioni per i nuovi pulsanti
+    handleDone,
+    handlePay,
+    getLeaderboard,
+    endGame
   } = props;
 
   // Rendering condizionale in base allo stato del gioco
@@ -121,7 +130,13 @@ const GameUI = (props) => {
                 cursor: 'pointer'
               }}
             >
-              {language === 'it' ? '🇮🇹 Italiano' : '🇬🇧 English'} - {language === 'it' ? 'Cambia lingua' : 'Change language'}
+              {language === 'it' ? '🇮🇹 Italiano' : 
+               language === 'en' ? '🇬🇧 English' : 
+               language === 'fr' ? '🇫🇷 Français' : 
+               '🇩🇪 Deutsch'} - {language === 'it' ? 'Cambia lingua' : 
+                                 language === 'en' ? 'Change language' : 
+                                 language === 'fr' ? 'Changer de langue' : 
+                                 'Sprache ändern'}
             </button>
             
             {/* Pulsante nascosto per reset (solo per testing) */}
@@ -185,7 +200,10 @@ const GameUI = (props) => {
               fontSize: '28px',
               letterSpacing: '1px'
             }}>
-              {language === 'it' ? 'LINGUA' : 'LANGUAGE'}
+              {language === 'it' ? 'LINGUA' : 
+               language === 'en' ? 'LANGUAGE' : 
+               language === 'fr' ? 'LANGUE' : 
+               'SPRACHE'}
             </h1>
             
             <div></div>
@@ -196,7 +214,8 @@ const GameUI = (props) => {
             display: 'flex',
             flexDirection: 'column',
             padding: '0 20px',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            overflowY: 'auto'
           }}>
             <div style={{
               display: 'flex',
@@ -283,6 +302,88 @@ const GameUI = (props) => {
                   <span style={{ fontSize: '24px', color: '#FFFFFF' }}>✓</span>
                 )}
               </button>
+
+              {/* Aggiungiamo l'opzione per il francese */}
+              <button 
+                onClick={() => changeLanguage('fr')}
+                style={{
+                  backgroundColor: language === 'fr' ? '#3498db' : '#2A2A2A',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: '15px',
+                  cursor: 'pointer'
+                }}
+              >
+                <span style={{ fontSize: '24px' }}>🇫🇷</span>
+                <div style={{
+                  textAlign: 'left',
+                  flex: 1
+                }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    color: '#FFFFFF',
+                    margin: 0,
+                    marginBottom: '5px'
+                  }}>
+                    Français
+                  </h3>
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#AAAAAA',
+                    margin: 0
+                  }}>
+                    Jouer en Français
+                  </p>
+                </div>
+                {language === 'fr' && (
+                  <span style={{ fontSize: '24px', color: '#FFFFFF' }}>✓</span>
+                )}
+              </button>
+
+              {/* Aggiungiamo l'opzione per il tedesco */}
+              <button 
+                onClick={() => changeLanguage('de')}
+                style={{
+                  backgroundColor: language === 'de' ? '#3498db' : '#2A2A2A',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: '15px',
+                  cursor: 'pointer'
+                }}
+              >
+                <span style={{ fontSize: '24px' }}>🇩🇪</span>
+                <div style={{
+                  textAlign: 'left',
+                  flex: 1
+                }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    color: '#FFFFFF',
+                    margin: 0,
+                    marginBottom: '5px'
+                  }}>
+                    Deutsch
+                  </h3>
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#AAAAAA',
+                    margin: 0
+                  }}>
+                    Auf Deutsch spielen
+                  </p>
+                </div>
+                {language === 'de' && (
+                  <span style={{ fontSize: '24px', color: '#FFFFFF' }}>✓</span>
+                )}
+              </button>
             </div>
           </div>
           
@@ -309,7 +410,10 @@ const GameUI = (props) => {
                 cursor: 'pointer'
               }}
             >
-              {language === 'it' ? 'CONFERMA' : 'CONFIRM'}
+              {language === 'it' ? 'CONFERMA' : 
+               language === 'en' ? 'CONFIRM' : 
+               language === 'fr' ? 'CONFIRMER' : 
+               'BESTÄTIGEN'}
             </button>
           </div>
         </div>
@@ -858,47 +962,217 @@ const GameUI = (props) => {
             backgroundColor: 'transparent',
             zIndex: 10
           }}>
+            {/* NUOVO: Sostituiamo il pulsante NEXT con due nuovi pulsanti */}
+            {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" ? (
+              // Manteniamo il pulsante originale durante la scelta Truth/Dare/Debt
+              <button 
+                style={{
+                  width: '100%',
+                  backgroundColor: '#AAAAAA',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '0',
+                  padding: '16px',
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  cursor: 'not-allowed',
+                  opacity: 0.5
+                }}
+              >
+                {t.truthDareOptions.chooseOption}
+              </button>
+            ) : (
+              // Nuovi pulsanti "Fatto" e "Paga"
+              <div style={{
+                display: 'flex',
+                width: '100%'
+              }}>
+                <button 
+                  onClick={() => {
+                    if (activeSpecialGame) {
+                      nextTurnAfterSpecialGame();
+                    } else {
+                      handleDone();
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#2ECC71',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '0',
+                    padding: '16px',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t.doneButton}
+                </button>
+                <button 
+                  onClick={() => {
+                    if (activeSpecialGame) {
+                      nextTurnAfterSpecialGame();
+                    } else {
+                      handlePay();
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#E74C3C',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '0',
+                    padding: '16px',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t.payButton}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* NUOVO: Leaderboard Screen */}
+      {gameState === 'leaderboard' && (
+        <div className="screen leaderboard-screen" style={{ 
+          backgroundColor: '#000000', 
+          color: '#FFFFFF',
+          padding: '20px 0 0 0',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh'
+        }}>
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: '50px 1fr 50px',
+            alignItems: 'center',
+            padding: '15px 0',
+            marginBottom: '20px'
+          }}>
+            <div></div>
+            
+            <h1 style={{ 
+              margin: 0, 
+              textAlign: 'center',
+              fontWeight: 'bold',
+              fontSize: '28px',
+              letterSpacing: '1px'
+            }}>
+              {t.leaderboardTitle}
+            </h1>
+            
+            <div></div>
+          </div>
+          
+          <div style={{ 
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '0 20px',
+            marginBottom: '80px'
+          }}>
+            <p style={{
+              fontSize: '16px',
+              textAlign: 'center',
+              color: '#AAAAAA',
+              marginBottom: '30px'
+            }}>
+              {t.leaderboardSubtitle}
+            </p>
+            
+            <div style={{
+              backgroundColor: '#1A1A1A',
+              borderRadius: '15px',
+              padding: '20px',
+              marginBottom: '20px'
+            }}>
+              {getLeaderboard().map((item, index) => (
+                <div key={index} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '15px 10px',
+                  borderBottom: index < getLeaderboard().length - 1 ? '1px solid #333' : 'none'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '15px'
+                  }}>
+                    <div style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      backgroundColor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#555',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      fontWeight: 'bold',
+                      fontSize: '16px'
+                    }}>
+                      {index + 1}
+                    </div>
+                    <div style={{
+                      fontSize: '18px',
+                      fontWeight: index < 3 ? 'bold' : 'normal'
+                    }}>
+                      {item.player}
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: '22px',
+                    fontWeight: 'bold',
+                    color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#FFFFFF'
+                  }}>
+                    {item.penalties} <span style={{ fontSize: '14px', fontWeight: 'normal', opacity: 0.7 }}>{t.penaltiesLabel}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div style={{
+              marginTop: '20px',
+              textAlign: 'center'
+            }}>
+              <p style={{
+                fontSize: '16px',
+                color: '#AAAAAA',
+                marginBottom: '10px'
+              }}>
+                {t.actionsCompletedMessage.replace('{count}', props.MAX_ACTIONS_PER_GAME)}
+              </p>
+            </div>
+          </div>
+          
+          <div style={{ 
+            padding: '0',
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'transparent',
+            zIndex: 10
+          }}>
             <button 
-              onClick={() => {
-                if (activeSpecialGame === "truthOrDare") {
-                  if (truthDareState === "choosing") {
-                    // Se il giocatore non ha fatto una scelta, non fare nulla
-                    return;
-                  } else if (truthDareState === "executing") {
-                    // Prosegui al prossimo giocatore o termina il gioco
-                    nextTurnAfterSpecialGame();
-                  }
-                } else if (activeSpecialGame) {
-                  nextTurnAfterSpecialGame();
-                } else {
-                  nextTurn();
-                }
-              }}
+              onClick={endGame}
               style={{
                 width: '100%',
-                backgroundColor: 
-                  (activeSpecialGame === "truthOrDare" && truthDareState === "choosing")
-                    ? '#AAAAAA' // disabilitato visivamente se il gioco è in corso
-                    : '#3498db',
+                backgroundColor: '#3498db',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '0',
                 padding: '16px',
                 fontSize: '18px',
                 fontWeight: 'bold',
-                cursor: 
-                  (activeSpecialGame === "truthOrDare" && truthDareState === "choosing")
-                    ? 'not-allowed'
-                    : 'pointer',
-                opacity:
-                  (activeSpecialGame === "truthOrDare" && truthDareState === "choosing")
-                    ? 0.5
-                    : 1
+                cursor: 'pointer'
               }}
             >
-              {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" 
-                ? t.truthDareOptions.chooseOption
-                : t.nextButton}
+              {t.continueButton}
             </button>
           </div>
         </div>
