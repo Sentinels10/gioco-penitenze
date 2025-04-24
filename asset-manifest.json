@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/gioco-penitenze/static/css/main.cbadf274.css",
-    "main.js": "/gioco-penitenze/static/js/main.661eabbd.js",
+    "main.js": "/gioco-penitenze/static/js/main.c43aa51c.js",
     "static/js/486.515c20f6.chunk.js": "/gioco-penitenze/static/js/486.515c20f6.chunk.js",
     "static/js/328.de0f8d72.chunk.js": "/gioco-penitenze/static/js/328.de0f8d72.chunk.js",
     "static/media/pointing-glove.png": "/gioco-penitenze/static/media/pointing-glove.4b192411e05edabdfad5.png",
     "index.html": "/gioco-penitenze/index.html",
     "main.cbadf274.css.map": "/gioco-penitenze/static/css/main.cbadf274.css.map",
-    "main.661eabbd.js.map": "/gioco-penitenze/static/js/main.661eabbd.js.map"
+    "main.c43aa51c.js.map": "/gioco-penitenze/static/js/main.c43aa51c.js.map"
   },
   "entrypoints": [
     "static/css/main.cbadf274.css",
-    "static/js/main.661eabbd.js"
+    "static/js/main.c43aa51c.js"
   ]
 }
