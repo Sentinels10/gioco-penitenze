@@ -354,26 +354,45 @@ const useGameLogic = () => {
       
       // Carica le azioni di gruppo dal backup
       if (backupActions.groupActions && backupActions.groupActions.length > 0) {
-        // Mescola le azioni di gruppo e seleziona fino a 10 per questa partita
+        // Mescola le azioni di gruppo e seleziona fino a 15 per questa partita
+        // (aumentato da 10 per garantire abbastanza azioni uniche)
         const shuffledGroupActions = [...backupActions.groupActions]
           .sort(() => Math.random() - 0.5)
-          .slice(0, 10);
+          .slice(0, 15);
         
         setGroupActionsPool(shuffledGroupActions);
         
         // Determina in quali posizioni dovrebbero apparire le azioni di gruppo
-        // Garantisce che almeno 2 azioni di gruppo appaiano durante la partita
-        const maxPosition = MAX_ACTIONS_PER_GAME - 5; // Evita che appaiano alla fine
+        // Ora vogliamo 8 azioni di gruppo durante la partita
+        const positions = [];
         
-        // Posizione per la prima azione di gruppo (tra il 20% e il 40% delle azioni)
-        const firstPosition = Math.floor(MAX_ACTIONS_PER_GAME * 0.2) + 
-                             Math.floor(Math.random() * (MAX_ACTIONS_PER_GAME * 0.2));
+        // Dividiamo la partita in segmenti per distribuire le azioni di gruppo
+        // Escludiamo le prime 2 azioni e le ultime 5 per non avere azioni di gruppo all'inizio o alla fine
+        const startPosition = 2;
+        const endPosition = MAX_ACTIONS_PER_GAME - 5;
+        const availableRange = endPosition - startPosition;
         
-        // Posizione per la seconda azione di gruppo (tra il 60% e l'80% delle azioni)
-        const secondPosition = Math.floor(MAX_ACTIONS_PER_GAME * 0.6) + 
-                              Math.floor(Math.random() * (MAX_ACTIONS_PER_GAME * 0.2));
+        // Calcoliamo quante azioni normali dovrebbero esserci tra ogni azione di gruppo
+        // Per avere 8 azioni di gruppo, avremo bisogno di 7 intervalli
+        const interval = Math.floor(availableRange / 8);
         
-        setGroupActionPositions([firstPosition, secondPosition]);
+        // Garantiamo almeno 2 azioni normali tra ogni azione di gruppo
+        const minSpacing = 2;
+        
+        // Generiamo le 8 posizioni con un po' di randomicità ma mantenendo la distanza minima
+        for (let i = 0; i < 8; i++) {
+          // Base position nel suo segmento
+          const basePosition = startPosition + (i * interval);
+          
+          // Aggiungiamo un po' di randomicità ma manteniamo la distanza minima
+          // La randomicità è limitata per non sconfinare nel segmento successivo
+          const maxOffset = Math.max(0, Math.min(interval - minSpacing, 3));
+          const randomOffset = Math.floor(Math.random() * maxOffset);
+          
+          positions.push(basePosition + randomOffset);
+        }
+        
+        setGroupActionPositions(positions);
         setGroupActionsShown(0);
       }
       
@@ -740,7 +759,7 @@ const useGameLogic = () => {
     // Verifica se è il momento di mostrare un'azione di gruppo
     if (groupActionsPool.length > 0 && 
         groupActionPositions.includes(actionsCounter) && 
-        groupActionsShown < 2) {
+        groupActionsShown < 8) {  // Modificato da 2 a 8
       
       // Seleziona un'azione di gruppo casuale
       const randomIndex = Math.floor(Math.random() * groupActionsPool.length);
