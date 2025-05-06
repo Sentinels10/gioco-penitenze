@@ -252,41 +252,45 @@ const useGameLogic = () => {
   };
   
   // Carica il file backupActions nella lingua corrente
-  const loadBackupActions = async () => {
+const loadBackupActions = async () => {
+  try {
+    // Determina il nome del file in base alla lingua corrente
+    const backupActionsFileName = `backupActions_${language}.json`;
+    let backupActionsModule;
+    
+    // Prima tenta di caricare dalla cartella actions
     try {
-      // Determina il nome del file in base alla lingua corrente
-      const backupActionsFileName = `backupActions_${language}.json`;
-      
-      // Percorso alla cartella che contiene i file backupActions
-      const folderPath = './actions'; // Sostituisci 'data' con il nome della tua cartella
-      
-      // Carica dinamicamente il file corretto in base alla lingua
-      let backupActionsModule;
-      
-      // Gestione dei diversi percorsi in base alla lingua
-      if (language === 'it') {
-        backupActionsModule = await import(`${folderPath}/backupActions_it.json`);
-      } else {
-        // Default to English if the language is not Italian
-        backupActionsModule = await import(`${folderPath}/backupActions_en.json`);
-      }
-      
-      console.log(`Caricato con successo: ${folderPath}/${backupActionsFileName}`);
+      // Importa il file dalla cartella actions
+      backupActionsModule = await import(`./actions/${backupActionsFileName}`);
+      console.log(`Caricato con successo: ./actions/${backupActionsFileName}`);
       return backupActionsModule.default;
     } catch (error) {
-      console.error(`Errore nel caricamento del file backupActions_${language}.json:`, error);
-      console.log('Tentativo di caricare il file di backup dalla directory principale...');
+      console.warn(`Errore nel caricamento di ./actions/${backupActionsFileName}:`, error);
       
-      // Fallback: prova a caricare dalla directory principale
+      // Se non riesce, prova con la lingua inglese come fallback
       try {
-        const backupActionsModule = await import(`./backupActions.json`);
+        backupActionsModule = await import('./actions/backupActions_en.json');
+        console.log('Fallback: Caricato backupActions_en.json');
         return backupActionsModule.default;
-      } catch (fallbackError) {
-        console.error('Errore anche nel caricamento del file di fallback:', fallbackError);
-        return {}; // Restituisce un oggetto vuoto se non può caricare nessun file
+      } catch (enError) {
+        console.warn('Errore nel caricamento del fallback inglese:', enError);
+        
+        // Ultimo tentativo: italiano
+        try {
+          backupActionsModule = await import('./actions/backupActions_it.json');
+          console.log('Fallback: Caricato backupActions_it.json');
+          return backupActionsModule.default;
+        } catch (itError) {
+          console.error('Impossibile caricare qualsiasi file di backup:', itError);
+          return {}; // Restituisce un oggetto vuoto se tutti i tentativi falliscono
+        }
       }
     }
-  };
+  } catch (error) {
+    console.error('Errore generale nel caricamento dei file backupActions:', error);
+    return {}; // Restituisce un oggetto vuoto in caso di errore generale
+  }
+};
   
   // Seleziona una stanza e prepara il gioco
   const selectRoom = async (room) => {
