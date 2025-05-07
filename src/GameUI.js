@@ -34,6 +34,9 @@ const GameUI = (props) => {
     truthDareContent,
     truthDareState,
     
+    // NUOVO: Contenuto del gioco "preferiresti"
+    wouldYouRatherContent,
+    
     // Stati per paywall
     hasPlayedFreeGame,
     hasPaid,
@@ -838,7 +841,7 @@ const GameUI = (props) => {
               )}
               
               {/* Messaggio unificato per i giochi speciali attivi */}
-              {activeSpecialGame && (
+              {activeSpecialGame && activeSpecialGame !== "wouldYouRather" && (
                 <p style={{ 
                   marginTop: '15px', 
                   fontSize: '16px', 

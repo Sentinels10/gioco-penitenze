@@ -100,7 +100,8 @@ const translations = {
         debt: "{player} ha scelto Debito!"
       },
       ilPezzoGrosso: "{player} deve fare un'affermazione e tutti voteranno se è vero o falso...",
-      cringeOrClassy: "{player} deve confessare una sua passione segreta"
+      cringeOrClassy: "{player} deve confessare una sua passione segreta",
+      wouldYouRather: "{player} ha posto la domanda: Preferiresti? Tutti devono votare! La minoranza riceve penalità"
     },
     
     // Terminologia giochi speciali
@@ -110,8 +111,12 @@ const translations = {
       infamata: "INFAMATA",
       truthOrDare: "OBBLIGO VERITÀ O DEBITO",
       ilPezzoGrosso: "IL PEZZO GROSSO",
-      cringeOrClassy: "CRINGE OR CLASSY"
+      cringeOrClassy: "CRINGE OR CLASSY",
+      wouldYouRather: "PREFERIRESTI"
     },
+    
+    // Spiegazione del gioco Preferiresti
+    wouldYouRatherExplanation: "Tutti votano: alza la mano per la prima opzione, tienila abbassata per la seconda. Chi è in minoranza fa penalità!",
     
     // Opzioni gioco Verità o Obbligo
     truthDareOptions: {
@@ -269,7 +274,8 @@ const translations = {
         debt: "{player} chose Debt!"
       },
       ilPezzoGrosso: "{player} must make a statement and everyone will vote if it's true or false...",
-      cringeOrClassy: "{player} must confess a secret passion"
+      cringeOrClassy: "{player} must confess a secret passion",
+      wouldYouRather: "{player} asked the question: Would You Rather? Everyone must vote! The minority gets penalties"
     },
     
     // Special games terminology
@@ -279,8 +285,12 @@ const translations = {
       infamata: "SNITCH",
       truthOrDare: "TRUTH, DARE OR DEBT",
       ilPezzoGrosso: "THE BIG SHOT",
-      cringeOrClassy: "CRINGE OR CLASSY"
+      cringeOrClassy: "CRINGE OR CLASSY",
+      wouldYouRather: "WOULD YOU RATHER"
     },
+    
+    // Would You Rather game explanation
+    wouldYouRatherExplanation: "Everyone votes: raise your hand for the first option, keep it down for the second. Those in the minority get penalties!",
     
     // Truth or Dare game options
     truthDareOptions: {
@@ -437,7 +447,8 @@ const translations = {
         debt: "{player} a choisi Dette!"
       },
       ilPezzoGrosso: "{player} doit faire une déclaration et tout le monde va voter si c'est vrai ou faux...",
-      cringeOrClassy: "{player} doit confesser une passion secrète"
+      cringeOrClassy: "{player} doit confesser une passion secrète",
+      wouldYouRather: "{player} a posé la question: Préférerais-tu? Tout le monde doit voter! La minorité reçoit des pénalités"
     },
     
     // Terminologie des jeux spéciaux
@@ -447,8 +458,12 @@ const translations = {
       infamata: "BALANCE",
       truthOrDare: "VÉRITÉ, ACTION OU DETTE",
       ilPezzoGrosso: "LE GROS BONNET",
-      cringeOrClassy: "GÊNANT OU CLASSE"
+      cringeOrClassy: "GÊNANT OU CLASSE",
+      wouldYouRather: "PRÉFÉRERAIS-TU"
     },
+    
+    // Explication du jeu Préférerais-tu
+    wouldYouRatherExplanation: "Tout le monde vote: levez la main pour la première option, gardez-la baissée pour la seconde. Ceux en minorité reçoivent des pénalités!",
     
     // Options du jeu Vérité ou Action
     truthDareOptions: {
@@ -605,7 +620,8 @@ const translations = {
         debt: "{player} hat Schuld gewählt!"
       },
       ilPezzoGrosso: "{player} muss eine Aussage machen und alle werden abstimmen, ob sie wahr oder falsch ist...",
-      cringeOrClassy: "{player} muss eine geheime Leidenschaft gestehen"
+      cringeOrClassy: "{player} muss eine geheime Leidenschaft gestehen",
+      wouldYouRather: "{player} stellte die Frage: Was hättest du lieber? Alle müssen abstimmen! Die Minderheit erhält Strafen"
     },
     
     // Spezielle Spiele Terminologie
@@ -615,8 +631,12 @@ const translations = {
       infamata: "PETZE",
       truthOrDare: "WAHRHEIT, PFLICHT ODER SCHULD",
       ilPezzoGrosso: "DER GROSSE BOSS",
-      cringeOrClassy: "PEINLICH ODER STILVOLL"
+      cringeOrClassy: "PEINLICH ODER STILVOLL",
+      wouldYouRather: "WAS HÄTTEST DU LIEBER"
     },
+    
+    // Erklärung des Spiels "Was hättest du lieber"
+    wouldYouRatherExplanation: "Alle stimmen ab: Hand heben für die erste Option, unten lassen für die zweite. Wer in der Minderheit ist, erhält Strafen!",
     
     // Wahrheit oder Pflicht Spieloptionen
     truthDareOptions: {

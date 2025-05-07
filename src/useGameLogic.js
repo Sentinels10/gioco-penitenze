@@ -61,24 +61,86 @@ const useGameLogic = () => {
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
   // Stato per tenere traccia di tutti i giochi speciali
-  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy'];
+  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather'];
+  
+  // Numerazione dei giochi speciali per una manutenzione più semplice
+  const SPECIAL_GAME_TYPES = {
+    BOUNCER: 0,
+    POINT_FINGER: 1,
+    INFAMATA: 2, 
+    TRUTH_OR_DARE: 3,
+    IL_PEZZO_GROSSO: 4,
+    CRINGE_OR_CLASSY: 5,
+    WOULD_YOU_RATHER: 6
+  };
+
+  // Funzione che determina quali giochi speciali sono disponibili per ogni stanza
+  const getAvailableSpecialGames = (roomId) => {
+    switch(roomId) {
+      case 'coppie':
+        // Per la modalità "coppie" truth or dare e would you rather
+        return [SPECIAL_GAME_TYPES.TRUTH_OR_DARE, SPECIAL_GAME_TYPES.WOULD_YOU_RATHER];
+      case 'redRoom':
+        // Per la stanza rossa tutti i giochi
+        return [
+          SPECIAL_GAME_TYPES.BOUNCER,
+          SPECIAL_GAME_TYPES.POINT_FINGER,
+          SPECIAL_GAME_TYPES.INFAMATA,
+          SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
+          SPECIAL_GAME_TYPES.IL_PEZZO_GROSSO,
+          SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
+          SPECIAL_GAME_TYPES.WOULD_YOU_RATHER
+        ];
+      case 'darkRoom':
+        // Per la dark room, non includere Point Finger e Cringe or Classy
+        return [
+          SPECIAL_GAME_TYPES.BOUNCER,
+          SPECIAL_GAME_TYPES.INFAMATA,
+          SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
+          SPECIAL_GAME_TYPES.IL_PEZZO_GROSSO,
+          SPECIAL_GAME_TYPES.WOULD_YOU_RATHER
+        ];
+      case 'party':
+        // Per la party room, tutti i giochi eccetto Il Pezzo Grosso
+        return [
+          SPECIAL_GAME_TYPES.BOUNCER,
+          SPECIAL_GAME_TYPES.POINT_FINGER,
+          SPECIAL_GAME_TYPES.INFAMATA,
+          SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
+          SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
+          SPECIAL_GAME_TYPES.WOULD_YOU_RATHER
+        ];
+      case 'neonRoulette':
+      default:
+        // Per la Neon Roulette e come default, tutti i giochi
+        return [
+          SPECIAL_GAME_TYPES.BOUNCER,
+          SPECIAL_GAME_TYPES.POINT_FINGER,
+          SPECIAL_GAME_TYPES.INFAMATA,
+          SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
+          SPECIAL_GAME_TYPES.IL_PEZZO_GROSSO,
+          SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
+          SPECIAL_GAME_TYPES.WOULD_YOU_RATHER
+        ];
+    }
+  };
   
   // Stato per tracciare quali giochi sono stati usati
   const [specialGamesUsed, setSpecialGamesUsed] = useState({
-    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
-    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
-    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
-    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false },
-    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false }
+    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false },
+    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false },
+    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false },
+    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false },
+    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false }
   });
   
   // Stato per tracciare quando deve apparire ciascun gioco
   const [specialGamesRound, setSpecialGamesRound] = useState({
-    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
-    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
-    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
-    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 },
-    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40 }
+    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10 },
+    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10 },
+    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10 },
+    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10 },
+    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10 }
   });
   
   // Stato per il gioco speciale attualmente in corso
@@ -121,6 +183,9 @@ const useGameLogic = () => {
   const [cringeOrClassyState, setCringeOrClassyState] = useState(null); // "voting", "result"
   const [cringeOrClassyResult, setCringeOrClassyResult] = useState(null);
 
+  // Nuovo stato per il gioco "Preferiresti"
+  const [wouldYouRatherContent, setWouldYouRatherContent] = useState(null);
+  
   // Verifica lo stato del paywall quando il componente si monta
   useEffect(() => {
     // Recupera lo stato del pagamento da localStorage
@@ -315,6 +380,7 @@ const loadBackupActions = async () => {
       setSpecialGamePlayer(null);
       setCringeOrClassyState(null);
       setCringeOrClassyResult(null);
+      setWouldYouRatherContent(null);
       
       // NUOVO: Resetta il contatore dell'ultima azione speciale
       setLastSpecialGameRound(prev => ({
@@ -323,7 +389,7 @@ const loadBackupActions = async () => {
       }));
       
       // Distribuisci i giochi speciali in modo uniforme ma casuale
-      const gamePositions = distributeSpecialGames(MAX_ACTIONS_PER_GAME);
+      const gamePositions = distributeSpecialGames(MAX_ACTIONS_PER_GAME, room.id);
       
       // Resetta tutti gli stati dei giochi speciali
       setSpecialGamesUsed(prev => ({
@@ -334,7 +400,8 @@ const loadBackupActions = async () => {
           infamata: false,
           truthOrDare: false,
           ilPezzoGrosso: false,
-          cringeOrClassy: false
+          cringeOrClassy: false,
+          wouldYouRather: false
         }
       }));
       
@@ -347,7 +414,8 @@ const loadBackupActions = async () => {
           infamata: gamePositions.infamata || 20,
           truthOrDare: gamePositions.truthOrDare || 25,
           ilPezzoGrosso: gamePositions.ilPezzoGrosso || 35,
-          cringeOrClassy: gamePositions.cringeOrClassy || 40
+          cringeOrClassy: gamePositions.cringeOrClassy || 40,
+          wouldYouRather: gamePositions.wouldYouRather || 10
         }
       }));
       
@@ -532,19 +600,25 @@ const loadBackupActions = async () => {
   };
   
   // NUOVO: Funzione per distribuire i giochi speciali nella partita
-  const distributeSpecialGames = (maxActions) => {
+  const distributeSpecialGames = (maxActions, roomId) => {
     const MIN_SPACING = 5; // Distanza minima tra i giochi speciali
     
-    // Mescola l'array dei giochi per un ordine casuale
-    const shuffledGames = [...SPECIAL_GAMES].sort(() => Math.random() - 0.5);
+    // Otteniamo i giochi disponibili per questa stanza
+    const availableGameTypes = getAvailableSpecialGames(roomId);
+    
+    // Convertiamo i tipi numerici nei nomi dei giochi
+    const availableGames = availableGameTypes.map(gameType => SPECIAL_GAMES[gameType]);
+    
+    // Mescola l'array dei giochi disponibili per un ordine casuale
+    const shuffledGames = [...availableGames].sort(() => Math.random() - 0.5);
     
     // Range disponibile per la distribuzione dei giochi
     const minPosition = 10; // Iniziamo un po' dopo l'inizio della partita
     const maxPosition = maxActions - 10; // Finiamo un po' prima della fine
     const availableRange = maxPosition - minPosition;
     
-    // Calcola la distribuzione ideale
-    const segmentSize = Math.floor(availableRange / SPECIAL_GAMES.length);
+    // Calcola la distribuzione ideale basata sul numero di giochi disponibili
+    const segmentSize = Math.floor(availableRange / shuffledGames.length);
     
     // Crea le posizioni con un po' di randomicità ma mantieni la distanza minima
     const positions = {};
@@ -556,6 +630,14 @@ const loadBackupActions = async () => {
       
       // Aggiungi randomicità all'interno del segmento
       positions[game] = segmentStart + Math.floor(Math.random() * (segmentEnd - segmentStart));
+    });
+    
+    // Per i giochi non disponibili in questa stanza, impostiamo una posizione
+    // molto alta in modo che non vengano mai attivati
+    SPECIAL_GAMES.forEach(game => {
+      if (!positions[game]) {
+        positions[game] = maxActions * 2; // Posizione irraggiungibile
+      }
     });
     
     return positions;
@@ -607,6 +689,7 @@ const loadBackupActions = async () => {
     setTruthDareState(null);
     setCringeOrClassyState(null);
     setCringeOrClassyResult(null);
+    setWouldYouRatherContent(null);
     
     // Prosegui con il turno normale
     nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
@@ -727,6 +810,26 @@ const loadBackupActions = async () => {
         // Sostituisci {player} con il nome del giocatore corrente
         actionText = t.truthDareIntro.replace('{player}', players[currentPlayerIndex]);
         break;
+        
+      case "wouldYouRather":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Seleziona una domanda casuale dal pool di wouldYouRather
+        if (backupActions.wouldYouRather && backupActions.wouldYouRather.length > 0) {
+          const randomIndex = Math.floor(Math.random() * backupActions.wouldYouRather.length);
+          const question = backupActions.wouldYouRather[randomIndex].text;
+          
+          // Imposta la domanda per uso futuro
+          setWouldYouRatherContent(question);
+          
+          // Aggiungi la domanda al testo dell'azione
+          actionText += " " + question;
+        }
+        break;
     }
     
     // Imposta il gioco speciale attivo
@@ -792,8 +895,14 @@ const loadBackupActions = async () => {
     
     // Controlla se è il momento di mostrare un gioco speciale
     if (canShowSpecialGame && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
-      // Verifica ogni tipo di gioco speciale
-      for (const gameType of SPECIAL_GAMES) {
+      // Otteniamo i giochi disponibili per questa stanza
+      const availableGameTypes = getAvailableSpecialGames(roomId);
+      
+      // Convertiamo i tipi numerici nei nomi dei giochi
+      const availableGames = availableGameTypes.map(gameType => SPECIAL_GAMES[gameType]);
+      
+      // Verifica ogni tipo di gioco speciale disponibile
+      for (const gameType of availableGames) {
         // Verifica solo se il gioco non è già stato usato e se è il momento giusto
         if (!specialGamesUsed[roomId][gameType] && actionsCounter >= specialGamesRound[roomId][gameType]) {
           handleSpecialGame(gameType);
@@ -1051,6 +1160,7 @@ const loadBackupActions = async () => {
     // Resetta gli stati dei giochi speciali
     setActiveSpecialGame(null);
     setSpecialGamePlayer(null);
+    setWouldYouRatherContent(null);
     
     // Resetta tutti gli stati di giochi usati e round
     const resetUsedGames = {};
@@ -1071,7 +1181,8 @@ const loadBackupActions = async () => {
           infamata: 20,
           truthOrDare: 25,
           ilPezzoGrosso: 35,
-          cringeOrClassy: 40
+          cringeOrClassy: 40,
+          wouldYouRather: 10
         };
         acc[game] = defaultPositions[game] || 10 + (index * 10);
         return acc;
@@ -1200,6 +1311,7 @@ const loadBackupActions = async () => {
     cringeOrClassyState,
     cringeOrClassyResult,
     playerPenalties, // NUOVO: Espone il contatore delle penalità
+    wouldYouRatherContent, // NUOVO: Contenuto del gioco "preferiresti"
     
     // Functions
     changeLanguage,
