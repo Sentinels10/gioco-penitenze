@@ -13,13 +13,51 @@
     "text": "OBBLIGO VERITA' O DEBITO: Se scegli Debito, eviti la penalità ma ti viene assegnato un debito che potrà essere riscattato in qualsiasi momento da chi dirige il gioco (es. \"Vai a prendermi da bere\" o \"Posta una storia imbarazzante\").. Decidete in senso orario partendo dal giocatore corrente."
   },
   "ilPezzoGrosso": {
-      "text": "{player} è IL PEZZO GROSSO! Deve fare un'affermazione \"Io sono il più...\" (es. \"Io sono il più festaiolo\"). Tutti votano segretamente se è Vero o Falso. Se la maggioranza non è d'accordo, {player} subisce una penalità!"
+      "text": "{player} è IL PEZZO GROSSO! Deve fare un'affermazione vera o falsa. su di sé  Tutti votano segretamente, se è Vero o Falso. Chi sbaglia riceve le penalità."
   },
   "wouldYouRather": {
       "text": "Tutti i giocatori devono scegliere tra due opzioni, alzando la mano per la prima opzione o tenendola abbassata per la seconda. Chi si trova in minoranza deve fare una penalità!"
     },
+    "chatDetective": {
+    "text": "{player} è il detective di WhatsApp! Tutti aprite WhatsApp e cercate una parola che {player} sceglierà. Chi non trova la parola nei propri messaggi o si rifiuta di leggere il messaggio trovato, deve fare una penitenza!"
+  },
   "cringeOrClassy": {
   "text": "{player} è stato scelto per CRINGE OR CLASSY! Deve confessare una sua passione segreta e il gruppo voterà se è cringe o classy. Se è cringe, {player} esegue una penitenza; se è classy, sceglie chi deve fare la prossima."
+},
+"newRule": {
+  "text": "{player} ha stabilito una NUOVA REGOLA! Nessuno può più [regola] fino a fine partita! Altrimenti 3 penalità",
+  "rules": [
+    "dire parolacce",
+    "toccarsi i capelli",
+    "chiamare gli altri per nome",
+    "usare la parola \"sì\"",
+    "incrociare le gambe",
+    "guardare il proprio telefono",
+    "ridere",
+    "bere senza usare entrambe le mani",
+    "usare pronomi personali (io, tu, egli, ecc.)",
+    "dire \"no\"",
+    "sedersi con le braccia incrociate",
+    "usare il pollice mentre tiene in mano oggetti",
+    "pronunciare la lettera \"r\"",
+    "iniziare una frase senza prima dire \"Tecnicamente...\"",
+    "finire le frasi degli altri",
+    "usare la parola \"ma\"",
+    "alzare la voce",
+    "grattarsi",
+    "dire l'ora",
+    "dire grazie o prego",
+    "usare le mani per bere",
+    "fare domande",
+    "parlare di sé in prima persona",
+    "guardare negli occhi gli altri giocatori",
+    "usare aggettivi possessivi",
+    "sedersi in modo comodo",
+    "accavallare le gambe",
+    "usare parole straniere",
+    "piegarsi in avanti",
+    "menzionare cibo o bevande"
+  ]
 }
 },
 "truthDareGame": {

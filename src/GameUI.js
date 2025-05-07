@@ -834,7 +834,8 @@ const GameUI = (props) => {
                 <p style={{
                   fontSize: '20px',
                   lineHeight: '1.4',
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  whiteSpace: 'pre-wrap'
                 }}>
                   {currentAction.text}
                 </p>
