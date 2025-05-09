@@ -102,7 +102,8 @@ const translations = {
       ilPezzoGrosso: "{player} deve fare un'affermazione e tutti voteranno se è vero o falso...",
       cringeOrClassy: "{player} deve confessare una sua passione segreta",
       wouldYouRather: "{player} ha posto la domanda: Preferiresti? Tutti devono votare! La minoranza riceve penalità",
-      chatDetective: "{player} è il detective di WhatsApp!"
+      chatDetective: "{player} è il detective di WhatsApp!",
+      tuttoHaUnPrezzo: "{player} ha avviato il gioco TUTTO HA UN PREZZO!"
     },
     
     // Terminologia giochi speciali
@@ -114,7 +115,8 @@ const translations = {
       ilPezzoGrosso: "IL PEZZO GROSSO",
       cringeOrClassy: "CRINGE OR CLASSY",
       wouldYouRather: "PREFERIRESTI",
-      chatDetective: "CHAT DETECTIVE"
+      chatDetective: "CHAT DETECTIVE",
+      tuttoHaUnPrezzo: "TUTTO HA UN PREZZO"
     },
     
     // Spiegazione del gioco Preferiresti
@@ -278,7 +280,8 @@ const translations = {
       ilPezzoGrosso: "{player} must make a statement and everyone will vote if it's true or false...",
       cringeOrClassy: "{player} must confess a secret passion",
       wouldYouRather: "{player} asked the question: Would You Rather? Everyone must vote! The minority gets penalties",
-      chatDetective: "{player} is the WhatsApp detective!"
+      chatDetective: "{player} is the WhatsApp detective!",
+      tuttoHaUnPrezzo: "{player} has started the EVERYTHING HAS A PRICE game!"
     },
     
     // Special games terminology
@@ -290,7 +293,8 @@ const translations = {
       ilPezzoGrosso: "THE BIG SHOT",
       cringeOrClassy: "CRINGE OR CLASSY",
       wouldYouRather: "WOULD YOU RATHER",
-      chatDetective: "CHAT DETECTIVE"
+      chatDetective: "CHAT DETECTIVE",
+      tuttoHaUnPrezzo: "EVERYTHING HAS A PRICE"
     },
     
     // Would You Rather game explanation
@@ -453,7 +457,8 @@ const translations = {
       ilPezzoGrosso: "{player} doit faire une déclaration et tout le monde va voter si c'est vrai ou faux...",
       cringeOrClassy: "{player} doit confesser une passion secrète",
       wouldYouRather: "{player} a posé la question: Préférerais-tu? Tout le monde doit voter! La minorité reçoit des pénalités",
-      chatDetective: "{player} est le détective WhatsApp !"
+      chatDetective: "{player} est le détective WhatsApp !",
+      tuttoHaUnPrezzo: "{player} a lancé le jeu TOUT A UN PRIX !"
     },
     
     // Terminologie des jeux spéciaux
@@ -465,7 +470,8 @@ const translations = {
       ilPezzoGrosso: "LE GROS BONNET",
       cringeOrClassy: "GÊNANT OU CLASSE",
       wouldYouRather: "PRÉFÉRERAIS-TU",
-      chatDetective: "DÉTECTIVE DE CHAT"
+      chatDetective: "DÉTECTIVE DE CHAT",
+      tuttoHaUnPrezzo: "TOUT A UN PRIX"
     },
     
     // Explication du jeu Préférerais-tu
@@ -628,7 +634,8 @@ const translations = {
       ilPezzoGrosso: "{player} muss eine Aussage machen und alle werden abstimmen, ob sie wahr oder falsch ist...",
       cringeOrClassy: "{player} muss eine geheime Leidenschaft gestehen",
       wouldYouRather: "{player} stellte die Frage: Was hättest du lieber? Alle müssen abstimmen! Die Minderheit erhält Strafen",
-      chatDetective: "{player} ist der WhatsApp-Detektiv!"
+      chatDetective: "{player} ist der WhatsApp-Detektiv!",
+      tuttoHaUnPrezzo: "{player} hat das Spiel ALLES HAT SEINEN PREIS gestartet!"
     },
     
     // Spezielle Spiele Terminologie
@@ -640,7 +647,8 @@ const translations = {
       ilPezzoGrosso: "DER GROSSE BOSS",
       cringeOrClassy: "PEINLICH ODER STILVOLL",
       wouldYouRather: "WAS HÄTTEST DU LIEBER",
-      chatDetective: "CHAT-DETEKTIV"
+      chatDetective: "CHAT-DETEKTIV",
+      tuttoHaUnPrezzo: "ALLES HAT SEINEN PREIS"
     },
     
     // Erklärung des Spiels "Was hättest du lieber"

@@ -61,7 +61,7 @@ const useGameLogic = () => {
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
   // Stato per tenere traccia di tutti i giochi speciali
-  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule'];
+  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo'];
   
   // Numerazione dei giochi speciali per una manutenzione più semplice
   const SPECIAL_GAME_TYPES = {
@@ -73,7 +73,8 @@ const useGameLogic = () => {
     CRINGE_OR_CLASSY: 5,
     WOULD_YOU_RATHER: 6,
     CHAT_DETECTIVE: 7,
-    NEW_RULE: 8
+    NEW_RULE: 8,
+    TUTTO_HA_UN_PREZZO: 9
   };
 
   // Funzione che determina quali giochi speciali sono disponibili per ogni stanza
@@ -83,7 +84,7 @@ const useGameLogic = () => {
         // Per la modalità "coppie" truth or dare, would you rather, chatDetective e newRule
         return [SPECIAL_GAME_TYPES.TRUTH_OR_DARE, SPECIAL_GAME_TYPES.WOULD_YOU_RATHER, SPECIAL_GAME_TYPES.CHAT_DETECTIVE, SPECIAL_GAME_TYPES.NEW_RULE];
       case 'redRoom':
-        // Per la stanza rossa tutti i giochi
+        // Per la stanza rossa tutti i giochi + il nuovo tuttoHaUnPrezzo
         return [
           SPECIAL_GAME_TYPES.BOUNCER,
           SPECIAL_GAME_TYPES.POINT_FINGER,
@@ -93,10 +94,11 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
-          SPECIAL_GAME_TYPES.NEW_RULE
+          SPECIAL_GAME_TYPES.NEW_RULE,
+          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO
         ];
       case 'darkRoom':
-        // Per la dark room, non includere Point Finger e Cringe or Classy
+        // Per la dark room, non includere Point Finger, Cringe or Classy e Tutto Ha Un Prezzo
         return [
           SPECIAL_GAME_TYPES.BOUNCER,
           SPECIAL_GAME_TYPES.INFAMATA,
@@ -107,7 +109,7 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.NEW_RULE
         ];
       case 'party':
-        // Per la party room, tutti i giochi eccetto Il Pezzo Grosso e Chat Detective
+        // Per la party room, aggiungiamo tuttoHaUnPrezzo ma escludiamo Il Pezzo Grosso e Chat Detective
         return [
           SPECIAL_GAME_TYPES.BOUNCER,
           SPECIAL_GAME_TYPES.POINT_FINGER,
@@ -115,7 +117,8 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
           SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
-          SPECIAL_GAME_TYPES.NEW_RULE
+          SPECIAL_GAME_TYPES.NEW_RULE,
+          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO
         ];
       case 'neonRoulette':
       default:
@@ -129,27 +132,28 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
-          SPECIAL_GAME_TYPES.NEW_RULE
+          SPECIAL_GAME_TYPES.NEW_RULE,
+          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO
         ];
     }
   };
   
   // Stato per tracciare quali giochi sono stati usati
   const [specialGamesUsed, setSpecialGamesUsed] = useState({
-    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false },
-    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false },
-    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false },
-    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false },
-    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false }
+    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false },
+    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false },
+    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false },
+    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false },
+    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false }
   });
   
   // Stato per tracciare quando deve apparire ciascun gioco
   const [specialGamesRound, setSpecialGamesRound] = useState({
-    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5 },
-    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5 },
-    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5 },
-    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5 },
-    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5 }
+    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 },
+    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 },
+    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 },
+    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 },
+    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 }
   });
   
   // Stato per il gioco speciale attualmente in corso
@@ -412,7 +416,8 @@ const loadBackupActions = async () => {
           cringeOrClassy: false,
           wouldYouRather: false,
           chatDetective: false,
-          newRule: false
+          newRule: false,
+          tuttoHaUnPrezzo: false
         }
       }));
       
@@ -428,7 +433,8 @@ const loadBackupActions = async () => {
           cringeOrClassy: gamePositions.cringeOrClassy || 40,
           wouldYouRather: gamePositions.wouldYouRather || 10,
           chatDetective: gamePositions.chatDetective || 45,
-          newRule: gamePositions.newRule || 5
+          newRule: gamePositions.newRule || 5,
+          tuttoHaUnPrezzo: gamePositions.tuttoHaUnPrezzo || 18
         }
       }));
       
@@ -864,6 +870,34 @@ const loadBackupActions = async () => {
           actionText = actionText.replace(/\[regola\]/g, "fare qualcosa di specifico");
         }
         break;
+        
+      case "tuttoHaUnPrezzo":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Selezioniamo una sfida appropriata in base alla stanza
+        if (backupActions.specialGames && backupActions.specialGames.tuttoHaUnPrezzo) {
+          let challenges = [];
+          
+          if (roomId === 'redRoom' && backupActions.specialGames.tuttoHaUnPrezzo.redRoom) {
+            challenges = backupActions.specialGames.tuttoHaUnPrezzo.redRoom;
+          } else if (roomId === 'party' && backupActions.specialGames.tuttoHaUnPrezzo.party) {
+            challenges = backupActions.specialGames.tuttoHaUnPrezzo.party;
+          }
+          
+          if (challenges && challenges.length > 0) {
+            // Seleziona una sfida casuale
+            const randomIndex = Math.floor(Math.random() * challenges.length);
+            const challenge = challenges[randomIndex];
+            
+            // Aggiungi la sfida al testo dell'azione
+            actionText += "\n\n" + challenge;
+          }
+        }
+        break;
     }
     
     // Imposta il gioco speciale attivo
@@ -1218,7 +1252,8 @@ const loadBackupActions = async () => {
           cringeOrClassy: 40,
           wouldYouRather: 10,
           chatDetective: 45,
-          newRule: 5
+          newRule: 5,
+          tuttoHaUnPrezzo: 18 // Aggiungiamo il nuovo gioco con un round di default
         };
         acc[game] = defaultPositions[game] || 10 + (index * 10);
         return acc;
