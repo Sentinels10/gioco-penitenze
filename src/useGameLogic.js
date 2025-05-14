@@ -61,7 +61,7 @@ const useGameLogic = () => {
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
   // Stato per tenere traccia di tutti i giochi speciali
-  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo', 'tuttiQuelliChe', 'penitenzeGruppo', 'penitenzaRandom'];
+  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo', 'tuttiQuelliChe', 'penitenzeGruppo', 'penitenzaRandom', 'nonHoMai'];
   
   // Numerazione dei giochi speciali per una manutenzione più semplice
   const SPECIAL_GAME_TYPES = {
@@ -77,7 +77,8 @@ const useGameLogic = () => {
     TUTTO_HA_UN_PREZZO: 9,
     TUTTI_QUELLI_CHE: 10,
     PENITENZE_GRUPPO: 11,
-    PENITENZA_RANDOM: 12
+    PENITENZA_RANDOM: 12,
+    NON_HO_MAI: 13
   };
 
   // Funzione che determina quali giochi speciali sono disponibili per ogni stanza
@@ -101,7 +102,8 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
           SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
           SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
-          SPECIAL_GAME_TYPES.PENITENZA_RANDOM
+          SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
+          SPECIAL_GAME_TYPES.NON_HO_MAI
         ];
       case 'darkRoom':
         // Per la dark room, non includere Point Finger, Cringe or Classy e Tutto Ha Un Prezzo
@@ -115,7 +117,8 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.NEW_RULE,
           SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
           SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
-          SPECIAL_GAME_TYPES.PENITENZA_RANDOM
+          SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
+          SPECIAL_GAME_TYPES.NON_HO_MAI
         ];
       case 'party':
         // Per la party room, aggiungiamo tuttoHaUnPrezzo ma escludiamo Il Pezzo Grosso e Chat Detective
@@ -130,7 +133,8 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
           SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
           SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
-          SPECIAL_GAME_TYPES.PENITENZA_RANDOM
+          SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
+          SPECIAL_GAME_TYPES.NON_HO_MAI
         ];
       case 'neonRoulette':
       default:
@@ -148,27 +152,28 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
           SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
           SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
-          SPECIAL_GAME_TYPES.PENITENZA_RANDOM
+          SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
+          SPECIAL_GAME_TYPES.NON_HO_MAI
         ];
     }
   };
   
   // Stato per tracciare quali giochi sono stati usati
   const [specialGamesUsed, setSpecialGamesUsed] = useState({
-    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false },
-    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false },
-    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false },
-    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false },
-    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false }
+    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false, nonHoMai: false },
+    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false, nonHoMai: false },
+    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false, nonHoMai: false },
+    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false, nonHoMai: false },
+    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false, nonHoMai: false }
   });
   
   // Stato per tracciare quando deve apparire ciascun gioco
   const [specialGamesRound, setSpecialGamesRound] = useState({
-    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 },
-    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 },
-    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 },
-    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 },
-    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 }
+    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28, nonHoMai: 33 },
+    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28, nonHoMai: 33 },
+    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28, nonHoMai: 33 },
+    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28, nonHoMai: 33 },
+    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28, nonHoMai: 33 }
   });
   
   // Stato per il gioco speciale attualmente in corso
@@ -189,7 +194,7 @@ const useGameLogic = () => {
   const [debtList, setDebtList] = useState([]);
   
   // NUOVO: Costante per l'intervallo minimo tra giochi speciali
-  const MIN_ACTIONS_BETWEEN_SPECIAL_GAMES = 3;
+  const MIN_ACTIONS_BETWEEN_SPECIAL_GAMES = 2;
   
   // Nuovi stati per il paywall
   const [hasPlayedFreeGame, setHasPlayedFreeGame] = useState(false);
@@ -435,7 +440,8 @@ const loadBackupActions = async () => {
           tuttoHaUnPrezzo: false,
           tuttiQuelliChe: false,
           penitenzeGruppo: false,
-          penitenzaRandom: false
+          penitenzaRandom: false,
+          nonHoMai: false
         }
       }));
       
@@ -455,7 +461,8 @@ const loadBackupActions = async () => {
           tuttoHaUnPrezzo: gamePositions.tuttoHaUnPrezzo || 18,
           tuttiQuelliChe: gamePositions.tuttiQuelliChe || 22,
           penitenzeGruppo: gamePositions.penitenzeGruppo || 13,
-          penitenzaRandom: gamePositions.penitenzaRandom || 28
+          penitenzaRandom: gamePositions.penitenzaRandom || 28,
+          nonHoMai: gamePositions.nonHoMai || 33
         }
       }));
       
@@ -872,6 +879,7 @@ const loadBackupActions = async () => {
       case "ilPezzoGrosso":
       case "cringeOrClassy":
       case "chatDetective":
+      case "nonHoMai":
         // Il giocatore corrente sarà il protagonista
         setSpecialGamePlayer(players[currentPlayerIndex]);
         
@@ -1487,7 +1495,8 @@ const loadBackupActions = async () => {
           tuttoHaUnPrezzo: 18,
           tuttiQuelliChe: 22,
           penitenzeGruppo: 13,
-          penitenzaRandom: 28
+          penitenzaRandom: 28,
+          nonHoMai: 33
         };
         acc[game] = defaultPositions[game] || 10 + (index * 10);
         return acc;

@@ -24,6 +24,9 @@
   "cringeOrClassy": {
   "text": "{player} è stato scelto per CRINGE OR CLASSY! Deve confessare una sua passione segreta e il gruppo voterà se è cringe o classy. Se è cringe, {player} esegue una penitenza; se è classy, sceglie chi deve fare la prossima."
 },
+"nonHoMai": {
+    "text": "{player} ha iniziato il gioco NON HO MAI! Completa la frase \"Io non ho mai...\". Chi l'ha fatto paga 3 penalità!"
+  },
 "penitenzaRandom": {
   "text": "{player} ha attivato PENITENZE RANDOM!",
   "redRoom": [

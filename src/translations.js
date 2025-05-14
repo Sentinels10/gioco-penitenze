@@ -106,7 +106,8 @@ const translations = {
       tuttoHaUnPrezzo: "{player} ha avviato il gioco TUTTO HA UN PREZZO!",
       tuttiQuelliChe: "{player} ha attivato il gioco TUTTI QUELLI CHE!",
       penitenzeGruppo: "{player} ha attivato PENITENZE DI GRUPPO!",
-      penitenzaRandom: "{player} ha attivato le PENITENZE RANDOM!"
+      penitenzaRandom: "{player} ha attivato le PENITENZE RANDOM!",
+      nonHoMai: "{player} ha iniziato il gioco NON HO MAI! Dopo di lui tocca al giocatore alla sua destra, finché non lo fanno tutti"
     },
     
     // Terminologia giochi speciali
@@ -122,7 +123,8 @@ const translations = {
       tuttoHaUnPrezzo: "TUTTO HA UN PREZZO",
       tuttiQuelliChe: "TUTTI QUELLI CHE",
       penitenzeGruppo: "PENITENZE DI GRUPPO",
-      penitenzaRandom: "PENITENZE RANDOM"
+      penitenzaRandom: "PENITENZE RANDOM",
+      nonHoMai: "NON HO MAI"
     },
     
     // Spiegazione del gioco Preferiresti
@@ -290,7 +292,8 @@ const translations = {
       tuttoHaUnPrezzo: "{player} has started the EVERYTHING HAS A PRICE game!",
       tuttiQuelliChe: "{player} has activated the ALL THOSE WHO game!",
       penitenzeGruppo: "{player} has activated GROUP PENALTIES!",
-      penitenzaRandom: "{player} has activated RANDOM PENALTIES!"
+      penitenzaRandom: "{player} has activated RANDOM PENALTIES!",
+      nonHoMai: "{player} has started the I HAVE NEVER game! After them, it's the player on their right's turn, until everyone has played."
     },
     
     // Special games terminology
@@ -306,7 +309,8 @@ const translations = {
       tuttoHaUnPrezzo: "EVERYTHING HAS A PRICE",
       tuttiQuelliChe: "ALL THOSE WHO",
       penitenzeGruppo: "GROUP PENALTIES",
-      penitenzaRandom: "RANDOM PENALTIES"
+      penitenzaRandom: "RANDOM PENALTIES",
+      nonHoMai: "I HAVE NEVER"
     },
     
     // Would You Rather game explanation
@@ -473,7 +477,8 @@ const translations = {
       tuttoHaUnPrezzo: "{player} a lancé le jeu TOUT A UN PRIX !",
       tuttiQuelliChe: "{player} a activé le jeu TOUS CEUX QUI!",
       penitenzeGruppo: "{player} a activé PÉNALITÉS DE GROUPE!",
-      penitenzaRandom: "{player} a activé les PÉNALITÉS ALÉATOIRES!"
+      penitenzaRandom: "{player} a activé les PÉNALITÉS ALÉATOIRES!",
+      nonHoMai: "{player} a commencé le jeu JE N'AI JAMAIS! Après lui, c'est au tour du joueur à sa droite, jusqu'à ce que tout le monde ait joué."
     },
     
     // Terminologie des jeux spéciaux
@@ -489,7 +494,8 @@ const translations = {
       tuttoHaUnPrezzo: "TOUT A UN PRIX",
       tuttiQuelliChe: "TOUS CEUX QUI",
       penitenzeGruppo: "PÉNALITÉS DE GROUPE",
-      penitenzaRandom: "PÉNALITÉS ALÉATOIRES"
+      penitenzaRandom: "PÉNALITÉS ALÉATOIRES",
+      nonHoMai: "JE N'AI JAMAIS"
     },
     
     // Explication du jeu Préférerais-tu
@@ -656,7 +662,8 @@ const translations = {
       tuttoHaUnPrezzo: "{player} hat das Spiel ALLES HAT SEINEN PREIS gestartet!",
       tuttiQuelliChe: "{player} hat das Spiel ALLE, DIE aktiviert!",
       penitenzeGruppo: "{player} hat GRUPPENSTRAFEN aktiviert!",
-      penitenzaRandom: "{player} hat ZUFÄLLIGE STRAFEN aktiviert!"
+      penitenzaRandom: "{player} hat ZUFÄLLIGE STRAFEN aktiviert!",
+      nonHoMai: "{player} hat das Spiel ICH HABE NIE gestartet! Nach ihm ist der Spieler zu seiner Rechten an der Reihe, bis alle dran waren."
     },
     
     // Spezielle Spiele Terminologie
@@ -672,7 +679,8 @@ const translations = {
       tuttoHaUnPrezzo: "ALLES HAT SEINEN PREIS",
       tuttiQuelliChe: "ALLE, DIE",
       penitenzeGruppo: "GRUPPENSTRAFEN",
-      penitenzaRandom: "ZUFÄLLIGE STRAFEN"
+      penitenzaRandom: "ZUFÄLLIGE STRAFEN",
+      nonHoMai: "ICH HABE NIE"
     },
     
     // Erklärung des Spiels "Was hättest du lieber"
