@@ -61,7 +61,7 @@ const useGameLogic = () => {
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
   // Stato per tenere traccia di tutti i giochi speciali
-  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo'];
+  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo', 'tuttiQuelliChe', 'penitenzeGruppo', 'penitenzaRandom'];
   
   // Numerazione dei giochi speciali per una manutenzione più semplice
   const SPECIAL_GAME_TYPES = {
@@ -74,7 +74,10 @@ const useGameLogic = () => {
     WOULD_YOU_RATHER: 6,
     CHAT_DETECTIVE: 7,
     NEW_RULE: 8,
-    TUTTO_HA_UN_PREZZO: 9
+    TUTTO_HA_UN_PREZZO: 9,
+    TUTTI_QUELLI_CHE: 10,
+    PENITENZE_GRUPPO: 11,
+    PENITENZA_RANDOM: 12
   };
 
   // Funzione che determina quali giochi speciali sono disponibili per ogni stanza
@@ -84,7 +87,7 @@ const useGameLogic = () => {
         // Per la modalità "coppie" truth or dare, would you rather, chatDetective e newRule
         return [SPECIAL_GAME_TYPES.TRUTH_OR_DARE, SPECIAL_GAME_TYPES.WOULD_YOU_RATHER, SPECIAL_GAME_TYPES.CHAT_DETECTIVE, SPECIAL_GAME_TYPES.NEW_RULE];
       case 'redRoom':
-        // Per la stanza rossa tutti i giochi + il nuovo tuttoHaUnPrezzo
+        // Per la stanza rossa tutti i giochi + il nuovo tuttoHaUnPrezzo e tuttiQuelliChe e penitenzaRandom
         return [
           SPECIAL_GAME_TYPES.BOUNCER,
           SPECIAL_GAME_TYPES.POINT_FINGER,
@@ -95,7 +98,10 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
           SPECIAL_GAME_TYPES.NEW_RULE,
-          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO
+          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
+          SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
+          SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
+          SPECIAL_GAME_TYPES.PENITENZA_RANDOM
         ];
       case 'darkRoom':
         // Per la dark room, non includere Point Finger, Cringe or Classy e Tutto Ha Un Prezzo
@@ -106,7 +112,10 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.IL_PEZZO_GROSSO,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
-          SPECIAL_GAME_TYPES.NEW_RULE
+          SPECIAL_GAME_TYPES.NEW_RULE,
+          SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
+          SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
+          SPECIAL_GAME_TYPES.PENITENZA_RANDOM
         ];
       case 'party':
         // Per la party room, aggiungiamo tuttoHaUnPrezzo ma escludiamo Il Pezzo Grosso e Chat Detective
@@ -118,7 +127,10 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.NEW_RULE,
-          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO
+          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
+          SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
+          SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
+          SPECIAL_GAME_TYPES.PENITENZA_RANDOM
         ];
       case 'neonRoulette':
       default:
@@ -133,27 +145,30 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
           SPECIAL_GAME_TYPES.NEW_RULE,
-          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO
+          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
+          SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
+          SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
+          SPECIAL_GAME_TYPES.PENITENZA_RANDOM
         ];
     }
   };
   
   // Stato per tracciare quali giochi sono stati usati
   const [specialGamesUsed, setSpecialGamesUsed] = useState({
-    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false },
-    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false },
-    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false },
-    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false },
-    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false }
+    redRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false },
+    darkRoom: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false },
+    coppie: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false },
+    party: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false },
+    neonRoulette: { bouncer: false, pointFinger: false, infamata: false, truthOrDare: false, ilPezzoGrosso: false, cringeOrClassy: false, wouldYouRather: false, chatDetective: false, newRule: false, tuttoHaUnPrezzo: false, tuttiQuelliChe: false, penitenzeGruppo: false, penitenzaRandom: false }
   });
   
   // Stato per tracciare quando deve apparire ciascun gioco
   const [specialGamesRound, setSpecialGamesRound] = useState({
-    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 },
-    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 },
-    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 },
-    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 },
-    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18 }
+    redRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 },
+    darkRoom: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 },
+    coppie: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 },
+    party: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 },
+    neonRoulette: { bouncer: 15, pointFinger: 30, infamata: 20, truthOrDare: 25, ilPezzoGrosso: 35, cringeOrClassy: 40, wouldYouRather: 10, chatDetective: 45, newRule: 5, tuttoHaUnPrezzo: 18, tuttiQuelliChe: 22, penitenzeGruppo: 13, penitenzaRandom: 28 }
   });
   
   // Stato per il gioco speciale attualmente in corso
@@ -165,7 +180,7 @@ const useGameLogic = () => {
   const [lastSpecialGameRound, setLastSpecialGameRound] = useState({
     redRoom: 0,
     darkRoom: 0,
-    clash: 0,
+    coppie: 0,
     party: 0,
     neonRoulette: 0
   });
@@ -417,7 +432,10 @@ const loadBackupActions = async () => {
           wouldYouRather: false,
           chatDetective: false,
           newRule: false,
-          tuttoHaUnPrezzo: false
+          tuttoHaUnPrezzo: false,
+          tuttiQuelliChe: false,
+          penitenzeGruppo: false,
+          penitenzaRandom: false
         }
       }));
       
@@ -434,7 +452,10 @@ const loadBackupActions = async () => {
           wouldYouRather: gamePositions.wouldYouRather || 10,
           chatDetective: gamePositions.chatDetective || 45,
           newRule: gamePositions.newRule || 5,
-          tuttoHaUnPrezzo: gamePositions.tuttoHaUnPrezzo || 18
+          tuttoHaUnPrezzo: gamePositions.tuttoHaUnPrezzo || 18,
+          tuttiQuelliChe: gamePositions.tuttiQuelliChe || 22,
+          penitenzeGruppo: gamePositions.penitenzeGruppo || 13,
+          penitenzaRandom: gamePositions.penitenzaRandom || 28
         }
       }));
       
@@ -494,6 +515,7 @@ const loadBackupActions = async () => {
         let darkRoomActions = [];
         let coppieActions = [];
         let partyActions = [];
+        let specialGameActions = [];
         
         // Raccogli azioni dal file backup per ogni stanza
         if (backupActions.redRoom && backupActions.redRoom.length > 0) {
@@ -510,6 +532,32 @@ const loadBackupActions = async () => {
         
         if (backupActions.party && backupActions.party.length > 0) {
           partyActions = [...backupActions.party];
+        }
+        
+        // MIGLIORAMENTO: Raccogliamo anche le azioni dai giochi speciali
+        if (backupActions.specialGames) {
+          // Raccogliamo tutte le azioni dei giochi speciali
+          Object.values(backupActions.specialGames).forEach(gameData => {
+            if (typeof gameData === 'object' && gameData.text) {
+              specialGameActions.push({ text: gameData.text });
+            }
+            
+            // Per i giochi con sottosezioni (come tuttoHaUnPrezzo o tuttiQuelliChe)
+            if (typeof gameData === 'object') {
+              if (gameData.redRoom && Array.isArray(gameData.redRoom)) {
+                specialGameActions = [...specialGameActions, ...gameData.redRoom.map(text => ({ text }))];
+              }
+              if (gameData.darkRoom && Array.isArray(gameData.darkRoom)) {
+                specialGameActions = [...specialGameActions, ...gameData.darkRoom.map(text => ({ text }))];
+              }
+              if (gameData.party && Array.isArray(gameData.party)) {
+                specialGameActions = [...specialGameActions, ...gameData.party.map(text => ({ text }))];
+              }
+              if (gameData.rules && Array.isArray(gameData.rules)) {
+                specialGameActions = [...specialGameActions, ...gameData.rules.map(text => ({ text }))];
+              }
+            }
+          });
         }
         
         // Se qualche categoria ha poche o nessuna azione, usa il fallback
@@ -542,22 +590,25 @@ const loadBackupActions = async () => {
         darkRoomActions = darkRoomActions.sort(() => Math.random() - 0.5);
         coppieActions = coppieActions.sort(() => Math.random() - 0.5);
         partyActions = partyActions.sort(() => Math.random() - 0.5);
+        specialGameActions = specialGameActions.sort(() => Math.random() - 0.5);
         
         // Calcola quante azioni prendere da ciascuna categoria per un totale di circa 100
-        const maxPerCategory = 25; // 25 azioni per categoria = 100 totali
+        const maxPerCategory = 20; // 20 azioni per categoria per fare spazio ai giochi speciali
         
         // Prendi un numero bilanciato di azioni da ciascuna categoria
         const selectedRedRoomActions = redRoomActions.slice(0, Math.min(maxPerCategory, redRoomActions.length));
         const selectedDarkRoomActions = darkRoomActions.slice(0, Math.min(maxPerCategory, darkRoomActions.length));
         const selectedCoppieActions = coppieActions.slice(0, Math.min(maxPerCategory, coppieActions.length));
         const selectedPartyActions = partyActions.slice(0, Math.min(maxPerCategory, partyActions.length));
+        const selectedSpecialGameActions = specialGameActions.slice(0, Math.min(maxPerCategory, specialGameActions.length));
         
         // Combina tutte le azioni selezionate
         const combinedActions = [
           ...selectedRedRoomActions,
           ...selectedDarkRoomActions,
           ...selectedCoppieActions,
-          ...selectedPartyActions
+          ...selectedPartyActions,
+          ...selectedSpecialGameActions
         ];
         
         // Mescola le azioni combinate
@@ -568,6 +619,7 @@ const loadBackupActions = async () => {
         console.log(t.logMessages.darkRoomStats.replace('{count}', selectedDarkRoomActions.length));
         console.log(t.logMessages.coppieStats.replace('{count}', selectedCoppieActions.length));
         console.log(t.logMessages.partyStats.replace('{count}', selectedPartyActions.length));
+        console.log("Special Games: " + selectedSpecialGameActions.length + " azioni");
         console.log(t.logMessages.totalStats.replace('{count}', shuffledActions.length));
         
         // Aggiorna il pool di azioni per la Neon Roulette
@@ -620,7 +672,8 @@ const loadBackupActions = async () => {
   
   // NUOVO: Funzione per distribuire i giochi speciali nella partita
   const distributeSpecialGames = (maxActions, roomId) => {
-    const MIN_SPACING = 5; // Distanza minima tra i giochi speciali
+    // Distanza minima voluta tra i giochi
+    const MIN_SPACING = 3; // Come richiesto
     
     // Otteniamo i giochi disponibili per questa stanza
     const availableGameTypes = getAvailableSpecialGames(roomId);
@@ -628,16 +681,29 @@ const loadBackupActions = async () => {
     // Convertiamo i tipi numerici nei nomi dei giochi
     const availableGames = availableGameTypes.map(gameType => SPECIAL_GAMES[gameType]);
     
-    // Mescola l'array dei giochi disponibili per un ordine casuale
-    const shuffledGames = [...availableGames].sort(() => Math.random() - 0.5);
+    // Assicuriamoci che nella modalità Neon Roulette vengano inclusi tutti i giochi speciali
+    let shuffledGames = [];
+    if (roomId === 'neonRoulette') {
+      // Per Neon Roulette, includiamo TUTTI i giochi speciali
+      shuffledGames = [...SPECIAL_GAMES].sort(() => Math.random() - 0.5);
+    } else {
+      // Per le altre stanze, utilizziamo solo i giochi disponibili
+      shuffledGames = [...availableGames].sort(() => Math.random() - 0.5);
+    }
     
     // Range disponibile per la distribuzione dei giochi
-    const minPosition = 10; // Iniziamo un po' dopo l'inizio della partita
-    const maxPosition = maxActions - 10; // Finiamo un po' prima della fine
+    const minPosition = 5; // Iniziamo dopo le prime azioni
+    const maxPosition = maxActions - 5; // Finiamo prima della fine
     const availableRange = maxPosition - minPosition;
     
-    // Calcola la distribuzione ideale basata sul numero di giochi disponibili
-    const segmentSize = Math.floor(availableRange / shuffledGames.length);
+    // Verifica se abbiamo abbastanza spazio per tutti i giochi con la distanza minima
+    const minRequiredSpace = shuffledGames.length * (1 + MIN_SPACING) - MIN_SPACING;
+    if (minRequiredSpace > availableRange) {
+      console.warn(`Attenzione: non c'è abbastanza spazio per distribuire tutti i giochi con la distanza minima richiesta.`);
+    }
+    
+    // Calcola la dimensione ottimale dei segmenti (garantendo la distanza minima se possibile)
+    const segmentSize = Math.max(MIN_SPACING + 1, Math.floor(availableRange / shuffledGames.length));
     
     // Crea le posizioni con un po' di randomicità ma mantieni la distanza minima
     const positions = {};
@@ -645,10 +711,29 @@ const loadBackupActions = async () => {
     shuffledGames.forEach((game, index) => {
       // Base position nel suo segmento
       const segmentStart = minPosition + (index * segmentSize);
-      const segmentEnd = segmentStart + segmentSize - MIN_SPACING;
+      // Il segmento finisce prima dell'inizio del prossimo segmento
+      const segmentEnd = Math.min(maxPosition, segmentStart + segmentSize - 1);
       
-      // Aggiungi randomicità all'interno del segmento
-      positions[game] = segmentStart + Math.floor(Math.random() * (segmentEnd - segmentStart));
+      // Se è il primo gioco, non c'è un gioco precedente
+      if (index === 0) {
+        // Posiziona il primo gioco in una posizione casuale all'interno del suo segmento
+        positions[game] = segmentStart + Math.floor(Math.random() * (segmentEnd - segmentStart + 1));
+      } else {
+        // Per i giochi successivi, verifica la distanza dal gioco precedente
+        const prevGame = shuffledGames[index - 1];
+        const prevPosition = positions[prevGame];
+        
+        // La posizione minima valida è prevPosition + MIN_SPACING
+        const minValidPosition = prevPosition + MIN_SPACING;
+        
+        // Se la posizione minima valida è oltre la fine del segmento, usa quella
+        if (minValidPosition > segmentEnd) {
+          positions[game] = minValidPosition;
+        } else {
+          // Altrimenti, scegli una posizione casuale nel range valido
+          positions[game] = minValidPosition + Math.floor(Math.random() * (segmentEnd - minValidPosition + 1));
+        }
+      }
     });
     
     // Per i giochi non disponibili in questa stanza, impostiamo una posizione
@@ -886,6 +971,138 @@ const loadBackupActions = async () => {
             challenges = backupActions.specialGames.tuttoHaUnPrezzo.redRoom;
           } else if (roomId === 'party' && backupActions.specialGames.tuttoHaUnPrezzo.party) {
             challenges = backupActions.specialGames.tuttoHaUnPrezzo.party;
+          } else if (roomId === 'neonRoulette') {
+            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
+            const allChallenges = [];
+            if (backupActions.specialGames.tuttoHaUnPrezzo.redRoom) 
+              allChallenges.push(...backupActions.specialGames.tuttoHaUnPrezzo.redRoom);
+            if (backupActions.specialGames.tuttoHaUnPrezzo.party) 
+              allChallenges.push(...backupActions.specialGames.tuttoHaUnPrezzo.party);
+            
+            challenges = allChallenges;
+          }
+          
+          if (challenges && challenges.length > 0) {
+            // Seleziona una sfida casuale
+            const randomIndex = Math.floor(Math.random() * challenges.length);
+            const challenge = challenges[randomIndex];
+            
+            // Aggiungi la sfida al testo dell'azione
+            actionText += "\n\n" + challenge;
+          }
+        }
+        break;
+
+      case "tuttiQuelliChe":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Selezioniamo una sfida appropriata in base alla stanza
+        if (backupActions.specialGames && backupActions.specialGames.tuttiQuelliChe) {
+          let challenges = [];
+          
+          if (roomId === 'redRoom' && backupActions.specialGames.tuttiQuelliChe.redRoom) {
+            challenges = backupActions.specialGames.tuttiQuelliChe.redRoom;
+          } else if (roomId === 'darkRoom' && backupActions.specialGames.tuttiQuelliChe.darkRoom) {
+            challenges = backupActions.specialGames.tuttiQuelliChe.darkRoom;
+          } else if (roomId === 'party' && backupActions.specialGames.tuttiQuelliChe.party) {
+            challenges = backupActions.specialGames.tuttiQuelliChe.party;
+          } else if (roomId === 'neonRoulette') {
+            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
+            const allChallenges = [];
+            if (backupActions.specialGames.tuttiQuelliChe.redRoom) 
+              allChallenges.push(...backupActions.specialGames.tuttiQuelliChe.redRoom);
+            if (backupActions.specialGames.tuttiQuelliChe.darkRoom) 
+              allChallenges.push(...backupActions.specialGames.tuttiQuelliChe.darkRoom);
+            if (backupActions.specialGames.tuttiQuelliChe.party)
+              allChallenges.push(...backupActions.specialGames.tuttiQuelliChe.party);
+            
+            challenges = allChallenges;
+          }
+          
+          if (challenges && challenges.length > 0) {
+            // Seleziona una sfida casuale
+            const randomIndex = Math.floor(Math.random() * challenges.length);
+            const challenge = challenges[randomIndex];
+            
+            // Aggiungi la sfida al testo dell'azione
+            actionText += "\n\n" + challenge;
+          }
+        }
+        break;
+
+      case "penitenzeGruppo":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Selezioniamo una sfida appropriata in base alla stanza
+        if (backupActions.specialGames && backupActions.specialGames.penitenzeGruppo) {
+          let challenges = [];
+          
+          if (roomId === 'redRoom' && backupActions.specialGames.penitenzeGruppo.redRoom) {
+            challenges = backupActions.specialGames.penitenzeGruppo.redRoom;
+          } else if (roomId === 'darkRoom' && backupActions.specialGames.penitenzeGruppo.darkRoom) {
+            challenges = backupActions.specialGames.penitenzeGruppo.darkRoom;
+          } else if (roomId === 'party' && backupActions.specialGames.penitenzeGruppo.party) {
+            challenges = backupActions.specialGames.penitenzeGruppo.party;
+          } else if (roomId === 'neonRoulette') {
+            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
+            const allChallenges = [];
+            if (backupActions.specialGames.penitenzeGruppo.redRoom) 
+              allChallenges.push(...backupActions.specialGames.penitenzeGruppo.redRoom);
+            if (backupActions.specialGames.penitenzeGruppo.darkRoom) 
+              allChallenges.push(...backupActions.specialGames.penitenzeGruppo.darkRoom);
+            if (backupActions.specialGames.penitenzeGruppo.party)
+              allChallenges.push(...backupActions.specialGames.penitenzeGruppo.party);
+            
+            challenges = allChallenges;
+          }
+          
+          if (challenges && challenges.length > 0) {
+            // Seleziona una sfida casuale
+            const randomIndex = Math.floor(Math.random() * challenges.length);
+            const challenge = challenges[randomIndex];
+            
+            // Aggiungi la sfida al testo dell'azione
+            actionText += "\n\n" + challenge;
+          }
+        }
+        break;
+        
+      case "penitenzaRandom":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Selezioniamo una sfida appropriata in base alla stanza
+        if (backupActions.specialGames && backupActions.specialGames.penitenzaRandom) {
+          let challenges = [];
+          
+          if (roomId === 'redRoom' && backupActions.specialGames.penitenzaRandom.redRoom) {
+            challenges = backupActions.specialGames.penitenzaRandom.redRoom;
+          } else if (roomId === 'darkRoom' && backupActions.specialGames.penitenzaRandom.darkRoom) {
+            challenges = backupActions.specialGames.penitenzaRandom.darkRoom;
+          } else if (roomId === 'party' && backupActions.specialGames.penitenzaRandom.party) {
+            challenges = backupActions.specialGames.penitenzaRandom.party;
+          } else if (roomId === 'neonRoulette') {
+            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
+            const allChallenges = [];
+            if (backupActions.specialGames.penitenzaRandom.redRoom) 
+              allChallenges.push(...backupActions.specialGames.penitenzaRandom.redRoom);
+            if (backupActions.specialGames.penitenzaRandom.darkRoom) 
+              allChallenges.push(...backupActions.specialGames.penitenzaRandom.darkRoom);
+            if (backupActions.specialGames.penitenzaRandom.party)
+              allChallenges.push(...backupActions.specialGames.penitenzaRandom.party);
+            
+            challenges = allChallenges;
           }
           
           if (challenges && challenges.length > 0) {
@@ -969,13 +1186,27 @@ const loadBackupActions = async () => {
       // Convertiamo i tipi numerici nei nomi dei giochi
       const availableGames = availableGameTypes.map(gameType => SPECIAL_GAMES[gameType]);
       
-      // Verifica ogni tipo di gioco speciale disponibile
-      for (const gameType of availableGames) {
-        // Verifica solo se il gioco non è già stato usato e se è il momento giusto
-        if (!specialGamesUsed[roomId][gameType] && actionsCounter >= specialGamesRound[roomId][gameType]) {
-          handleSpecialGame(gameType);
-          return;
+      // Per Neon Roulette, assicuriamoci che tutti i giochi siano considerati
+      const gamesToCheck = roomId === 'neonRoulette' ? SPECIAL_GAMES : availableGames;
+      
+      // Trova il gioco non ancora usato con la posizione più vicina alla posizione attuale
+      let nextGameToShow = null;
+      let nextGamePosition = Infinity;
+      
+      for (const gameType of gamesToCheck) {
+        const gamePosition = specialGamesRound[roomId][gameType];
+        
+        // Verifica se il gioco non è ancora stato usato e se è il momento giusto
+        if (!specialGamesUsed[roomId][gameType] && actionsCounter >= gamePosition && gamePosition < nextGamePosition) {
+          nextGameToShow = gameType;
+          nextGamePosition = gamePosition;
         }
+      }
+      
+      // Se abbiamo trovato un gioco da mostrare, mostralo
+      if (nextGameToShow) {
+        handleSpecialGame(nextGameToShow);
+        return;
       }
     }
     
@@ -1253,7 +1484,10 @@ const loadBackupActions = async () => {
           wouldYouRather: 10,
           chatDetective: 45,
           newRule: 5,
-          tuttoHaUnPrezzo: 18 // Aggiungiamo il nuovo gioco con un round di default
+          tuttoHaUnPrezzo: 18,
+          tuttiQuelliChe: 22,
+          penitenzeGruppo: 13,
+          penitenzaRandom: 28
         };
         acc[game] = defaultPositions[game] || 10 + (index * 10);
         return acc;
@@ -1270,7 +1504,7 @@ const loadBackupActions = async () => {
     setLastSpecialGameRound({
       redRoom: 0,
       darkRoom: 0,
-      clash: 0,
+      coppie: 0,
       party: 0,
       neonRoulette: 0
     });

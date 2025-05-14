@@ -103,7 +103,10 @@ const translations = {
       cringeOrClassy: "{player} deve confessare una sua passione segreta",
       wouldYouRather: "{player} ha posto la domanda: Preferiresti? Tutti devono votare! La minoranza riceve penalità",
       chatDetective: "{player} è il detective di WhatsApp!",
-      tuttoHaUnPrezzo: "{player} ha avviato il gioco TUTTO HA UN PREZZO!"
+      tuttoHaUnPrezzo: "{player} ha avviato il gioco TUTTO HA UN PREZZO!",
+      tuttiQuelliChe: "{player} ha attivato il gioco TUTTI QUELLI CHE!",
+      penitenzeGruppo: "{player} ha attivato PENITENZE DI GRUPPO!",
+      penitenzaRandom: "{player} ha attivato le PENITENZE RANDOM!"
     },
     
     // Terminologia giochi speciali
@@ -116,7 +119,10 @@ const translations = {
       cringeOrClassy: "CRINGE OR CLASSY",
       wouldYouRather: "PREFERIRESTI",
       chatDetective: "CHAT DETECTIVE",
-      tuttoHaUnPrezzo: "TUTTO HA UN PREZZO"
+      tuttoHaUnPrezzo: "TUTTO HA UN PREZZO",
+      tuttiQuelliChe: "TUTTI QUELLI CHE",
+      penitenzeGruppo: "PENITENZE DI GRUPPO",
+      penitenzaRandom: "PENITENZE RANDOM"
     },
     
     // Spiegazione del gioco Preferiresti
@@ -281,7 +287,10 @@ const translations = {
       cringeOrClassy: "{player} must confess a secret passion",
       wouldYouRather: "{player} asked the question: Would You Rather? Everyone must vote! The minority gets penalties",
       chatDetective: "{player} is the WhatsApp detective!",
-      tuttoHaUnPrezzo: "{player} has started the EVERYTHING HAS A PRICE game!"
+      tuttoHaUnPrezzo: "{player} has started the EVERYTHING HAS A PRICE game!",
+      tuttiQuelliChe: "{player} has activated the ALL THOSE WHO game!",
+      penitenzeGruppo: "{player} has activated GROUP PENALTIES!",
+      penitenzaRandom: "{player} has activated RANDOM PENALTIES!"
     },
     
     // Special games terminology
@@ -294,7 +303,10 @@ const translations = {
       cringeOrClassy: "CRINGE OR CLASSY",
       wouldYouRather: "WOULD YOU RATHER",
       chatDetective: "CHAT DETECTIVE",
-      tuttoHaUnPrezzo: "EVERYTHING HAS A PRICE"
+      tuttoHaUnPrezzo: "EVERYTHING HAS A PRICE",
+      tuttiQuelliChe: "ALL THOSE WHO",
+      penitenzeGruppo: "GROUP PENALTIES",
+      penitenzaRandom: "RANDOM PENALTIES"
     },
     
     // Would You Rather game explanation
@@ -458,7 +470,10 @@ const translations = {
       cringeOrClassy: "{player} doit confesser une passion secrète",
       wouldYouRather: "{player} a posé la question: Préférerais-tu? Tout le monde doit voter! La minorité reçoit des pénalités",
       chatDetective: "{player} est le détective WhatsApp !",
-      tuttoHaUnPrezzo: "{player} a lancé le jeu TOUT A UN PRIX !"
+      tuttoHaUnPrezzo: "{player} a lancé le jeu TOUT A UN PRIX !",
+      tuttiQuelliChe: "{player} a activé le jeu TOUS CEUX QUI!",
+      penitenzeGruppo: "{player} a activé PÉNALITÉS DE GROUPE!",
+      penitenzaRandom: "{player} a activé les PÉNALITÉS ALÉATOIRES!"
     },
     
     // Terminologie des jeux spéciaux
@@ -471,7 +486,10 @@ const translations = {
       cringeOrClassy: "GÊNANT OU CLASSE",
       wouldYouRather: "PRÉFÉRERAIS-TU",
       chatDetective: "DÉTECTIVE DE CHAT",
-      tuttoHaUnPrezzo: "TOUT A UN PRIX"
+      tuttoHaUnPrezzo: "TOUT A UN PRIX",
+      tuttiQuelliChe: "TOUS CEUX QUI",
+      penitenzeGruppo: "PÉNALITÉS DE GROUPE",
+      penitenzaRandom: "PÉNALITÉS ALÉATOIRES"
     },
     
     // Explication du jeu Préférerais-tu
@@ -635,7 +653,10 @@ const translations = {
       cringeOrClassy: "{player} muss eine geheime Leidenschaft gestehen",
       wouldYouRather: "{player} stellte die Frage: Was hättest du lieber? Alle müssen abstimmen! Die Minderheit erhält Strafen",
       chatDetective: "{player} ist der WhatsApp-Detektiv!",
-      tuttoHaUnPrezzo: "{player} hat das Spiel ALLES HAT SEINEN PREIS gestartet!"
+      tuttoHaUnPrezzo: "{player} hat das Spiel ALLES HAT SEINEN PREIS gestartet!",
+      tuttiQuelliChe: "{player} hat das Spiel ALLE, DIE aktiviert!",
+      penitenzeGruppo: "{player} hat GRUPPENSTRAFEN aktiviert!",
+      penitenzaRandom: "{player} hat ZUFÄLLIGE STRAFEN aktiviert!"
     },
     
     // Spezielle Spiele Terminologie
@@ -648,7 +669,10 @@ const translations = {
       cringeOrClassy: "PEINLICH ODER STILVOLL",
       wouldYouRather: "WAS HÄTTEST DU LIEBER",
       chatDetective: "CHAT-DETEKTIV",
-      tuttoHaUnPrezzo: "ALLES HAT SEINEN PREIS"
+      tuttoHaUnPrezzo: "ALLES HAT SEINEN PREIS",
+      tuttiQuelliChe: "ALLE, DIE",
+      penitenzeGruppo: "GRUPPENSTRAFEN",
+      penitenzaRandom: "ZUFÄLLIGE STRAFEN"
     },
     
     // Erklärung des Spiels "Was hättest du lieber"

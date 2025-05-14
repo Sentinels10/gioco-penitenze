@@ -24,6 +24,45 @@
   "cringeOrClassy": {
   "text": "{player} è stato scelto per CRINGE OR CLASSY! Deve confessare una sua passione segreta e il gruppo voterà se è cringe o classy. Se è cringe, {player} esegue una penitenza; se è classy, sceglie chi deve fare la prossima."
 },
+"penitenzaRandom": {
+  "text": "{player} ha attivato PENITENZE RANDOM!",
+  "redRoom": [
+    "Chi ha mai fatto sexting paga 3 penalità",
+    "Chi ha una cotta segreta per qualcuno in questa stanza paga 3 penalità",
+    "Chi ha mai fatto sesso in un luogo pubblico paga 3 penalità",
+    "Chi ha mai baciato qualcuno dello stesso sesso paga 3 penalità",
+    "Chi ha un vibratore o sex toy a casa paga 3 penalità",
+    "Chi ha mai fatto un sogno erotico con qualcuno in questa stanza paga 3 penalità",
+    "Chi ha fatto più di 3 partner sessuali paga 3 penalità",
+    "Chi ha mai avuto una fantasia con un insegnante o un capo paga 3 penalità",
+    "Chi ha finto un orgasmo almeno una volta paga 4 penalità",
+    "Chi ha mai flirtato con qualcuno impegnato paga 3 penalità"
+  ],
+  "darkRoom": [
+    "Chi ha un segreto che non ha mai confessato a nessuno paga 4 penalità",
+    "Chi ha mai provato invidia per il successo di un amico paga 3 penalità",
+    "Chi ha mai desiderato di essere qualcun altro paga 3 penalità",
+    "Chi ha mantenuto un'amicizia solo per convenienza paga 3 penalità",
+    "Chi ha mai augurato il male a qualcuno paga 3 penalità",
+    "Chi ha deluso profondamente i propri genitori paga 4 penalità",
+    "Chi ha paura di restare solo nella vita paga 3 penalità",
+    "Chi nasconde un lato oscuro della propria personalità paga 3 penalità",
+    "Chi ha mai tradito la fiducia di un amico paga 3 penalità",
+    "Chi ha mentito durante questo gioco paga 5 penalità"
+  ],
+  "party": [
+    "Chi ha mai fatto una figura imbarazzante ad una festa paga 2 penalità",
+    "Chi ha fatto il bagno vestito almeno una volta paga 2 penalità",
+    "Chi ha cantato sotto la doccia questa settimana paga 2 penalità",
+    "Chi ha ballato davanti allo specchio da solo paga 2 penalità",
+    "Chi ha mai mangiato qualcosa caduto per terra paga 2 penalità",
+    "Chi ha finto di conoscere una canzone in un karaoke paga 2 penalità",
+    "Chi ha più di 10 selfie falliti nella galleria paga 2 penalità",
+    "Chi ha finto di essere al telefono per evitare qualcuno paga 2 penalità",
+    "Chi ha pubblicato una foto sui social e poi l'ha cancellata entro 10 minuti paga 2 penalità",
+    "Chi ha fatto uno screenshot di una storia Instagram oggi paga 2 penalità"
+  ]
+},
 "tuttoHaUnPrezzo": {
       "text": "{player} ha avviato il gioco TUTTO HA UN PREZZO! Votate tutti: alzate la mano per SÌ, tenetela abbassata per NO. La minoranza riceve 3 penalità!",
       "redRoom": [
@@ -39,18 +78,117 @@
         "Racconteresti nei minimi dettagli la tua ultima esperienza sessuale per 6.000€?"
       ],
       "party": [
-        "Mangeresti uno scarafaggio vivo per 500€?",
-        "Berresti un bicchiere intero di salsa piccante per 1.000€?",
-        "Ti tingeresti i capelli color arcobaleno per un mese intero per 2.000€?",
-        "Rinunceresti al tuo smartphone per un mese per 5.000€?",
-        "Andresti a lavoro/università in pigiama per una settimana per 1.500€?",
-        "Mangeresti solo cibo per animali per 3 giorni per 3.000€?",
-        "Faresti 100 flessioni ora davanti a tutti per 200€?",
-        "Chiameresti la persona che ti piace e le diresti 'ti amo' davanti a tutti per 1.000€?",
-        "Indosseresti vestiti del sesso opposto per una settimana per 2.500€?",
-        "Improvviseresti un balletto di 2 minuti in centro città per 800€?"
+        "Diresti che hai tradito la fiducia di qualcuno che ti voleva bene per 6.000€?",
+"Accetteresti di perdere tutti i tuoi contatti e ricominciare da zero per 300.000€?",
+"Diresti a tua madre che ti ha fatto sentire solo per 12.000€?",
+"Confesseresti che non ti sei mai sentito orgoglioso di te stesso per 80.000€?",
+"Accetteresti di vivere una vita senza mai essere toccato per 2 milioni di euro?",
+"Diresti che ti sei sentito superiore solo per umiliare qualcuno per 4.000€?",
+"Cancelleresti il ricordo della tua prima relazione per 150.000€?",
+"Diresti che hai provato odio per una persona che ti ha voluto bene per 18.000€?",
+"Accetteresti di non provare più nulla durante il sesso per 500.000€?",
+"Ammetteresti di aver mentito per far sembrare peggiore qualcun altro per 7.000€?",
+"Diresti al tuo partner che pensi spesso di lasciarlo per 60.000€?",
+"Accetteresti di vivere il resto della tua vita senza mai innamorarti per 900.000€?",
+"Diresti che non sopporti il successo di qualcuno vicino a te per 9.000€?",
+"Accetteresti di dimenticare ogni volto che hai amato finora per 1.000.000€?",
+"Diresti che non provi niente da molto tempo per 10.000€?",
+"Diresti che non credi che tua madre sia una brava persona per 300.000€?",
+"Diresti che preferiresti essere solo piuttosto che onesto per 5.000€?",
+"Accetteresti di sapere ogni pensiero degli altri… ma non poter mai rispondere per 800.000€?",
+"Diresti che spesso fingi per non deludere gli altri per 13.000€?",
+"Ammetteresti che hai fatto piangere qualcuno apposta per 45.000€?",
+"Rinunceresti alla possibilità di essere mai compreso davvero per 600.000€?",
+"Diresti a tuo fratello che non l'hai mai stimato per 3.000€?",
+"Diresti che non cambieresti nulla di un errore che ha ferito qualcuno per 90.000€?",
+"Diresti che preferisci il rispetto alla verità per 75.000€?",
+"Accetteresti di vivere una vita perfetta… sapendo che è tutta una bugia per 2.500.000€?",
+"Diresti che non hai mai perdonato davvero chi ti ha fatto del male per 8.000€?",
+"Accetteresti che nessuno ti ami mai più, ma essere sempre circondato da persone per 1.200.000€?",
+"Diresti che ti sei venduto almeno una volta per 11.000€?",
+"Diresti che non vuoi mai diventare come tuo padre, anche se a volte gli somigli per 60.000€?",
+"Accetteresti che ogni tua memoria sia stata scritta da qualcun altro per 500 milioni di euro?"
       ]
     },
+      "tuttiQuelliChe": {
+        "text": "{player} ha attivato il gioco TUTTI QUELLI CHE!",
+        "redRoom": [
+          "Tutti quelli che hanno trombato oggi devono fare 3 penalità",
+          "Tutti quelli che hanno mai fatto sexting devono fare 3 penalità",
+          "Tutti quelli che hanno una cotta segreta per qualcuno in questa stanza devono fare 3 penalità",
+          "Tutti quelli che hanno mentito sulla loro vita sessuale per sembrare più interessanti devono fare 3 penalità",
+          "Tutti quelli che hanno mai fantasticato su un professore o un capo devono fare 3 penalità",
+          "Tutti quelli che hanno fake account sui social media devono fare 2 penalità",
+          "Tutti quelli che hanno mai finto un orgasmo devono fare 4 penalità",
+          "Tutti quelli che hanno mai googlato un ex dopo la rottura devono fare 2 penalità",
+          "Tutti quelli che hanno mai baciato qualcuno dello stesso sesso devono fare 3 penalità",
+          "Tutti quelli che hanno un vibratore o sex toy a casa devono fare 3 penalità"
+        ],
+        "darkRoom": [
+          "Tutti quelli che hanno mai tradito la fiducia di un amico devono fare 3 penalità",
+          "Tutti quelli che hanno un segreto che non hanno mai confessato a nessuno devono fare 4 penalità",
+          "Tutti quelli che hanno mai provato invidia per il successo di un amico devono fare 3 penalità",
+          "Tutti quelli che hanno mai desiderato di essere qualcun altro devono fare 3 penalità",
+          "Tutti quelli che hanno mantenuto un'amicizia solo per convenienza devono fare 3 penalità",
+          "Tutti quelli che hanno mai augurato il male a qualcuno devono fare 3 penalità",
+          "Tutti quelli che hanno deluso profondamente i propri genitori devono fare 4 penalità",
+          "Tutti quelli che hanno paura di restare soli nella vita devono fare 3 penalità", 
+          "Tutti quelli che nascondono un lato oscuro della loro personalità devono fare 3 penalità",
+          "Tutti quelli che hanno mentito durante questo gioco devono fare 5 penalità"
+        ],
+        "party": [
+          "Tutti quelli che hanno mai fatto una figura imbarazzante ad una festa devono fare 2 penalità",
+          "Tutti quelli che hanno fatto il bagno vestiti almeno una volta devono fare 2 penalità",
+          "Tutti quelli che hanno cantato sotto la doccia questa settimana devono fare 2 penalità",
+          "Tutti quelli che hanno ballato davanti allo specchio da soli devono fare 2 penalità",
+          "Tutti quelli che hanno mai mangiato qualcosa caduto per terra devono fare 2 penalità",
+          "Tutti quelli che hanno finto di conoscere una canzone in un karaoke devono fare 2 penalità",
+          "Tutti quelli che hanno più di 10 selfie falliti nella galleria devono fare 2 penalità",
+          "Tutti quelli che hanno finto di essere al telefono per evitare qualcuno devono fare 2 penalità",
+          "Tutti quelli che hanno pubblicato una foto sui social e poi l'hanno cancellata entro 10 minuti devono fare 2 penalità",
+          "Tutti quelli che hanno fatto uno screenshot di una storia Instagram oggi devono fare 2 penalità"
+        ]
+      },
+
+  "penitenzeGruppo": {
+    "text": "{player} ha attivato PENITENZE DI GRUPPO!",
+    "party": [
+      "Bevono tutti quelli che hanno postato una foto sui social nelle ultime 24 ore",
+      "Bevono tutti quelli che hanno mai partecipato a un karaoke",
+      "Bevono tutti quelli che si sono mai addormentati a una festa",
+      "Bevono tutti quelli che hanno un tatuaggio",
+      "Bevono tutti quelli che sanno ballare un ballo tradizionale",
+      "Bevono tutti quelli che hanno più di 1000 foto sul telefono",
+      "Bevono tutti quelli che sono arrivati in ritardo stasera",
+      "Bevono tutti quelli che hanno indossato qualcosa di nuovo oggi",
+      "Bevono tutti quelli che hanno cambiato la foto profilo nell'ultimo mese",
+      "Bevono tutti quelli che non hanno mai guidato un'auto"
+    ],
+    "redRoom": [
+"Bevono tutti quelli che hanno il pene",
+  "Bevono tutti quelli che hanno fatto sesso nell'ultimo mese",
+  "Bevono tutti quelli che hanno mai fatto un sogno erotico con qualcuno in questa stanza",
+  "Bevono tutti quelli che hanno mai flirtato con qualcuno impegnato",
+  "Bevono tutti quelli che hanno mai fatto sexting",
+  "Bevono tutti quelli che hanno avuto più di tre partner sessuali",
+  "Bevono tutti quelli che hanno mai guardato un film per adulti in compagnia",
+  "Bevono tutti quelli che hanno mai bestemmiato durante un rapporto",
+  "Bevono tutti quelli che hanno mai provato giochi di ruolo a letto",
+  "Bevono tutti quelli che hanno una posizione preferita"
+    ],
+    "darkRoom": [
+"Bevono tutti quelli che hanno mai finto di essere qualcun altro",
+  "Bevono tutti quelli che hanno mai tradito la fiducia di un amico",
+  "Bevono tutti quelli che hanno un segreto che non hanno mai raccontato a nessuno qui presente",
+  "Bevono tutti quelli che hanno mai nascosto qualcosa di importante ai genitori",
+  "Bevono tutti quelli che hanno mai invidiato profondamente qualcuno in questa stanza",
+  "Bevono tutti quelli che hanno mai pensato di lasciare tutto e ricominciare da zero",
+  "Bevono tutti quelli che hanno mai pianto da soli nell'ultimo mese",
+  "Bevono tutti quelli che hanno paura di non essere mai veramente amati",
+  "Bevono tutti quelli che hanno mai desiderato di essere qualcun altro",
+  "Bevono tutti quelli che hanno una ferita emotiva che non hanno mai superato"
+    ]
+  },
 "newRule": {
   "text": "{player} ha stabilito una NUOVA REGOLA! Nessuno può più [regola] fino a fine partita! Altrimenti 3 penalità",
   "rules": [
