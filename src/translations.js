@@ -107,7 +107,9 @@ const translations = {
       tuttiQuelliChe: "{player} ha attivato il gioco TUTTI QUELLI CHE!",
       penitenzeGruppo: "{player} ha attivato PENITENZE DI GRUPPO!",
       penitenzaRandom: "{player} ha attivato le PENITENZE RANDOM!",
-      nonHoMai: "{player} ha iniziato il gioco NON HO MAI! Dopo di lui tocca al giocatore alla sua destra, finché non lo fanno tutti"
+      nonHoMai: "{player} ha iniziato il gioco NON HO MAI! Dopo di lui tocca al giocatore alla sua destra, finché non lo fanno tutti",
+      chiEPiuProbabile: "{player} ha attivato il gioco CHI È PIÙ PROBABILE CHE! Tutti votano contemporaneamente puntando il dito. Chi riceve più voti fa le penalità!",
+      happyHour: "{player} ha attivato HAPPY HOUR! Tutti ricevono {count} penalità! 🎉"
     },
     
     // Terminologia giochi speciali
@@ -124,7 +126,9 @@ const translations = {
       tuttiQuelliChe: "TUTTI QUELLI CHE",
       penitenzeGruppo: "PENITENZE DI GRUPPO",
       penitenzaRandom: "PENITENZE RANDOM",
-      nonHoMai: "NON HO MAI"
+      nonHoMai: "NON HO MAI",
+      chiEPiuProbabile: "CHI È PIÙ PROBABILE CHE",
+      happyHour: "HAPPY HOUR"
     },
     
     // Spiegazione del gioco Preferiresti
@@ -293,7 +297,9 @@ const translations = {
       tuttiQuelliChe: "{player} has activated the ALL THOSE WHO game!",
       penitenzeGruppo: "{player} has activated GROUP PENALTIES!",
       penitenzaRandom: "{player} has activated RANDOM PENALTIES!",
-      nonHoMai: "{player} has started the I HAVE NEVER game! After them, it's the player on their right's turn, until everyone has played."
+      nonHoMai: "{player} has started the I HAVE NEVER game! After them, it's the player on their right's turn, until everyone has played.",
+      chiEPiuProbabile: "{player} has activated the WHO IS MOST LIKELY TO game! Everyone votes simultaneously by pointing a finger. Whoever gets the most votes takes the penalties!",
+      happyHour: "{player} has activated HAPPY HOUR! Everyone receives {count} penalties! 🎉"
     },
     
     // Special games terminology
@@ -310,7 +316,9 @@ const translations = {
       tuttiQuelliChe: "ALL THOSE WHO",
       penitenzeGruppo: "GROUP PENALTIES",
       penitenzaRandom: "RANDOM PENALTIES",
-      nonHoMai: "I HAVE NEVER"
+      nonHoMai: "I HAVE NEVER",
+      chiEPiuProbabile: "WHO IS MOST LIKELY TO",
+      happyHour: "HAPPY HOUR"
     },
     
     // Would You Rather game explanation
@@ -478,7 +486,9 @@ const translations = {
       tuttiQuelliChe: "{player} a activé le jeu TOUS CEUX QUI!",
       penitenzeGruppo: "{player} a activé PÉNALITÉS DE GROUPE!",
       penitenzaRandom: "{player} a activé les PÉNALITÉS ALÉATOIRES!",
-      nonHoMai: "{player} a commencé le jeu JE N'AI JAMAIS! Après lui, c'est au tour du joueur à sa droite, jusqu'à ce que tout le monde ait joué."
+      nonHoMai: "{player} a commencé le jeu JE N'AI JAMAIS! Après lui, c'est au tour du joueur à sa droite, jusqu'à ce que tout le monde ait joué.",
+      chiEPiuProbabile: "{player} a activé le jeu QUI EST LE PLUS SUSCEPTIBLE DE! Tout le monde vote simultanément en pointant du doigt. Celui qui reçoit le plus de votes reçoit les pénalités!",
+      happyHour: "{player} a activé l'HAPPY HOUR ! Tout le monde reçoit {count} pénalités ! 🎉"
     },
     
     // Terminologie des jeux spéciaux
@@ -495,7 +505,9 @@ const translations = {
       tuttiQuelliChe: "TOUS CEUX QUI",
       penitenzeGruppo: "PÉNALITÉS DE GROUPE",
       penitenzaRandom: "PÉNALITÉS ALÉATOIRES",
-      nonHoMai: "JE N'AI JAMAIS"
+      nonHoMai: "JE N'AI JAMAIS",
+      chiEPiuProbabile: "QUI EST LE PLUS SUSCEPTIBLE DE",
+      happyHour: "HAPPY HOUR"
     },
     
     // Explication du jeu Préférerais-tu
@@ -663,7 +675,9 @@ const translations = {
       tuttiQuelliChe: "{player} hat das Spiel ALLE, DIE aktiviert!",
       penitenzeGruppo: "{player} hat GRUPPENSTRAFEN aktiviert!",
       penitenzaRandom: "{player} hat ZUFÄLLIGE STRAFEN aktiviert!",
-      nonHoMai: "{player} hat das Spiel ICH HABE NIE gestartet! Nach ihm ist der Spieler zu seiner Rechten an der Reihe, bis alle dran waren."
+      nonHoMai: "{player} hat das Spiel ICH HABE NIE gestartet! Nach ihm ist der Spieler zu seiner Rechten an der Reihe, bis alle dran waren.",
+      chiEPiuProbabile: "{player} hat das Spiel WER WÜRDE AM EHESTEN aktiviert! Alle stimmen gleichzeitig ab, indem sie mit dem Finger zeigen. Wer die meisten Stimmen erhält, bekommt die Strafen!",
+      happyHour: "{player} hat die HAPPY HOUR aktiviert! Jeder erhält {count} Strafen! 🎉"
     },
     
     // Spezielle Spiele Terminologie
@@ -680,7 +694,9 @@ const translations = {
       tuttiQuelliChe: "ALLE, DIE",
       penitenzeGruppo: "GRUPPENSTRAFEN",
       penitenzaRandom: "ZUFÄLLIGE STRAFEN",
-      nonHoMai: "ICH HABE NIE"
+      nonHoMai: "ICH HABE NIE",
+      chiEPiuProbabile: "WER WÜRDE AM EHESTEN",
+      happyHour: "HAPPY HOUR"
     },
     
     // Erklärung des Spiels "Was hättest du lieber"

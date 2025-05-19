@@ -27,6 +27,31 @@
 "nonHoMai": {
     "text": "{player} ha iniziato il gioco NON HO MAI! Completa la frase \"Io non ho mai...\". Chi l'ha fatto paga 3 penalità!"
   },
+  "chiEPiuProbabile": {
+    "text": "{player} ha attivato CHI È PIÙ PROBABILE CHE! Votate tutti contemporaneamente puntando il dito. Chi riceve più voti fa le penalità!",
+    "actions": [
+      "Chi è più probabile che si metta nei guai con la legge? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che diventi famoso? 2 penalità a chi ottiene più voti!",
+      "Chi è più probabile che dimentichi un appuntamento importante? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che faccia una figuraccia in pubblico? 2 penalità a chi ottiene più voti!",
+      "Chi è più probabile che si sposi per primo? 2 penalità a chi ottiene più voti!",
+      "Chi è più probabile che sopravviva in un'apocalisse zombie? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che diventi milionario? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che si trasferisca all'estero? 2 penalità a chi ottiene più voti!",
+      "Chi è più probabile che diventi presidente di un'azienda? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che faccia cilecca in un momento importante? 4 penalità a chi ottiene più voti!",
+      "Chi è più probabile che diventi influencer? 2 penalità a chi ottiene più voti!",
+      "Chi è più probabile che finisca in un reality show? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che cada in pubblico? 2 penalità a chi ottiene più voti!",
+      "Chi è più probabile che faccia una follia per amore? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che diventi calvo/perda i capelli? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che vinca alla lotteria e perda il biglietto? 4 penalità a chi ottiene più voti!",
+      "Chi è più probabile che litighi con uno sconosciuto? 3 penalità a chi ottiene più voti!",
+      "Chi è più probabile che rovini una sorpresa? 2 penalità a chi ottiene più voti!",
+      "Chi è più probabile che si addormenti durante un film? 2 penalità a chi ottiene più voti!",
+      "Chi è più probabile che si tatui il nome di qualcuno e poi se ne penta? 4 penalità a chi ottiene più voti!"
+    ]
+  },
 "penitenzaRandom": {
   "text": "{player} ha attivato PENITENZE RANDOM!",
   "redRoom": [
