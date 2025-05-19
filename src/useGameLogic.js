@@ -1518,18 +1518,25 @@ const loadBackupActions = async () => {
     let actionText = currentPool[adjustedIndex].text;
     
     // Gestisci il segnaposto playerB
-    if (actionText.includes("{playerB}")) {
-      let otherPlayers = players.filter((_, idx) => idx !== currentPlayerIndex);
-      
-      if (otherPlayers.length > 0) {
-        const randomPlayerIndex = Math.floor(Math.random() * otherPlayers.length);
-        const randomPlayerName = otherPlayers[randomPlayerIndex];
-        
-        actionText = actionText.replace(/{playerB}/g, randomPlayerName);
-      } else {
-        actionText = actionText.replace(/{playerB}/g, "qualcun altro");
-      }
-    }
+if (actionText.includes("{playerB}")) {
+  // Ottieni il nome del giocatore corrente
+  const currentPlayer = players[currentPlayerIndex];
+  
+  // Crea una lista di tutti gli altri giocatori (escluso quello corrente)
+  let otherPlayers = players.filter(player => player !== currentPlayer);
+  
+  if (otherPlayers.length > 0) {
+    // Seleziona un giocatore casuale tra gli altri
+    const randomPlayerIndex = Math.floor(Math.random() * otherPlayers.length);
+    const randomPlayerName = otherPlayers[randomPlayerIndex];
+    
+    // Sostituisci il segnaposto con il nome del giocatore scelto
+    actionText = actionText.replace(/{playerB}/g, randomPlayerName);
+  } else {
+    // Fallback se non ci sono altri giocatori
+    actionText = actionText.replace(/{playerB}/g, "qualcun altro");
+  }
+}
     
     // Controlla prima se la frase contiene un punto interrogativo
     if (actionText.includes("?")) {
