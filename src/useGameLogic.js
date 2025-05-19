@@ -61,7 +61,7 @@ const useGameLogic = () => {
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
   // Stato per tenere traccia di tutti i giochi speciali
-  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo', 'tuttiQuelliChe', 'penitenzeGruppo', 'penitenzaRandom', 'nonHoMai', 'chiEPiuProbabile', 'happyHour'];
+  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo', 'tuttiQuelliChe', 'penitenzeGruppo', 'penitenzaRandom', 'nonHoMai', 'chiEPiuProbabile', 'happyHour', 'oneVsOne'];
   
   // Numerazione dei giochi speciali per una manutenzione più semplice
   const SPECIAL_GAME_TYPES = {
@@ -80,7 +80,8 @@ const useGameLogic = () => {
     PENITENZA_RANDOM: 12,
     NON_HO_MAI: 13,
     CHI_E_PIU_PROBABILE: 14,
-    HAPPY_HOUR: 15
+    HAPPY_HOUR: 15,
+    ONE_VS_ONE: 16
   };
 
   // Funzione che determina quali giochi speciali sono disponibili per ogni stanza
@@ -149,7 +150,8 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
           SPECIAL_GAME_TYPES.NON_HO_MAI,
           SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-          SPECIAL_GAME_TYPES.HAPPY_HOUR
+          SPECIAL_GAME_TYPES.HAPPY_HOUR,
+          SPECIAL_GAME_TYPES.ONE_VS_ONE // Aggiungiamo il nuovo gioco speciale solo alla modalità Party
         ];
       case 'neonRoulette':
       default:
@@ -170,7 +172,8 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
           SPECIAL_GAME_TYPES.NON_HO_MAI,
           SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-          SPECIAL_GAME_TYPES.HAPPY_HOUR
+          SPECIAL_GAME_TYPES.HAPPY_HOUR,
+          SPECIAL_GAME_TYPES.ONE_VS_ONE // Incluso anche in Neon Roulette
         ];
     }
   };
@@ -193,7 +196,8 @@ const useGameLogic = () => {
       penitenzaRandom: false, 
       nonHoMai: false,
       chiEPiuProbabile: false,
-      happyHour: false
+      happyHour: false,
+      oneVsOne: false
     },
     darkRoom: { 
       bouncer: false, 
@@ -211,7 +215,8 @@ const useGameLogic = () => {
       penitenzaRandom: false, 
       nonHoMai: false,
       chiEPiuProbabile: false,
-      happyHour: false
+      happyHour: false,
+      oneVsOne: false
     },
     coppie: { 
       bouncer: false, 
@@ -229,7 +234,8 @@ const useGameLogic = () => {
       penitenzaRandom: false, 
       nonHoMai: false,
       chiEPiuProbabile: false,
-      happyHour: false
+      happyHour: false,
+      oneVsOne: false
     },
     party: { 
       bouncer: false, 
@@ -247,7 +253,8 @@ const useGameLogic = () => {
       penitenzaRandom: false, 
       nonHoMai: false,
       chiEPiuProbabile: false,
-      happyHour: false
+      happyHour: false,
+      oneVsOne: false
     },
     neonRoulette: { 
       bouncer: false, 
@@ -265,7 +272,8 @@ const useGameLogic = () => {
       penitenzaRandom: false, 
       nonHoMai: false,
       chiEPiuProbabile: false,
-      happyHour: false
+      happyHour: false,
+      oneVsOne: false
     }
   });
   
@@ -287,7 +295,8 @@ const useGameLogic = () => {
       penitenzaRandom: 28, 
       nonHoMai: 33,
       chiEPiuProbabile: 24,
-      happyHour: 38
+      happyHour: 38,
+      oneVsOne: 42
     },
     darkRoom: { 
       bouncer: 15, 
@@ -305,7 +314,8 @@ const useGameLogic = () => {
       penitenzaRandom: 28, 
       nonHoMai: 33,
       chiEPiuProbabile: 24,
-      happyHour: 38
+      happyHour: 38,
+      oneVsOne: 42
     },
     coppie: { 
       bouncer: 15, 
@@ -323,7 +333,8 @@ const useGameLogic = () => {
       penitenzaRandom: 28, 
       nonHoMai: 33,
       chiEPiuProbabile: 24,
-      happyHour: 38
+      happyHour: 38,
+      oneVsOne: 42
     },
     party: { 
       bouncer: 15, 
@@ -341,7 +352,8 @@ const useGameLogic = () => {
       penitenzaRandom: 28, 
       nonHoMai: 33,
       chiEPiuProbabile: 24,
-      happyHour: 38
+      happyHour: 38,
+      oneVsOne: 42
     },
     neonRoulette: { 
       bouncer: 15, 
@@ -359,7 +371,8 @@ const useGameLogic = () => {
       penitenzaRandom: 28, 
       nonHoMai: 33,
       chiEPiuProbabile: 24,
-      happyHour: 38
+      happyHour: 38,
+      oneVsOne: 42
     }
   });
   
@@ -429,10 +442,14 @@ const useGameLogic = () => {
   // Effetto per caricare la prima domanda quando lo stato è 'playing'
   useEffect(() => {
     if (gameState === 'playing' && selectedRoom) {
-      // Breve timeout per assicurarsi che lo stato sia aggiornato
-      setTimeout(() => {
-        updateCurrentAction();
-      }, 100);
+      // Usa una flag per assicurarti che questo venga eseguito solo una volta
+      const firstLoadFlag = 'firstActionLoaded_' + selectedRoom.id;
+      if (!sessionStorage.getItem(firstLoadFlag)) {
+        setTimeout(() => {
+          updateCurrentAction();
+          sessionStorage.setItem(firstLoadFlag, 'true');
+        }, 100);
+      }
     }
   }, [gameState, selectedRoom]);
   
@@ -630,7 +647,8 @@ const loadBackupActions = async () => {
           penitenzaRandom: false,
           nonHoMai: false,
           chiEPiuProbabile: false,
-          happyHour: false
+          happyHour: false,
+          oneVsOne: false
         }
       }));
       
@@ -653,7 +671,8 @@ const loadBackupActions = async () => {
           penitenzaRandom: gamePositions.penitenzaRandom || 28,
           nonHoMai: gamePositions.nonHoMai || 33,
           chiEPiuProbabile: gamePositions.chiEPiuProbabile || 24,
-          happyHour: gamePositions.happyHour || 38
+          happyHour: gamePositions.happyHour || 38,
+          oneVsOne: gamePositions.oneVsOne || 42
         }
       }));
       
@@ -1359,6 +1378,23 @@ const loadBackupActions = async () => {
         });
         setPlayerPenalties(updatedPenalties);
         break;
+        
+      case "oneVsOne":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Seleziona un altro giocatore casuale per la sfida
+        let opponentIndex;
+        do {
+          opponentIndex = Math.floor(Math.random() * players.length);
+        } while (opponentIndex === currentPlayerIndex);
+        
+        // Sostituisci {opponent} con il nome dell'avversario
+        actionText = actionText.replace(/{opponent}/g, players[opponentIndex]);
+        break;
     }
     
     // Imposta il gioco speciale attivo
@@ -1741,7 +1777,8 @@ if (actionText.includes("{playerB}")) {
           penitenzaRandom: 28,
           nonHoMai: 33,
           chiEPiuProbabile: 24,
-          happyHour: 38
+          happyHour: 38,
+          oneVsOne: 42
         };
         acc[game] = defaultPositions[game] || 10 + (index * 10);
         return acc;

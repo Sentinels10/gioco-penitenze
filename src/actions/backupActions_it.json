@@ -27,6 +27,9 @@
 "nonHoMai": {
     "text": "{player} ha iniziato il gioco NON HO MAI! Completa la frase \"Io non ho mai...\". Chi l'ha fatto paga 3 penalità!"
   },
+  "oneVsOne": {
+    "text": "{player} ha sfidato {opponent} a 1V1! Mettetevi faccia a faccia e citate espressioni da tifoso. Chi ride o si blocca fa 1 penitenza."
+  },
   "chiEPiuProbabile": {
     "text": "{player} ha attivato CHI È PIÙ PROBABILE CHE! Votate tutti contemporaneamente puntando il dito. Chi riceve più voti fa le penalità!",
     "actions": [

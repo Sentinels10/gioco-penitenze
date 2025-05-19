@@ -109,7 +109,8 @@ const translations = {
       penitenzaRandom: "{player} ha attivato le PENITENZE RANDOM!",
       nonHoMai: "{player} ha iniziato il gioco NON HO MAI! Dopo di lui tocca al giocatore alla sua destra, finché non lo fanno tutti",
       chiEPiuProbabile: "{player} ha attivato il gioco CHI È PIÙ PROBABILE CHE! Tutti votano contemporaneamente puntando il dito. Chi riceve più voti fa le penalità!",
-      happyHour: "{player} ha attivato HAPPY HOUR! Tutti ricevono {count} penalità! 🎉"
+      happyHour: "{player} ha attivato HAPPY HOUR! Tutti ricevono {count} penalità! 🎉",
+      oneVsOne: "1V1!"
     },
     
     // Terminologia giochi speciali
@@ -128,10 +129,11 @@ const translations = {
       penitenzaRandom: "PENITENZE RANDOM",
       nonHoMai: "NON HO MAI",
       chiEPiuProbabile: "CHI È PIÙ PROBABILE CHE",
-      happyHour: "HAPPY HOUR"
+      happyHour: "HAPPY HOUR",
+      oneVsOne: "1V1!"
     },
     
-    // Spiegazione del gioco Preferiresti
+    // Spiegazione del gioco "preferiresti"
     wouldYouRatherExplanation: "Tutti votano: alza la mano per la prima opzione, tienila abbassata per la seconda. Chi è in minoranza fa penalità!",
     
     // Opzioni gioco Verità o Obbligo
@@ -299,7 +301,8 @@ const translations = {
       penitenzaRandom: "{player} has activated RANDOM PENALTIES!",
       nonHoMai: "{player} has started the I HAVE NEVER game! After them, it's the player on their right's turn, until everyone has played.",
       chiEPiuProbabile: "{player} has activated the WHO IS MOST LIKELY TO game! Everyone votes simultaneously by pointing a finger. Whoever gets the most votes takes the penalties!",
-      happyHour: "{player} has activated HAPPY HOUR! Everyone receives {count} penalties! 🎉"
+      happyHour: "{player} has activated HAPPY HOUR! Everyone receives {count} penalties! 🎉",
+      oneVsOne: "1V1!"
     },
     
     // Special games terminology
@@ -318,7 +321,8 @@ const translations = {
       penitenzaRandom: "RANDOM PENALTIES",
       nonHoMai: "I HAVE NEVER",
       chiEPiuProbabile: "WHO IS MOST LIKELY TO",
-      happyHour: "HAPPY HOUR"
+      happyHour: "HAPPY HOUR",
+      oneVsOne: "1V1!"
     },
     
     // Would You Rather game explanation
@@ -488,7 +492,8 @@ const translations = {
       penitenzaRandom: "{player} a activé les PÉNALITÉS ALÉATOIRES!",
       nonHoMai: "{player} a commencé le jeu JE N'AI JAMAIS! Après lui, c'est au tour du joueur à sa droite, jusqu'à ce que tout le monde ait joué.",
       chiEPiuProbabile: "{player} a activé le jeu QUI EST LE PLUS SUSCEPTIBLE DE! Tout le monde vote simultanément en pointant du doigt. Celui qui reçoit le plus de votes reçoit les pénalités!",
-      happyHour: "{player} a activé l'HAPPY HOUR ! Tout le monde reçoit {count} pénalités ! 🎉"
+      happyHour: "{player} a activé l'HAPPY HOUR ! Tout le monde reçoit {count} pénalités ! 🎉",
+      oneVsOne: "1V1!"
     },
     
     // Terminologie des jeux spéciaux
@@ -507,7 +512,8 @@ const translations = {
       penitenzaRandom: "PÉNALITÉS ALÉATOIRES",
       nonHoMai: "JE N'AI JAMAIS",
       chiEPiuProbabile: "QUI EST LE PLUS SUSCEPTIBLE DE",
-      happyHour: "HAPPY HOUR"
+      happyHour: "HAPPY HOUR",
+      oneVsOne: "1V1!"
     },
     
     // Explication du jeu Préférerais-tu
@@ -677,7 +683,8 @@ const translations = {
       penitenzaRandom: "{player} hat ZUFÄLLIGE STRAFEN aktiviert!",
       nonHoMai: "{player} hat das Spiel ICH HABE NIE gestartet! Nach ihm ist der Spieler zu seiner Rechten an der Reihe, bis alle dran waren.",
       chiEPiuProbabile: "{player} hat das Spiel WER WÜRDE AM EHESTEN aktiviert! Alle stimmen gleichzeitig ab, indem sie mit dem Finger zeigen. Wer die meisten Stimmen erhält, bekommt die Strafen!",
-      happyHour: "{player} hat die HAPPY HOUR aktiviert! Jeder erhält {count} Strafen! 🎉"
+      happyHour: "{player} hat die HAPPY HOUR aktiviert! Jeder erhält {count} Strafen! 🎉",
+      oneVsOne: "1V1!"
     },
     
     // Spezielle Spiele Terminologie
@@ -696,7 +703,8 @@ const translations = {
       penitenzaRandom: "ZUFÄLLIGE STRAFEN",
       nonHoMai: "ICH HABE NIE",
       chiEPiuProbabile: "WER WÜRDE AM EHESTEN",
-      happyHour: "HAPPY HOUR"
+      happyHour: "HAPPY HOUR",
+      oneVsOne: "1V1!"
     },
     
     // Erklärung des Spiels "Was hättest du lieber"
