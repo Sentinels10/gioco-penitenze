@@ -2,28 +2,28 @@
   "files": {
     "static/js/0.d1f6d920.chunk.js": "/gioco-penitenze/static/js/0.d1f6d920.chunk.js",
     "static/js/0.d1f6d920.chunk.js.map": "/gioco-penitenze/static/js/0.d1f6d920.chunk.js.map",
-    "static/js/1.c6e536e4.chunk.js": "/gioco-penitenze/static/js/1.c6e536e4.chunk.js",
-    "static/js/1.c6e536e4.chunk.js.map": "/gioco-penitenze/static/js/1.c6e536e4.chunk.js.map",
+    "static/js/1.84b12a1e.chunk.js": "/gioco-penitenze/static/js/1.84b12a1e.chunk.js",
+    "static/js/1.84b12a1e.chunk.js.map": "/gioco-penitenze/static/js/1.84b12a1e.chunk.js.map",
     "static/js/2.c4b327f9.chunk.js": "/gioco-penitenze/static/js/2.c4b327f9.chunk.js",
     "static/js/2.c4b327f9.chunk.js.map": "/gioco-penitenze/static/js/2.c4b327f9.chunk.js.map",
     "main.css": "/gioco-penitenze/static/css/main.1aa36282.chunk.css",
-    "main.js": "/gioco-penitenze/static/js/main.76a0bc8e.chunk.js",
-    "main.js.map": "/gioco-penitenze/static/js/main.76a0bc8e.chunk.js.map",
-    "runtime-main.js": "/gioco-penitenze/static/js/runtime-main.e2d13a3d.js",
-    "runtime-main.js.map": "/gioco-penitenze/static/js/runtime-main.e2d13a3d.js.map",
+    "main.js": "/gioco-penitenze/static/js/main.a05fd23c.chunk.js",
+    "main.js.map": "/gioco-penitenze/static/js/main.a05fd23c.chunk.js.map",
+    "runtime-main.js": "/gioco-penitenze/static/js/runtime-main.bc085176.js",
+    "runtime-main.js.map": "/gioco-penitenze/static/js/runtime-main.bc085176.js.map",
     "static/js/5.5a018b3d.chunk.js": "/gioco-penitenze/static/js/5.5a018b3d.chunk.js",
     "static/js/5.5a018b3d.chunk.js.map": "/gioco-penitenze/static/js/5.5a018b3d.chunk.js.map",
     "index.html": "/gioco-penitenze/index.html",
-    "precache-manifest.43d2d5e6feed8cbfed7d1db77db2804a.js": "/gioco-penitenze/precache-manifest.43d2d5e6feed8cbfed7d1db77db2804a.js",
+    "precache-manifest.c1dc970748b68957f0d852893c51b5f6.js": "/gioco-penitenze/precache-manifest.c1dc970748b68957f0d852893c51b5f6.js",
     "service-worker.js": "/gioco-penitenze/service-worker.js",
     "static/css/main.1aa36282.chunk.css.map": "/gioco-penitenze/static/css/main.1aa36282.chunk.css.map",
     "static/js/5.5a018b3d.chunk.js.LICENSE.txt": "/gioco-penitenze/static/js/5.5a018b3d.chunk.js.LICENSE.txt",
     "static/media/pointing-glove.png": "/gioco-penitenze/static/media/pointing-glove.f00b599b.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.e2d13a3d.js",
+    "static/js/runtime-main.bc085176.js",
     "static/js/5.5a018b3d.chunk.js",
     "static/css/main.1aa36282.chunk.css",
-    "static/js/main.76a0bc8e.chunk.js"
+    "static/js/main.a05fd23c.chunk.js"
   ]
 }
