@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/gioco-penitenze/precache-manifest.c1dc970748b68957f0d852893c51b5f6.js"
+  "/gioco-penitenze/precache-manifest.6378fa47adb4a115d0003754d83b7bf7.js"
 );
 
 self.addEventListener('message', (event) => {
