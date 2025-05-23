@@ -1124,11 +1124,60 @@ const loadBackupActions = async () => {
         setCurrentTruthDareChoice(null);
         setTruthDareContent(null);
         
-        // Carica il pool di contenuti per verità e obblighi
+        // Carica il pool di contenuti per verità e obblighi specifici per la stanza
+        let truthPool = [];
+        let darePool = [];
+
         if (backupActions.truthDareGame) {
+          // Prima cerca contenuti specifici per la stanza
+          if (backupActions.truthDareGame.truth && backupActions.truthDareGame.truth[roomId]) {
+            truthPool = [...backupActions.truthDareGame.truth[roomId]];
+          } 
+          // Fallback sul pool generico
+          else if (backupActions.truthDareGame.truth) {
+            truthPool = [...backupActions.truthDareGame.truth];
+          }
+          
+          if (backupActions.truthDareGame.dare && backupActions.truthDareGame.dare[roomId]) {
+            darePool = [...backupActions.truthDareGame.dare[roomId]];
+          } 
+          // Fallback sul pool generico
+          else if (backupActions.truthDareGame.dare) {
+            darePool = [...backupActions.truthDareGame.dare];
+          }
+          
+          // Per Neon Roulette, mescola contenuti da tutte le stanze
+          if (roomId === 'neonRoulette') {
+            truthPool = [];
+            darePool = [];
+            
+            if (backupActions.truthDareGame.truth) {
+              if (backupActions.truthDareGame.truth.party) truthPool.push(...backupActions.truthDareGame.truth.party);
+              if (backupActions.truthDareGame.truth.redRoom) truthPool.push(...backupActions.truthDareGame.truth.redRoom);
+              if (backupActions.truthDareGame.truth.darkRoom) truthPool.push(...backupActions.truthDareGame.truth.darkRoom);
+              if (backupActions.truthDareGame.truth.coppie) truthPool.push(...backupActions.truthDareGame.truth.coppie);
+            }
+            
+            if (backupActions.truthDareGame.dare) {
+              if (backupActions.truthDareGame.dare.party) darePool.push(...backupActions.truthDareGame.dare.party);
+              if (backupActions.truthDareGame.dare.redRoom) darePool.push(...backupActions.truthDareGame.dare.redRoom);
+              if (backupActions.truthDareGame.dare.darkRoom) darePool.push(...backupActions.truthDareGame.dare.darkRoom);
+              if (backupActions.truthDareGame.dare.coppie) darePool.push(...backupActions.truthDareGame.dare.coppie);
+            }
+            
+            // Se non ci sono pool specifici, usa quelli generici
+            if (truthPool.length === 0 && backupActions.truthDareGame.truth) {
+              truthPool = [...backupActions.truthDareGame.truth];
+            }
+            if (darePool.length === 0 && backupActions.truthDareGame.dare) {
+              darePool = [...backupActions.truthDareGame.dare];
+            }
+          }
+          
+          // Mescola i pool
           setTruthDareContentPool({
-            truth: [...backupActions.truthDareGame.truth || []].sort(() => Math.random() - 0.5),
-            dare: [...backupActions.truthDareGame.dare || []].sort(() => Math.random() - 0.5)
+            truth: truthPool.sort(() => Math.random() - 0.5),
+            dare: darePool.sort(() => Math.random() - 0.5)
           });
         }
         
@@ -1143,10 +1192,38 @@ const loadBackupActions = async () => {
         // Il giocatore corrente sarà il protagonista
         setSpecialGamePlayer(players[currentPlayerIndex]);
         
-        // Seleziona una domanda casuale dal pool di wouldYouRather
-        if (backupActions.wouldYouRather && backupActions.wouldYouRather.length > 0) {
-          const randomIndex = Math.floor(Math.random() * backupActions.wouldYouRather.length);
-          const question = backupActions.wouldYouRather[randomIndex].text;
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Seleziona una domanda tematizzata in base alla stanza corrente
+        let wouldYouRatherQuestions = [];
+        
+        // Cerca prima le domande specifiche per la stanza
+        if (backupActions.wouldYouRather && backupActions.wouldYouRather[roomId] && 
+            backupActions.wouldYouRather[roomId].length > 0) {
+          wouldYouRatherQuestions = backupActions.wouldYouRather[roomId];
+        } 
+        // Se non ci sono domande specifiche per la stanza o siamo in Neon Roulette, usa il pool generico
+        else if (roomId === 'neonRoulette') {
+          // Per Neon Roulette, raccogliamo domande da tutte le stanze
+          const allQuestions = [];
+          if (backupActions.wouldYouRather) {
+            if (backupActions.wouldYouRather.party) allQuestions.push(...backupActions.wouldYouRather.party);
+            if (backupActions.wouldYouRather.redRoom) allQuestions.push(...backupActions.wouldYouRather.redRoom);
+            if (backupActions.wouldYouRather.darkRoom) allQuestions.push(...backupActions.wouldYouRather.darkRoom);
+            if (backupActions.wouldYouRather.coppie) allQuestions.push(...backupActions.wouldYouRather.coppie);
+          }
+          wouldYouRatherQuestions = allQuestions.length > 0 ? allQuestions : (backupActions.wouldYouRather || []);
+        }
+        // Fallback al pool generico se non ci sono domande specifiche
+        else if (backupActions.wouldYouRather && backupActions.wouldYouRather.length > 0) {
+          wouldYouRatherQuestions = backupActions.wouldYouRather;
+        }
+        
+        // Se abbiamo domande, seleziona una casualmente
+        if (wouldYouRatherQuestions.length > 0) {
+          const randomIndex = Math.floor(Math.random() * wouldYouRatherQuestions.length);
+          const question = wouldYouRatherQuestions[randomIndex].text;
           
           // Imposta la domanda per uso futuro
           setWouldYouRatherContent(question);
@@ -1344,14 +1421,40 @@ const loadBackupActions = async () => {
         // Sostituisci {player} con il nome del giocatore corrente
         actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
         
-        // Seleziona una domanda casuale dal pool
-        if (backupActions.specialGames && backupActions.specialGames.chiEPiuProbabile && 
-            backupActions.specialGames.chiEPiuProbabile.actions && 
-            backupActions.specialGames.chiEPiuProbabile.actions.length > 0) {
-          
-          const questions = backupActions.specialGames.chiEPiuProbabile.actions;
-          const randomIndex = Math.floor(Math.random() * questions.length);
-          const question = questions[randomIndex];
+        // Seleziona una domanda tematizzata in base alla stanza corrente
+        let chiEPiuProbabileQuestions = [];
+
+        // Cerca prima le domande specifiche per la stanza
+        if (backupActions.specialGames && backupActions.specialGames.chiEPiuProbabile) {
+          if (backupActions.specialGames.chiEPiuProbabile[roomId] && 
+              backupActions.specialGames.chiEPiuProbabile[roomId].length > 0) {
+            chiEPiuProbabileQuestions = backupActions.specialGames.chiEPiuProbabile[roomId];
+          } 
+          // Per Neon Roulette, raccogliamo domande da tutte le stanze
+          else if (roomId === 'neonRoulette') {
+            const allQuestions = [];
+            if (backupActions.specialGames.chiEPiuProbabile.party) 
+              allQuestions.push(...backupActions.specialGames.chiEPiuProbabile.party);
+            if (backupActions.specialGames.chiEPiuProbabile.redRoom) 
+              allQuestions.push(...backupActions.specialGames.chiEPiuProbabile.redRoom);
+            if (backupActions.specialGames.chiEPiuProbabile.darkRoom) 
+              allQuestions.push(...backupActions.specialGames.chiEPiuProbabile.darkRoom);
+            if (backupActions.specialGames.chiEPiuProbabile.coppie) 
+              allQuestions.push(...backupActions.specialGames.chiEPiuProbabile.coppie);
+            
+            chiEPiuProbabileQuestions = allQuestions;
+          }
+          // Fallback alle actions generiche se non ci sono domande specifiche
+          else if (backupActions.specialGames.chiEPiuProbabile.actions && 
+                   backupActions.specialGames.chiEPiuProbabile.actions.length > 0) {
+            chiEPiuProbabileQuestions = backupActions.specialGames.chiEPiuProbabile.actions;
+          }
+        }
+
+        // Se abbiamo domande, seleziona una casualmente
+        if (chiEPiuProbabileQuestions.length > 0) {
+          const randomIndex = Math.floor(Math.random() * chiEPiuProbabileQuestions.length);
+          const question = chiEPiuProbabileQuestions[randomIndex];
           
           // Aggiungi la domanda all'azione con un a capo
           actionText += "\n\n" + question;
