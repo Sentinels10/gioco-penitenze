@@ -1,5 +1,5 @@
 // useGameLogic.js - Custom hook per gestire lo stato e la logica del gioco
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import translations from './translations';
 
 /**
@@ -19,6 +19,7 @@ const useGameLogic = () => {
   const [currentAction, setCurrentAction] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [previousAction, setPreviousAction] = useState(null);
+  const timerIntervalRef = useRef(null);
   // Contatore per le azioni giocate in una partita (nascosto dall'UI)
   const [actionsCounter, setActionsCounter] = useState(0);
   // Costante per il numero massimo di azioni per partita
@@ -60,29 +61,32 @@ const useGameLogic = () => {
   const [groupActionsShown, setGroupActionsShown] = useState(0);
   
   // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
-  // Stato per tenere traccia di tutti i giochi speciali
-  const SPECIAL_GAMES = ['bouncer', 'pointFinger', 'infamata', 'truthOrDare', 'ilPezzoGrosso', 'cringeOrClassy', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo', 'tuttiQuelliChe', 'penitenzeGruppo', 'penitenzaRandom', 'nonHoMai', 'chiEPiuProbabile', 'happyHour', 'oneVsOne'];
+  // Stato per tenere traccia di tutti i giochi speciali (RIMOSSI: bouncer, cringeOrClassy, ilPezzoGrosso)
+  const SPECIAL_GAMES = ['pointFinger', 'infamata', 'truthOrDare', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo', 'tuttiQuelliChe', 'penitenzeGruppo', 'penitenzaRandom', 'nonHoMai', 'chiEPiuProbabile', 'happyHour', 'oneVsOne', 'timerChallenge'];
   
-  // Numerazione dei giochi speciali per una manutenzione più semplice
+  // Numerazione dei giochi speciali per una manutenzione più semplice (AGGIORNATA)
   const SPECIAL_GAME_TYPES = {
-    BOUNCER: 0,
-    POINT_FINGER: 1,
-    INFAMATA: 2, 
-    TRUTH_OR_DARE: 3,
-    IL_PEZZO_GROSSO: 4,
-    CRINGE_OR_CLASSY: 5,
-    WOULD_YOU_RATHER: 6,
-    CHAT_DETECTIVE: 7,
-    NEW_RULE: 8,
-    TUTTO_HA_UN_PREZZO: 9,
-    TUTTI_QUELLI_CHE: 10,
-    PENITENZE_GRUPPO: 11,
-    PENITENZA_RANDOM: 12,
-    NON_HO_MAI: 13,
-    CHI_E_PIU_PROBABILE: 14,
-    HAPPY_HOUR: 15,
-    ONE_VS_ONE: 16
+    POINT_FINGER: 0,
+    INFAMATA: 1, 
+    TRUTH_OR_DARE: 2,
+    WOULD_YOU_RATHER: 3,
+    CHAT_DETECTIVE: 4,
+    NEW_RULE: 5,
+    TUTTO_HA_UN_PREZZO: 6,
+    TUTTI_QUELLI_CHE: 7,
+    PENITENZE_GRUPPO: 8,
+    PENITENZA_RANDOM: 9,
+    NON_HO_MAI: 10,
+    CHI_E_PIU_PROBABILE: 11,
+    HAPPY_HOUR: 12,
+    ONE_VS_ONE: 13,
+    TIMER_CHALLENGE: 14
   };
+
+  // Nuovi stati per il timer challenge
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState(20);
+  const [timerChallengeContent, setTimerChallengeContent] = useState(null);
 
   // Funzione che determina quali giochi speciali sono disponibili per ogni stanza
   const getAvailableSpecialGames = (roomId) => {
@@ -98,14 +102,11 @@ const useGameLogic = () => {
             SPECIAL_GAME_TYPES.HAPPY_HOUR
         ];
       case 'redRoom':
-        // Per la stanza rossa tutti i giochi + il nuovo tuttoHaUnPrezzo e tuttiQuelliChe e penitenzaRandom
+        // Per la stanza rossa tutti i giochi (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
         return [
-          SPECIAL_GAME_TYPES.BOUNCER,
           SPECIAL_GAME_TYPES.POINT_FINGER,
           SPECIAL_GAME_TYPES.INFAMATA,
           SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
-          SPECIAL_GAME_TYPES.IL_PEZZO_GROSSO,
-          SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
           SPECIAL_GAME_TYPES.NEW_RULE,
@@ -115,15 +116,14 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
           SPECIAL_GAME_TYPES.NON_HO_MAI,
           SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-          SPECIAL_GAME_TYPES.HAPPY_HOUR
+          SPECIAL_GAME_TYPES.HAPPY_HOUR,
+          SPECIAL_GAME_TYPES.TIMER_CHALLENGE
         ];
       case 'darkRoom':
-        // Per la dark room, non includere Point Finger, Cringe or Classy e Tutto Ha Un Prezzo
+        // Per la dark room (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
         return [
-          SPECIAL_GAME_TYPES.BOUNCER,
           SPECIAL_GAME_TYPES.INFAMATA,
           SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
-          SPECIAL_GAME_TYPES.IL_PEZZO_GROSSO,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
           SPECIAL_GAME_TYPES.NEW_RULE,
@@ -132,16 +132,15 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
           SPECIAL_GAME_TYPES.NON_HO_MAI,
           SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-          SPECIAL_GAME_TYPES.HAPPY_HOUR
+          SPECIAL_GAME_TYPES.HAPPY_HOUR,
+          SPECIAL_GAME_TYPES.TIMER_CHALLENGE
         ];
       case 'party':
-        // Per la party room, aggiungiamo tuttoHaUnPrezzo ma escludiamo Il Pezzo Grosso e Chat Detective
+        // Per la party room (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
         return [
-          SPECIAL_GAME_TYPES.BOUNCER,
           SPECIAL_GAME_TYPES.POINT_FINGER,
           SPECIAL_GAME_TYPES.INFAMATA,
           SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
-          SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.NEW_RULE,
           SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
@@ -151,18 +150,16 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.NON_HO_MAI,
           SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
           SPECIAL_GAME_TYPES.HAPPY_HOUR,
-          SPECIAL_GAME_TYPES.ONE_VS_ONE // Aggiungiamo il nuovo gioco speciale solo alla modalità Party
+          SPECIAL_GAME_TYPES.ONE_VS_ONE,
+          SPECIAL_GAME_TYPES.TIMER_CHALLENGE
         ];
       case 'neonRoulette':
       default:
-        // Per la Neon Roulette e come default, tutti i giochi
+        // Per la Neon Roulette e come default, tutti i giochi rimanenti
         return [
-          SPECIAL_GAME_TYPES.BOUNCER,
           SPECIAL_GAME_TYPES.POINT_FINGER,
           SPECIAL_GAME_TYPES.INFAMATA,
           SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
-          SPECIAL_GAME_TYPES.IL_PEZZO_GROSSO,
-          SPECIAL_GAME_TYPES.CRINGE_OR_CLASSY,
           SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
           SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
           SPECIAL_GAME_TYPES.NEW_RULE,
@@ -173,20 +170,18 @@ const useGameLogic = () => {
           SPECIAL_GAME_TYPES.NON_HO_MAI,
           SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
           SPECIAL_GAME_TYPES.HAPPY_HOUR,
-          SPECIAL_GAME_TYPES.ONE_VS_ONE // Incluso anche in Neon Roulette
+          SPECIAL_GAME_TYPES.ONE_VS_ONE,
+          SPECIAL_GAME_TYPES.TIMER_CHALLENGE
         ];
     }
   };
   
-  // Stato per tracciare quali giochi sono stati usati
+  // Stato per tracciare quali giochi sono stati usati (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
   const [specialGamesUsed, setSpecialGamesUsed] = useState({
     redRoom: { 
-      bouncer: false, 
       pointFinger: false, 
       infamata: false, 
       truthOrDare: false, 
-      ilPezzoGrosso: false, 
-      cringeOrClassy: false, 
       wouldYouRather: false, 
       chatDetective: false, 
       newRule: false, 
@@ -197,15 +192,13 @@ const useGameLogic = () => {
       nonHoMai: false,
       chiEPiuProbabile: false,
       happyHour: false,
-      oneVsOne: false
+      oneVsOne: false,
+      timerChallenge: false
     },
     darkRoom: { 
-      bouncer: false, 
       pointFinger: false, 
       infamata: false, 
       truthOrDare: false, 
-      ilPezzoGrosso: false, 
-      cringeOrClassy: false, 
       wouldYouRather: false, 
       chatDetective: false, 
       newRule: false, 
@@ -216,15 +209,13 @@ const useGameLogic = () => {
       nonHoMai: false,
       chiEPiuProbabile: false,
       happyHour: false,
-      oneVsOne: false
+      oneVsOne: false,
+      timerChallenge: false
     },
     coppie: { 
-      bouncer: false, 
       pointFinger: false, 
       infamata: false, 
       truthOrDare: false, 
-      ilPezzoGrosso: false, 
-      cringeOrClassy: false, 
       wouldYouRather: false, 
       chatDetective: false, 
       newRule: false, 
@@ -235,15 +226,13 @@ const useGameLogic = () => {
       nonHoMai: false,
       chiEPiuProbabile: false,
       happyHour: false,
-      oneVsOne: false
+      oneVsOne: false,
+      timerChallenge: false
     },
     party: { 
-      bouncer: false, 
       pointFinger: false, 
       infamata: false, 
       truthOrDare: false, 
-      ilPezzoGrosso: false, 
-      cringeOrClassy: false, 
       wouldYouRather: false, 
       chatDetective: false, 
       newRule: false, 
@@ -254,15 +243,13 @@ const useGameLogic = () => {
       nonHoMai: false,
       chiEPiuProbabile: false,
       happyHour: false,
-      oneVsOne: false
+      oneVsOne: false,
+      timerChallenge: false
     },
     neonRoulette: { 
-      bouncer: false, 
       pointFinger: false, 
       infamata: false, 
       truthOrDare: false, 
-      ilPezzoGrosso: false, 
-      cringeOrClassy: false, 
       wouldYouRather: false, 
       chatDetective: false, 
       newRule: false, 
@@ -273,19 +260,17 @@ const useGameLogic = () => {
       nonHoMai: false,
       chiEPiuProbabile: false,
       happyHour: false,
-      oneVsOne: false
+      oneVsOne: false,
+      timerChallenge: false
     }
   });
   
-  // Stato per tracciare quando deve apparire ciascun gioco
+  // Stato per tracciare quando deve apparire ciascun gioco (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
   const [specialGamesRound, setSpecialGamesRound] = useState({
     redRoom: { 
-      bouncer: 15, 
       pointFinger: 30, 
       infamata: 20, 
       truthOrDare: 25, 
-      ilPezzoGrosso: 35, 
-      cringeOrClassy: 40, 
       wouldYouRather: 10, 
       chatDetective: 45, 
       newRule: 5, 
@@ -296,15 +281,13 @@ const useGameLogic = () => {
       nonHoMai: 33,
       chiEPiuProbabile: 24,
       happyHour: 38,
-      oneVsOne: 42
+      oneVsOne: 42,
+      timerChallenge: 16
     },
     darkRoom: { 
-      bouncer: 15, 
       pointFinger: 30, 
       infamata: 20, 
       truthOrDare: 25, 
-      ilPezzoGrosso: 35, 
-      cringeOrClassy: 40, 
       wouldYouRather: 10, 
       chatDetective: 45, 
       newRule: 5, 
@@ -315,15 +298,13 @@ const useGameLogic = () => {
       nonHoMai: 33,
       chiEPiuProbabile: 24,
       happyHour: 38,
-      oneVsOne: 42
+      oneVsOne: 42,
+      timerChallenge: 16
     },
     coppie: { 
-      bouncer: 15, 
       pointFinger: 30, 
       infamata: 20, 
       truthOrDare: 25, 
-      ilPezzoGrosso: 35, 
-      cringeOrClassy: 40, 
       wouldYouRather: 10, 
       chatDetective: 45, 
       newRule: 5, 
@@ -334,15 +315,13 @@ const useGameLogic = () => {
       nonHoMai: 33,
       chiEPiuProbabile: 24,
       happyHour: 38,
-      oneVsOne: 42
+      oneVsOne: 42,
+      timerChallenge: 16
     },
     party: { 
-      bouncer: 15, 
       pointFinger: 30, 
       infamata: 20, 
       truthOrDare: 25, 
-      ilPezzoGrosso: 35, 
-      cringeOrClassy: 40, 
       wouldYouRather: 10, 
       chatDetective: 45, 
       newRule: 5, 
@@ -353,15 +332,13 @@ const useGameLogic = () => {
       nonHoMai: 33,
       chiEPiuProbabile: 24,
       happyHour: 38,
-      oneVsOne: 42
+      oneVsOne: 42,
+      timerChallenge: 16
     },
     neonRoulette: { 
-      bouncer: 15, 
       pointFinger: 30, 
       infamata: 20, 
       truthOrDare: 25, 
-      ilPezzoGrosso: 35, 
-      cringeOrClassy: 40, 
       wouldYouRather: 10, 
       chatDetective: 45, 
       newRule: 5, 
@@ -372,7 +349,8 @@ const useGameLogic = () => {
       nonHoMai: 33,
       chiEPiuProbabile: 24,
       happyHour: 38,
-      oneVsOne: 42
+      oneVsOne: 42,
+      timerChallenge: 16
     }
   });
   
@@ -411,10 +389,6 @@ const useGameLogic = () => {
     truth: [],
     dare: []
   });
-  
-  // Nuovo stato per il gioco Cringe or Classy
-  const [cringeOrClassyState, setCringeOrClassyState] = useState(null); // "voting", "result"
-  const [cringeOrClassyResult, setCringeOrClassyResult] = useState(null);
 
   // Nuovo stato per il gioco "Preferiresti"
   const [wouldYouRatherContent, setWouldYouRatherContent] = useState(null);
@@ -615,9 +589,12 @@ const loadBackupActions = async () => {
       // Resetta lo stato dei giochi speciali
       setActiveSpecialGame(null);
       setSpecialGamePlayer(null);
-      setCringeOrClassyState(null);
-      setCringeOrClassyResult(null);
       setWouldYouRatherContent(null);
+      
+      // Resetta lo stato del timer
+      setIsTimerActive(false);
+      setTimerSeconds(20);
+      setTimerChallengeContent(null);
       
       // NUOVO: Resetta il contatore dell'ultima azione speciale
       setLastSpecialGameRound(prev => ({
@@ -628,16 +605,13 @@ const loadBackupActions = async () => {
       // Distribuisci i giochi speciali in modo uniforme ma casuale
       const gamePositions = distributeSpecialGames(MAX_ACTIONS_PER_GAME, room.id);
       
-      // Resetta tutti gli stati dei giochi speciali
+      // Resetta tutti gli stati dei giochi speciali (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
       setSpecialGamesUsed(prev => ({
         ...prev,
         [room.id]: {
-          bouncer: false,
           pointFinger: false,
           infamata: false,
           truthOrDare: false,
-          ilPezzoGrosso: false,
-          cringeOrClassy: false,
           wouldYouRather: false,
           chatDetective: false,
           newRule: false,
@@ -648,20 +622,18 @@ const loadBackupActions = async () => {
           nonHoMai: false,
           chiEPiuProbabile: false,
           happyHour: false,
-          oneVsOne: false
+          oneVsOne: false,
+          timerChallenge: false
         }
       }));
       
-      // Imposta i round per ogni gioco speciale
+      // Imposta i round per ogni gioco speciale (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
       setSpecialGamesRound(prev => ({
         ...prev,
         [room.id]: {
-          bouncer: gamePositions.bouncer || 15,
           pointFinger: gamePositions.pointFinger || 30,
           infamata: gamePositions.infamata || 20,
           truthOrDare: gamePositions.truthOrDare || 25,
-          ilPezzoGrosso: gamePositions.ilPezzoGrosso || 35,
-          cringeOrClassy: gamePositions.cringeOrClassy || 40,
           wouldYouRather: gamePositions.wouldYouRather || 10,
           chatDetective: gamePositions.chatDetective || 45,
           newRule: gamePositions.newRule || 5,
@@ -672,7 +644,8 @@ const loadBackupActions = async () => {
           nonHoMai: gamePositions.nonHoMai || 33,
           chiEPiuProbabile: gamePositions.chiEPiuProbabile || 24,
           happyHour: gamePositions.happyHour || 38,
-          oneVsOne: gamePositions.oneVsOne || 42
+          oneVsOne: gamePositions.oneVsOne || 42,
+          timerChallenge: gamePositions.timerChallenge || 16
         }
       }));
       
@@ -998,6 +971,11 @@ const loadBackupActions = async () => {
       setTruthDareState("completed");
     }
     
+    // Ferma il timer se è attivo
+    if (isTimerActive) {
+      setIsTimerActive(false);
+    }
+    
     // Aggiorna il contatore dell'ultima azione speciale
     setLastSpecialGameRound(prev => ({
       ...prev,
@@ -1011,9 +989,8 @@ const loadBackupActions = async () => {
     setCurrentTruthDareChoice(null);
     setTruthDareContent(null);
     setTruthDareState(null);
-    setCringeOrClassyState(null);
-    setCringeOrClassyResult(null);
     setWouldYouRatherContent(null);
+    setTimerChallengeContent(null);
     
     // Prosegui con il turno normale
     nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
@@ -1053,6 +1030,46 @@ const loadBackupActions = async () => {
     setTruthDareState("executing");
   };
   
+  // Funzioni per gestire il timer
+  const startTimer = () => {
+    console.log("startTimer è stata chiamata!");
+    
+    // Resetta e avvia il timer
+    setTimerSeconds(20);
+    setIsTimerActive(true);
+    
+    // Cancella eventuali intervalli precedenti
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+    
+    // Crea un nuovo riferimento per l'intervallo
+    const intervalId = setInterval(() => {
+      setTimerSeconds(prev => {
+        if (prev <= 1) {
+          clearInterval(intervalId);
+          setIsTimerActive(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    // Salva il riferimento
+    timerIntervalRef.current = intervalId;
+  };
+  
+  // Assicurati di pulire l'intervallo quando il componente viene smontato
+  useEffect(() => {
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
+    };
+  }, []);
+  
   // NUOVO: Funzione helper per gestire i giochi speciali
   const handleSpecialGame = async (gameType) => {
     if (!selectedRoom) return;
@@ -1072,25 +1089,10 @@ const loadBackupActions = async () => {
     // Ottieni il testo del gioco dal backup
     let actionText = backupActions.specialGames[gameType].text;
     
-    // Gestisci i vari tipi di gioco
+    // Gestisci i vari tipi di gioco (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
     switch (gameType) {
-      case "bouncer":
-        // Scegli un giocatore diverso da quello corrente
-        let specialPlayerIndex;
-        do {
-          specialPlayerIndex = Math.floor(Math.random() * players.length);
-        } while (specialPlayerIndex === currentPlayerIndex);
-        
-        setSpecialGamePlayer(players[specialPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore
-        actionText = actionText.replace(/{player}/g, players[specialPlayerIndex]);
-        break;
-        
       case "pointFinger":
       case "infamata":
-      case "ilPezzoGrosso":
-      case "cringeOrClassy":
       case "chatDetective":
       case "nonHoMai":
         // Il giocatore corrente sarà il protagonista
@@ -1098,13 +1100,6 @@ const loadBackupActions = async () => {
         
         // Sostituisci {player} con il nome del giocatore corrente
         actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Imposta direttamente il risultato casuale senza fase di votazione
-        if (gameType === "cringeOrClassy") {
-          const isClassy = Math.random() > 0.5;
-          setCringeOrClassyResult(isClassy ? 'classy' : 'cringe');
-          setCringeOrClassyState("result"); // Passa direttamente allo stato result
-        }
         break;
       
       case "truthOrDare":
@@ -1498,6 +1493,54 @@ const loadBackupActions = async () => {
         // Sostituisci {opponent} con il nome dell'avversario
         actionText = actionText.replace(/{opponent}/g, players[opponentIndex]);
         break;
+        
+      case "timerChallenge":
+        // Il giocatore corrente sarà il protagonista
+        setSpecialGamePlayer(players[currentPlayerIndex]);
+        
+        // Sostituisci {player} con il nome del giocatore corrente
+        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
+        
+        // Seleziona una sfida appropriata in base alla stanza
+        if (backupActions.specialGames && backupActions.specialGames.timerChallenge) {
+          let challenges = [];
+          
+          if (roomId === 'redRoom' && backupActions.specialGames.timerChallenge.redRoom) {
+            challenges = backupActions.specialGames.timerChallenge.redRoom;
+          } else if (roomId === 'darkRoom' && backupActions.specialGames.timerChallenge.darkRoom) {
+            challenges = backupActions.specialGames.timerChallenge.darkRoom;
+          } else if (roomId === 'party' && backupActions.specialGames.timerChallenge.party) {
+            challenges = backupActions.specialGames.timerChallenge.party;
+          } else if (roomId === 'neonRoulette') {
+            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
+            const allChallenges = [];
+            if (backupActions.specialGames.timerChallenge.redRoom) 
+              allChallenges.push(...backupActions.specialGames.timerChallenge.redRoom);
+            if (backupActions.specialGames.timerChallenge.darkRoom) 
+              allChallenges.push(...backupActions.specialGames.timerChallenge.darkRoom);
+            if (backupActions.specialGames.timerChallenge.party)
+              allChallenges.push(...backupActions.specialGames.timerChallenge.party);
+            
+            challenges = allChallenges;
+          }
+          
+          if (challenges && challenges.length > 0) {
+            // Seleziona una sfida casuale
+            const randomIndex = Math.floor(Math.random() * challenges.length);
+            const challenge = challenges[randomIndex];
+            
+            // Salva il contenuto della sfida
+            setTimerChallengeContent(challenge);
+            
+            // Aggiungi la sfida al testo dell'azione
+            actionText += "\n\n" + challenge;
+          }
+        }
+        
+        // Reset del timer
+        setTimerSeconds(20);
+        setIsTimerActive(false);
+        break;
     }
     
     // Imposta il gioco speciale attivo
@@ -1851,7 +1894,7 @@ if (actionText.includes("{playerB}")) {
     setSpecialGamePlayer(null);
     setWouldYouRatherContent(null);
     
-    // Resetta tutti gli stati di giochi usati e round
+    // Resetta tutti gli stati di giochi usati e round (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
     const resetUsedGames = {};
     const resetGameRounds = {};
     
@@ -1863,14 +1906,11 @@ if (actionText.includes("{playerB}")) {
       }, {});
       
       resetGameRounds[room.id] = SPECIAL_GAMES.reduce((acc, game, index) => {
-        // Valori di default se non abbiamo posizioni specifiche
+        // Valori di default se non abbiamo posizioni specifiche (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
         const defaultPositions = {
-          bouncer: 15,
           pointFinger: 30,
           infamata: 20,
           truthOrDare: 25,
-          ilPezzoGrosso: 35,
-          cringeOrClassy: 40,
           wouldYouRather: 10,
           chatDetective: 45,
           newRule: 5,
@@ -1881,7 +1921,8 @@ if (actionText.includes("{playerB}")) {
           nonHoMai: 33,
           chiEPiuProbabile: 24,
           happyHour: 38,
-          oneVsOne: 42
+          oneVsOne: 42,
+          timerChallenge: 16
         };
         acc[game] = defaultPositions[game] || 10 + (index * 10);
         return acc;
@@ -1908,10 +1949,6 @@ if (actionText.includes("{playerB}")) {
     setCurrentTruthDareChoice(null);
     setTruthDareContent(null);
     setTruthDareState(null);
-    
-    // Resetta gli stati del gioco Cringe or Classy
-    setCringeOrClassyState(null);
-    setCringeOrClassyResult(null);
     
     // Resetta le azioni di gruppo
     setGroupActionsPool([]);
@@ -1957,7 +1994,7 @@ if (actionText.includes("{playerB}")) {
   const getSpecialGameMessage = () => {
     if (!activeSpecialGame || !specialGamePlayer) return null;
     
-    // Messaggi per ciascun tipo di gioco
+    // Messaggi per ciascun tipo di gioco (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
     if (activeSpecialGame === "truthOrDare") {
       if (truthDareState === "choosing") {
         return t.specialGames.truthOrDare.choosing.replace('{player}', specialGamePlayer);
@@ -2007,10 +2044,11 @@ if (actionText.includes("{playerB}")) {
     currentTruthDareChoice,
     truthDareContent,
     truthDareState,
-    cringeOrClassyState,
-    cringeOrClassyResult,
     playerPenalties, // NUOVO: Espone il contatore delle penalità
     wouldYouRatherContent, // NUOVO: Contenuto del gioco "preferiresti"
+    isTimerActive,
+    timerSeconds,
+    timerChallengeContent,
     
     // Functions
     changeLanguage,
@@ -2035,6 +2073,7 @@ if (actionText.includes("{playerB}")) {
     handlePay, // NUOVO: Funzione per il pulsante "Paga"
     getLeaderboard, // NUOVO: Funzione per ottenere la leaderboard
     endGame, // NUOVO: Funzione per terminare il gioco dopo la leaderboard
+    startTimer,
     
     // Additional state setters that need to be exposed
     setCurrentRoomIndex,

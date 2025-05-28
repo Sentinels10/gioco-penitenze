@@ -1,8 +1,5 @@
 {
   "specialGames": {
-  "bouncer": {
-    "text": "{player} è stato scelto come BUTTAFUORI del club! Può decidere se \"lasciar passare\" la penitenza o “espellere” un giocatore (farlo bere, fargli fare una sola penitenza extra)."
-  },
   "pointFinger": {
     "text": "{player} inizia il gioco del PUNTARE IL DITO! Deve scegliere una caratteristica (es. \"il più tirchio\", \"il più divertente\") e tutti indicheranno un giocatore. Chi riceve più voti fa una penalità!"
   },
@@ -12,18 +9,46 @@
   "truthOrDare": {
     "text": "OBBLIGO VERITA' O DEBITO: Se scegli Debito, eviti la penalità ma ti viene assegnato un debito che potrà essere riscattato in qualsiasi momento da chi dirige il gioco (es. \"Vai a prendermi da bere\" o \"Posta una storia imbarazzante\").. Decidete in senso orario partendo dal giocatore corrente."
   },
-  "ilPezzoGrosso": {
-      "text": "{player} è IL PEZZO GROSSO! Deve fare un'affermazione vera o falsa. su di sé  Tutti votano segretamente, se è Vero o Falso. Chi sbaglia riceve le penalità."
-  },
   "wouldYouRather": {
       "text": "Tutti i giocatori devono scegliere tra due opzioni, alzando la mano per la prima opzione o tenendola abbassata per la seconda. Chi si trova in minoranza deve fare una penalità!"
     },
     "chatDetective": {
     "text": "{player} è il detective di WhatsApp! Tutti aprite WhatsApp e cercate una parola che {player} sceglierà. Chi non trova la parola nei propri messaggi o si rifiuta di leggere il messaggio trovato, deve fare una penitenza!"
   },
-  "cringeOrClassy": {
-  "text": "{player} è stato scelto per CRINGE OR CLASSY! Deve confessare una sua passione segreta e il gruppo voterà se è cringe o classy. Se è cringe, {player} esegue una penitenza; se è classy, sceglie chi deve fare la prossima."
+  "happyHour": {
+  "text": "{player} ha attivato HAPPY HOUR! Tutti ricevono {count} penalità! 🎉"
 },
+
+"timerChallenge": {
+  "text": "{player} ha attivato SFIDE A TEMPO! Clicca il timer per iniziare la sfida!",
+  "party": [
+    "Hai venti secondi per nominare 5 cocktail alcolici. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 giochi da fare a una festa. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per nominare 5 canzoni da ballare a una festa. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 drink analcolici. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per nominare 5 tipi di balli. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 serie TV popolari. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per nominare 5 snack da festa. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 celebrità che vorresti incontrare. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per nominare 5 app social che usi. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 film comici. Se ti rifiuti o non fai in tempo, paghi 3 penitenze"
+  ],
+  "redRoom": [
+    "Hai venti secondi per nominare 5 posizioni sessuali. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 zone erogene. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per nominare 5 categorie di porno. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 giochi di ruolo piccanti. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per nominare 5 sex toys. Se ti rifiuti o non fai in tempo, paghi 3 penitenze"
+  ],
+  "darkRoom": [
+    "Hai venti secondi per nominare 5 paure che hai. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 bugie che hai detto. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per nominare 5 rimpianti della tua vita. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per elencare 5 cose che non sopporti delle persone. Se ti rifiuti o non fai in tempo, paghi 3 penitenze",
+    "Hai venti secondi per nominare 5 segreti che non hai mai confessato (senza rivelarli). Se ti rifiuti o non fai in tempo, paghi 3 penitenze"
+  ]
+},
+
 "nonHoMai": {
     "text": "{player} ha iniziato il gioco NON HO MAI! Completa la frase \"Io non ho mai...\". Chi l'ha fatto paga 3 penalità!"
   },
@@ -687,7 +712,7 @@
 { "text": "AZIONE DI GRUPPO: Chi ha mai provato abbigliamento intimo del sesso opposto deve fare 3 penalità" },
 { "text": "AZIONE DI GRUPPO: I giocatori che hanno mai finto di essere single quando non lo erano devono fare 4 penalità" }
     ],
-
+    
   "redRoom": [
     { "text": "Sussurra in modo sexy il nome di una categoria p*rno. Se nessuno la capisce… paga 3 penalità." },
   { "text": "Distribuisci 3 penalità a chi secondo te ha ricevuto un sexting imbarazzante… e non ha mai avuto il coraggio di cancellarlo." },

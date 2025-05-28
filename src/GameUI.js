@@ -1,6 +1,7 @@
 // GameUI.js - Componente per la parte visuale del gioco
 import React from 'react';
 import './App.css';
+import TimerChallengeComponent from './TimerChallengeComponent';
 
 // Importa l'immagine del guanto che punta
 import pointingGlove from './assets/pointing-glove.png';
@@ -37,6 +38,11 @@ const GameUI = (props) => {
     // NUOVO: Contenuto del gioco "preferiresti"
     wouldYouRatherContent,
     
+    // NUOVO: Stati per il timer challenge
+    isTimerActive,
+    timerSeconds,
+    timerChallengeContent,
+    
     // Stati per paywall
     hasPlayedFreeGame,
     hasPaid,
@@ -67,7 +73,11 @@ const GameUI = (props) => {
     handleDone,
     handlePay,
     getLeaderboard,
-    endGame
+    endGame,
+    
+    // NUOVO: Funzioni per il timer
+    startTimer,
+    stopTimer
   } = props;
 
   // Rendering condizionale in base allo stato del gioco
@@ -841,8 +851,21 @@ const GameUI = (props) => {
                 </p>
               )}
               
+              {/* SOSTITUISCI CON IL NUOVO COMPONENTE DEL TIMER */}
+              {activeSpecialGame === "timerChallenge" && (
+                <div style={{
+                  marginTop: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '15px'
+                }}>
+                  <TimerChallengeComponent timerChallengeContent={timerChallengeContent} />
+                </div>
+              )}
+              
               {/* Messaggio unificato per i giochi speciali attivi */}
-              {activeSpecialGame && activeSpecialGame !== "wouldYouRather" && (
+              {activeSpecialGame && activeSpecialGame !== "wouldYouRather" && activeSpecialGame !== "timerChallenge" && (
                 <p style={{ 
                   marginTop: '15px', 
                   fontSize: '16px', 
@@ -984,6 +1007,24 @@ const GameUI = (props) => {
                 }}
               >
                 {t.truthDareOptions.chooseOption}
+              </button>
+            ) :  activeSpecialGame === "timerChallenge" && !isTimerActive && timerSeconds > 0 ? (
+              // Per Timer Challenge quando il timer non è ancora stato avviato
+              <button 
+                onClick={() => props.startTimer()} // Ensure we're using props.startTimer consistently
+                style={{
+                  width: '100%',
+                  backgroundColor: '#FF6B35',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '0',
+                  padding: '16px',
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                }}
+              >
+                {t.startTimerButton}
               </button>
             ) : (
               // Nuovi pulsanti "Fatto" e "Paga"
@@ -1264,6 +1305,11 @@ const GameUI = (props) => {
               0% { transform: translateY(0px); }
               50% { transform: translateY(-10px); }
               100% { transform: translateY(0px); }
+            }
+            @keyframes pulse {
+              0% { transform: scale(1); }
+              50% { transform: scale(1.1); }
+              100% { transform: scale(1); }
             }
           `}</style>
         </div>

@@ -15,6 +15,7 @@ const translations = {
     enterButton: "ENTRA",
     resetButton: "Reset (Solo Test)",
     startGameButton: "START",
+    startTimerButton: "⏱️ AVVIA TIMER", // NUOVO: Pulsante per avviare il timer
     
     // Titoli delle schermate
     playersScreenTitle: "PLAYERS",
@@ -44,6 +45,16 @@ const translations = {
     leaderboardSubtitle: "Penalità accumulate",
     penaltiesLabel: "penalità",
     continueButton: "CONTINUA",
+    
+    // NUOVO: Timer Challenge
+    timerChallenge: {
+      timeUp: "TEMPO SCADUTO!",
+      timeRemaining: "Tempo rimanente: {seconds}s",
+      startTimer: "Clicca per avviare il timer!",
+      timerStarted: "Timer avviato! Inizia la sfida!",
+      completed: "Sfida completata!",
+      failed: "Tempo scaduto! Paga le penalità!"
+    },
     
     // Opzioni di pagamento
     paymentOptions: [
@@ -90,7 +101,6 @@ const translations = {
     
     // Giochi speciali
     specialGames: {
-      bouncer: "{player} è il buttafuori e sta decidendo...",
       pointFinger: "{player} sta scegliendo una caratteristica e tutti voteranno...",
       infamata: "{player} sta decidendo a chi assegnare la domanda o sfida...",
       truthOrDare: {
@@ -99,8 +109,6 @@ const translations = {
         dare: "{player} ha scelto Obbligo!",
         debt: "{player} ha scelto Debito!"
       },
-      ilPezzoGrosso: "{player} deve fare un'affermazione e tutti voteranno se è vero o falso...",
-      cringeOrClassy: "{player} deve confessare una sua passione segreta",
       wouldYouRather: "{player} ha posto la domanda: Preferiresti? Tutti devono votare! La minoranza riceve penalità",
       chatDetective: "{player} è il detective di WhatsApp!",
       tuttoHaUnPrezzo: "{player} ha avviato il gioco TUTTO HA UN PREZZO!",
@@ -110,17 +118,15 @@ const translations = {
       nonHoMai: "{player} ha iniziato il gioco NON HO MAI! Dopo di lui tocca al giocatore alla sua destra, finché non lo fanno tutti",
       chiEPiuProbabile: "{player} ha attivato il gioco CHI È PIÙ PROBABILE CHE! Tutti votano contemporaneamente puntando il dito. Chi riceve più voti fa le penalità!",
       happyHour: "{player} ha attivato HAPPY HOUR! Tutti ricevono {count} penalità! 🎉",
-      oneVsOne: "1V1!"
+      oneVsOne: "1V1!",
+      timerChallenge: "{player} ha attivato SFIDE A TEMPO! Clicca il timer per iniziare la sfida!"
     },
     
     // Terminologia giochi speciali
     specialGamesTitles: {
       pointFinger: "PUNTARE IL DITO",
-      bouncer: "BUTTAFUORI",
       infamata: "INFAMATA",
       truthOrDare: "OBBLIGO VERITÀ O DEBITO",
-      ilPezzoGrosso: "IL PEZZO GROSSO",
-      cringeOrClassy: "CRINGE OR CLASSY",
       wouldYouRather: "PREFERIRESTI",
       chatDetective: "CHAT DETECTIVE",
       tuttoHaUnPrezzo: "TUTTO HA UN PREZZO",
@@ -130,7 +136,8 @@ const translations = {
       nonHoMai: "NON HO MAI",
       chiEPiuProbabile: "CHI È PIÙ PROBABILE CHE",
       happyHour: "HAPPY HOUR",
-      oneVsOne: "1V1!"
+      oneVsOne: "1V1!",
+      timerChallenge: "SFIDE A TEMPO"
     },
     
     // Spiegazione del gioco "preferiresti"
@@ -207,6 +214,7 @@ const translations = {
     enterButton: "ENTER",
     resetButton: "Reset (Test Only)",
     startGameButton: "START",
+    startTimerButton: "⏱️ START TIMER", // NUOVO: Button to start the timer
     
     // Screen titles
     playersScreenTitle: "PLAYERS",
@@ -236,6 +244,16 @@ const translations = {
     leaderboardSubtitle: "Penalties accumulated",
     penaltiesLabel: "penalties",
     continueButton: "CONTINUE",
+    
+    // NUOVO: Timer Challenge
+    timerChallenge: {
+      timeUp: "TIME'S UP!",
+      timeRemaining: "Time remaining: {seconds}s",
+      startTimer: "Click to start the timer!",
+      timerStarted: "Timer started! Begin the challenge!",
+      completed: "Challenge completed!",
+      failed: "Time's up! Pay the penalties!"
+    },
     
     // Payment options
     paymentOptions: [
@@ -282,7 +300,6 @@ const translations = {
     
     // Special games
     specialGames: {
-      bouncer: "{player} is the bouncer and is deciding...",
       pointFinger: "{player} is choosing a characteristic and everyone will vote...",
       infamata: "{player} is deciding who to assign the question or challenge to...",
       truthOrDare: {
@@ -291,8 +308,6 @@ const translations = {
         dare: "{player} chose Dare!",
         debt: "{player} chose Debt!"
       },
-      ilPezzoGrosso: "{player} must make a statement and everyone will vote if it's true or false...",
-      cringeOrClassy: "{player} must confess a secret passion",
       wouldYouRather: "{player} asked the question: Would You Rather? Everyone must vote! The minority gets penalties",
       chatDetective: "{player} is the WhatsApp detective!",
       tuttoHaUnPrezzo: "{player} has started the EVERYTHING HAS A PRICE game!",
@@ -302,17 +317,15 @@ const translations = {
       nonHoMai: "{player} has started the I HAVE NEVER game! After them, it's the player on their right's turn, until everyone has played.",
       chiEPiuProbabile: "{player} has activated the WHO IS MOST LIKELY TO game! Everyone votes simultaneously by pointing a finger. Whoever gets the most votes takes the penalties!",
       happyHour: "{player} has activated HAPPY HOUR! Everyone receives {count} penalties! 🎉",
-      oneVsOne: "1V1!"
+      oneVsOne: "1V1!",
+      timerChallenge: "{player} has activated SPEED CHALLENGES! Click the timer to start the challenge!"
     },
     
     // Special games terminology
     specialGamesTitles: {
       pointFinger: "POINT THE FINGER",
-      bouncer: "BOUNCER",
       infamata: "SNITCH",
       truthOrDare: "TRUTH, DARE OR DEBT",
-      ilPezzoGrosso: "THE BIG SHOT",
-      cringeOrClassy: "CRINGE OR CLASSY",
       wouldYouRather: "WOULD YOU RATHER",
       chatDetective: "CHAT DETECTIVE",
       tuttoHaUnPrezzo: "EVERYTHING HAS A PRICE",
@@ -322,7 +335,8 @@ const translations = {
       nonHoMai: "I HAVE NEVER",
       chiEPiuProbabile: "WHO IS MOST LIKELY TO",
       happyHour: "HAPPY HOUR",
-      oneVsOne: "1V1!"
+      oneVsOne: "1V1!",
+      timerChallenge: "SPEED CHALLENGES"
     },
     
     // Would You Rather game explanation
@@ -398,6 +412,7 @@ const translations = {
     enterButton: "ENTRER",
     resetButton: "Réinitialiser (Test Uniquement)",
     startGameButton: "DÉMARRER",
+    startTimerButton: "⏱️ LANCER TIMER", // NOUVEAU: Bouton pour démarrer le timer
     
     // Titres des écrans
     playersScreenTitle: "JOUEURS",
@@ -427,6 +442,16 @@ const translations = {
     leaderboardSubtitle: "Pénalités accumulées",
     penaltiesLabel: "pénalités",
     continueButton: "CONTINUER",
+    
+    // NOUVEAU: Timer Challenge
+    timerChallenge: {
+      timeUp: "TEMPS ÉCOULÉ!",
+      timeRemaining: "Temps restant: {seconds}s",
+      startTimer: "Cliquez pour lancer le timer!",
+      timerStarted: "Timer lancé! Commencez le défi!",
+      completed: "Défi terminé!",
+      failed: "Temps écoulé! Payez les pénalités!"
+    },
     
     // Options de paiement
     paymentOptions: [
@@ -473,7 +498,6 @@ const translations = {
     
     // Jeux spéciaux
     specialGames: {
-      bouncer: "{player} est le videur et est en train de décider...",
       pointFinger: "{player} choisit une caractéristique et tout le monde va voter...",
       infamata: "{player} décide à qui attribuer la question ou le défi...",
       truthOrDare: {
@@ -482,8 +506,6 @@ const translations = {
         dare: "{player} a choisi Action!",
         debt: "{player} a choisi Dette!"
       },
-      ilPezzoGrosso: "{player} doit faire une déclaration et tout le monde va voter si c'est vrai ou faux...",
-      cringeOrClassy: "{player} doit confesser une passion secrète",
       wouldYouRather: "{player} a posé la question: Préférerais-tu? Tout le monde doit voter! La minorité reçoit des pénalités",
       chatDetective: "{player} est le détective WhatsApp !",
       tuttoHaUnPrezzo: "{player} a lancé le jeu TOUT A UN PRIX !",
@@ -493,17 +515,15 @@ const translations = {
       nonHoMai: "{player} a commencé le jeu JE N'AI JAMAIS! Après lui, c'est au tour du joueur à sa droite, jusqu'à ce que tout le monde ait joué.",
       chiEPiuProbabile: "{player} a activé le jeu QUI EST LE PLUS SUSCEPTIBLE DE! Tout le monde vote simultanément en pointant du doigt. Celui qui reçoit le plus de votes reçoit les pénalités!",
       happyHour: "{player} a activé l'HAPPY HOUR ! Tout le monde reçoit {count} pénalités ! 🎉",
-      oneVsOne: "1V1!"
+      oneVsOne: "1V1!",
+      timerChallenge: "{player} a activé DÉFIS CHRONOMÉTRÉS! Cliquez sur le timer pour commencer le défi!"
     },
     
     // Terminologie des jeux spéciaux
     specialGamesTitles: {
       pointFinger: "POINTER DU DOIGT",
-      bouncer: "VIDEUR",
       infamata: "BALANCE",
       truthOrDare: "VÉRITÉ, ACTION OU DETTE",
-      ilPezzoGrosso: "LE GROS BONNET",
-      cringeOrClassy: "GÊNANT OU CLASSE",
       wouldYouRather: "PRÉFÉRERAIS-TU",
       chatDetective: "DÉTECTIVE DE CHAT",
       tuttoHaUnPrezzo: "TOUT A UN PRIX",
@@ -513,7 +533,8 @@ const translations = {
       nonHoMai: "JE N'AI JAMAIS",
       chiEPiuProbabile: "QUI EST LE PLUS SUSCEPTIBLE DE",
       happyHour: "HAPPY HOUR",
-      oneVsOne: "1V1!"
+      oneVsOne: "1V1!",
+      timerChallenge: "DÉFIS CHRONOMÉTRÉS"
     },
     
     // Explication du jeu Préférerais-tu
@@ -589,6 +610,7 @@ const translations = {
     enterButton: "EINTRETEN",
     resetButton: "Zurücksetzen (Nur Test)",
     startGameButton: "START",
+    startTimerButton: "⏱️ TIMER STARTEN", // NOUVEAU: Button für Timer-Start
     
     // Bildschirmtitel
     playersScreenTitle: "SPIELER",
@@ -618,6 +640,16 @@ const translations = {
     leaderboardSubtitle: "Angesammelte Strafen",
     penaltiesLabel: "Strafen",
     continueButton: "FORTFAHREN",
+    
+    // NOUVEAU: Timer Challenge
+    timerChallenge: {
+      timeUp: "ZEIT IST UM!",
+      timeRemaining: "Verbleibende Zeit: {seconds}s",
+      startTimer: "Klicken Sie, um den Timer zu starten!",
+      timerStarted: "Timer gestartet! Beginnen Sie die Herausforderung!",
+      completed: "Herausforderung abgeschlossen!",
+      failed: "Zeit ist um! Zahlen Sie die Strafen!"
+    },
     
     // Zahlungsoptionen
     paymentOptions: [
@@ -664,7 +696,6 @@ const translations = {
     
     // Spezielle Spiele
     specialGames: {
-      bouncer: "{player} ist der Türsteher und entscheidet...",
       pointFinger: "{player} wählt ein Merkmal aus und alle werden abstimmen...",
       infamata: "{player} entscheidet, wem die Frage oder Herausforderung zugewiesen wird...",
       truthOrDare: {
@@ -673,8 +704,6 @@ const translations = {
         dare: "{player} hat Pflicht gewählt!",
         debt: "{player} hat Schuld gewählt!"
       },
-      ilPezzoGrosso: "{player} muss eine Aussage machen und alle werden abstimmen, ob sie wahr oder falsch ist...",
-      cringeOrClassy: "{player} muss eine geheime Leidenschaft gestehen",
       wouldYouRather: "{player} stellte die Frage: Was hättest du lieber? Alle müssen abstimmen! Die Minderheit erhält Strafen",
       chatDetective: "{player} ist der WhatsApp-Detektiv!",
       tuttoHaUnPrezzo: "{player} hat das Spiel ALLES HAT SEINEN PREIS gestartet!",
@@ -684,17 +713,15 @@ const translations = {
       nonHoMai: "{player} hat das Spiel ICH HABE NIE gestartet! Nach ihm ist der Spieler zu seiner Rechten an der Reihe, bis alle dran waren.",
       chiEPiuProbabile: "{player} hat das Spiel WER WÜRDE AM EHESTEN aktiviert! Alle stimmen gleichzeitig ab, indem sie mit dem Finger zeigen. Wer die meisten Stimmen erhält, bekommt die Strafen!",
       happyHour: "{player} hat die HAPPY HOUR aktiviert! Jeder erhält {count} Strafen! 🎉",
-      oneVsOne: "1V1!"
+      oneVsOne: "1V1!",
+      timerChallenge: "{player} hat ZEITHERAUSFORDERUNGEN aktiviert! Klicken Sie auf den Timer, um die Herausforderung zu starten!"
     },
     
     // Spezielle Spiele Terminologie
     specialGamesTitles: {
       pointFinger: "MIT DEM FINGER ZEIGEN",
-      bouncer: "TÜRSTEHER",
       infamata: "PETZE",
       truthOrDare: "WAHRHEIT, PFLICHT ODER SCHULD",
-      ilPezzoGrosso: "DER GROSSE BOSS",
-      cringeOrClassy: "PEINLICH ODER STILVOLL",
       wouldYouRather: "WAS HÄTTEST DU LIEBER",
       chatDetective: "CHAT-DETEKTIV",
       tuttoHaUnPrezzo: "ALLES HAT SEINEN PREIS",
@@ -704,7 +731,8 @@ const translations = {
       nonHoMai: "ICH HABE NIE",
       chiEPiuProbabile: "WER WÜRDE AM EHESTEN",
       happyHour: "HAPPY HOUR",
-      oneVsOne: "1V1!"
+      oneVsOne: "1V1!",
+      timerChallenge: "ZEITHERAUSFORDERUNGEN"
     },
     
     // Erklärung des Spiels "Was hättest du lieber"
