@@ -110,6 +110,7 @@ const translations = {
         debt: "{player} ha scelto Debito!"
       },
       wouldYouRather: "{player} ha posto la domanda: Preferiresti? Tutti devono votare! La minoranza riceve penalità",
+      questoOQuello: "{player} ha attivato QUESTO O QUELLO! Tutti votano: alza la mano per la prima opzione, tienila abbassata per la seconda. Chi è in minoranza fa 3 penalità!",
       chatDetective: "{player} è il detective di WhatsApp!",
       tuttoHaUnPrezzo: "{player} ha avviato il gioco TUTTO HA UN PREZZO!",
       tuttiQuelliChe: "{player} ha attivato il gioco TUTTI QUELLI CHE!",
@@ -128,6 +129,7 @@ const translations = {
       infamata: "INFAMATA",
       truthOrDare: "OBBLIGO VERITÀ O DEBITO",
       wouldYouRather: "PREFERIRESTI",
+      questoOQuello: "QUESTO O QUELLO",
       chatDetective: "CHAT DETECTIVE",
       tuttoHaUnPrezzo: "TUTTO HA UN PREZZO",
       tuttiQuelliChe: "TUTTI QUELLI CHE",
@@ -309,6 +311,7 @@ const translations = {
         debt: "{player} chose Debt!"
       },
       wouldYouRather: "{player} asked the question: Would You Rather? Everyone must vote! The minority gets penalties",
+      questoOQuello: "{player} has activated THIS OR THAT! Everyone votes: raise your hand for the first option, keep it down for the second. The minority gets 3 penalties!",
       chatDetective: "{player} is the WhatsApp detective!",
       tuttoHaUnPrezzo: "{player} has started the EVERYTHING HAS A PRICE game!",
       tuttiQuelliChe: "{player} has activated the ALL THOSE WHO game!",
@@ -327,6 +330,7 @@ const translations = {
       infamata: "SNITCH",
       truthOrDare: "TRUTH, DARE OR DEBT",
       wouldYouRather: "WOULD YOU RATHER",
+      questoOQuello: "THIS OR THAT",
       chatDetective: "CHAT DETECTIVE",
       tuttoHaUnPrezzo: "EVERYTHING HAS A PRICE",
       tuttiQuelliChe: "ALL THOSE WHO",
@@ -507,6 +511,7 @@ const translations = {
         debt: "{player} a choisi Dette!"
       },
       wouldYouRather: "{player} a posé la question: Préférerais-tu? Tout le monde doit voter! La minorité reçoit des pénalités",
+      questoOQuello: "{player} a activé CECI OU CELA! Tout le monde vote: levez la main pour la première option, gardez-la baissée pour la seconde. La minorité reçoit 3 pénalités!",
       chatDetective: "{player} est le détective WhatsApp !",
       tuttoHaUnPrezzo: "{player} a lancé le jeu TOUT A UN PRIX !",
       tuttiQuelliChe: "{player} a activé le jeu TOUS CEUX QUI!",
@@ -525,6 +530,7 @@ const translations = {
       infamata: "BALANCE",
       truthOrDare: "VÉRITÉ, ACTION OU DETTE",
       wouldYouRather: "PRÉFÉRERAIS-TU",
+      questoOQuello: "CECI OU CELA",
       chatDetective: "DÉTECTIVE DE CHAT",
       tuttoHaUnPrezzo: "TOUT A UN PRIX",
       tuttiQuelliChe: "TOUS CEUX QUI",
@@ -705,6 +711,7 @@ const translations = {
         debt: "{player} hat Schuld gewählt!"
       },
       wouldYouRather: "{player} stellte die Frage: Was hättest du lieber? Alle müssen abstimmen! Die Minderheit erhält Strafen",
+      questoOQuello: "{player} hat DIES ODER DAS aktiviert! Alle stimmen ab: Hand heben für die erste Option, unten lassen für die zweite. Die Minderheit erhält 3 Strafen!",
       chatDetective: "{player} ist der WhatsApp-Detektiv!",
       tuttoHaUnPrezzo: "{player} hat das Spiel ALLES HAT SEINEN PREIS gestartet!",
       tuttiQuelliChe: "{player} hat das Spiel ALLE, DIE aktiviert!",
@@ -723,6 +730,7 @@ const translations = {
       infamata: "PETZE",
       truthOrDare: "WAHRHEIT, PFLICHT ODER SCHULD",
       wouldYouRather: "WAS HÄTTEST DU LIEBER",
+      questoOQuello: "DIES ODER DAS",
       chatDetective: "CHAT-DETEKTIV",
       tuttoHaUnPrezzo: "ALLES HAT SEINEN PREIS",
       tuttiQuelliChe: "ALLE, DIE",

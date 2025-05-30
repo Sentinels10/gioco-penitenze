@@ -77,7 +77,12 @@ const GameUI = (props) => {
     
     // NUOVO: Funzioni per il timer
     startTimer,
-    stopTimer
+    
+    // Props aggiuntive che potrebbero essere necessarie
+    setCurrentRoomIndex,
+    selectPaymentOption,
+    processPayment,
+    MAX_ACTIONS_PER_GAME
   } = props;
 
   // Rendering condizionale in base allo stato del gioco
@@ -710,9 +715,8 @@ const GameUI = (props) => {
             }}>
               <button 
                 onClick={() => {
-                  // Retrieve the setCurrentRoomIndex function from props
                   const newIndex = currentRoomIndex === 0 ? t.rooms.length - 1 : currentRoomIndex - 1;
-                  props.setCurrentRoomIndex(newIndex);
+                  setCurrentRoomIndex(newIndex);
                 }}
                 style={{
                   background: 'none',
@@ -733,7 +737,7 @@ const GameUI = (props) => {
                 {t.rooms.map((_, index) => (
                   <div 
                     key={index}
-                    onClick={() => props.setCurrentRoomIndex(index)}
+                    onClick={() => setCurrentRoomIndex(index)}
                     style={{
                       width: '10px',
                       height: '10px',
@@ -747,9 +751,8 @@ const GameUI = (props) => {
               
               <button 
                 onClick={() => {
-                  // Retrieve the setCurrentRoomIndex function from props
                   const newIndex = currentRoomIndex === t.rooms.length - 1 ? 0 : currentRoomIndex + 1;
-                  props.setCurrentRoomIndex(newIndex);
+                  setCurrentRoomIndex(newIndex);
                 }}
                 style={{
                   background: 'none',
@@ -826,7 +829,7 @@ const GameUI = (props) => {
               textAlign: 'center',
               margin: '10px 0 30px 0'
             }}>
-              {activeSpecialGame ? t.specialGamesTitles[activeSpecialGame] : players[currentPlayerIndex]}
+              {activeSpecialGame ? (t.specialGamesTitles ? t.specialGamesTitles[activeSpecialGame] : activeSpecialGame) : players[currentPlayerIndex]}
             </h2>
             
             <div style={{
@@ -851,7 +854,7 @@ const GameUI = (props) => {
                 </p>
               )}
               
-              {/* SOSTITUISCI CON IL NUOVO COMPONENTE DEL TIMER */}
+              {/* Timer Challenge Component */}
               {activeSpecialGame === "timerChallenge" && (
                 <div style={{
                   marginTop: '20px',
@@ -872,7 +875,7 @@ const GameUI = (props) => {
                   color: '#AAAAAA',
                   textAlign: 'center'
                 }}>
-                  {getSpecialGameMessage()}
+                  {getSpecialGameMessage && getSpecialGameMessage()}
                 </p>
               )}
               
@@ -989,7 +992,7 @@ const GameUI = (props) => {
             backgroundColor: 'transparent',
             zIndex: 10
           }}>
-            {/* NUOVO: Sostituiamo il pulsante NEXT con due nuovi pulsanti */}
+            {/* Gestione dei pulsanti in base al tipo di gioco speciale */}
             {activeSpecialGame === "truthOrDare" && truthDareState === "choosing" ? (
               // Manteniamo il pulsante originale durante la scelta Truth/Dare/Debt
               <button 
@@ -1008,10 +1011,10 @@ const GameUI = (props) => {
               >
                 {t.truthDareOptions.chooseOption}
               </button>
-            ) :  activeSpecialGame === "timerChallenge" && !isTimerActive && timerSeconds > 0 ? (
+            ) : activeSpecialGame === "timerChallenge" && !isTimerActive && timerSeconds > 0 ? (
               // Per Timer Challenge quando il timer non è ancora stato avviato
               <button 
-                onClick={() => props.startTimer()} // Ensure we're using props.startTimer consistently
+                onClick={() => startTimer()}
                 style={{
                   width: '100%',
                   backgroundColor: '#FF6B35',
@@ -1136,7 +1139,7 @@ const GameUI = (props) => {
               padding: '20px',
               marginBottom: '20px'
             }}>
-              {getLeaderboard().map((item, index) => (
+              {getLeaderboard && getLeaderboard().map((item, index) => (
                 <div key={index} style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -1189,7 +1192,9 @@ const GameUI = (props) => {
                 color: '#AAAAAA',
                 marginBottom: '10px'
               }}>
-                {t.actionsCompletedMessage.replace('{count}', props.MAX_ACTIONS_PER_GAME)}
+                {t.actionsCompletedMessage && MAX_ACTIONS_PER_GAME ? 
+                  t.actionsCompletedMessage.replace('{count}', MAX_ACTIONS_PER_GAME) : 
+                  `Partita completata!`}
               </p>
             </div>
           </div>
@@ -1265,7 +1270,9 @@ const GameUI = (props) => {
               color: '#CCCCCC',
               lineHeight: '1.5'
             }}>
-              {t.actionsCompletedMessage.replace('{count}', props.MAX_ACTIONS_PER_GAME)}
+              {t.actionsCompletedMessage && MAX_ACTIONS_PER_GAME ?
+                t.actionsCompletedMessage.replace('{count}', MAX_ACTIONS_PER_GAME) :
+                `Partita completata!`}
             </p>
             
             <div style={{ 
@@ -1290,12 +1297,12 @@ const GameUI = (props) => {
               fontSize: '16px', 
               color: '#3498db'
             }}>
-              {t.tapToContinueMessage.replace(
+              {t.tapToContinueMessage ? t.tapToContinueMessage.replace(
                 '{action}', 
                 hasPlayedFreeGame && !hasPaid 
-                  ? t.unlockMoreGamesMessage 
-                  : t.returnToRoomsMessage
-              )}
+                  ? (t.unlockMoreGamesMessage || 'sbloccare altre partite')
+                  : (t.returnToRoomsMessage || 'tornare alla selezione delle stanze')
+              ) : 'Tocca per continuare'}
             </p>
           </div>
           
@@ -1396,10 +1403,10 @@ const GameUI = (props) => {
                 gap: '15px',
                 marginTop: '25px'
               }}>
-                {t.paymentOptions.map(option => (
+                {t.paymentOptions && t.paymentOptions.map(option => (
                   <div 
                     key={option.id}
-                    onClick={() => props.selectPaymentOption(option)}
+                    onClick={() => selectPaymentOption && selectPaymentOption(option)}
                     style={{
                       backgroundColor: selectedPaymentOption?.id === option.id ? '#3498db20' : '#2A2A2A',
                       border: selectedPaymentOption?.id === option.id ? '2px solid #3498db' : '2px solid transparent',
@@ -1454,7 +1461,7 @@ const GameUI = (props) => {
             zIndex: 10
           }}>
             <button 
-              onClick={props.processPayment}
+              onClick={processPayment}
               disabled={!selectedPaymentOption || isProcessingPayment}
               style={{
                 width: '100%',
@@ -1480,7 +1487,7 @@ const GameUI = (props) => {
       )}
       
       {/* Interfaccia per i debiti */}
-      {gameState === 'playing' && debtList.length > 0 && (
+      {gameState === 'playing' && debtList && debtList.length > 0 && (
         <div style={{
           position: 'fixed',
           bottom: '70px',

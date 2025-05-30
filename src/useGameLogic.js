@@ -1,6 +1,7 @@
-// useGameLogic.js - Custom hook per gestire lo stato e la logica del gioco
+// useGameLogic.js - Custom hook per gestire lo stato e la logica del gioco (con fix prima azione vuota)
 import { useState, useEffect, useRef } from 'react';
 import translations from './translations';
+import useSpecialGames from './useSpecialGames';
 
 /**
  * Custom hook per gestire tutta la logica e lo stato del gioco
@@ -19,7 +20,7 @@ const useGameLogic = () => {
   const [currentAction, setCurrentAction] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [previousAction, setPreviousAction] = useState(null);
-  const timerIntervalRef = useRef(null);
+  
   // Contatore per le azioni giocate in una partita (nascosto dall'UI)
   const [actionsCounter, setActionsCounter] = useState(0);
   // Costante per il numero massimo di azioni per partita
@@ -60,338 +61,28 @@ const useGameLogic = () => {
   // Contatore per le azioni di gruppo mostrate
   const [groupActionsShown, setGroupActionsShown] = useState(0);
   
-  // ======== GIOCHI SPECIALI - STATO UNIFICATO ========
-  // Stato per tenere traccia di tutti i giochi speciali (RIMOSSI: bouncer, cringeOrClassy, ilPezzoGrosso)
-  const SPECIAL_GAMES = ['pointFinger', 'infamata', 'truthOrDare', 'wouldYouRather', 'chatDetective', 'newRule', 'tuttoHaUnPrezzo', 'tuttiQuelliChe', 'penitenzeGruppo', 'penitenzaRandom', 'nonHoMai', 'chiEPiuProbabile', 'happyHour', 'oneVsOne', 'timerChallenge'];
-  
-  // Numerazione dei giochi speciali per una manutenzione più semplice (AGGIORNATA)
-  const SPECIAL_GAME_TYPES = {
-    POINT_FINGER: 0,
-    INFAMATA: 1, 
-    TRUTH_OR_DARE: 2,
-    WOULD_YOU_RATHER: 3,
-    CHAT_DETECTIVE: 4,
-    NEW_RULE: 5,
-    TUTTO_HA_UN_PREZZO: 6,
-    TUTTI_QUELLI_CHE: 7,
-    PENITENZE_GRUPPO: 8,
-    PENITENZA_RANDOM: 9,
-    NON_HO_MAI: 10,
-    CHI_E_PIU_PROBABILE: 11,
-    HAPPY_HOUR: 12,
-    ONE_VS_ONE: 13,
-    TIMER_CHALLENGE: 14
-  };
-
-  // Nuovi stati per il timer challenge
-  const [isTimerActive, setIsTimerActive] = useState(false);
-  const [timerSeconds, setTimerSeconds] = useState(20);
-  const [timerChallengeContent, setTimerChallengeContent] = useState(null);
-
-  // Funzione che determina quali giochi speciali sono disponibili per ogni stanza
-  const getAvailableSpecialGames = (roomId) => {
-    switch(roomId) {
-      case 'coppie':
-        // Per la modalità "coppie" truth or dare, would you rather, chatDetective e newRule
-        return [
-            SPECIAL_GAME_TYPES.TRUTH_OR_DARE, 
-            SPECIAL_GAME_TYPES.WOULD_YOU_RATHER, 
-            SPECIAL_GAME_TYPES.CHAT_DETECTIVE, 
-            SPECIAL_GAME_TYPES.NEW_RULE,
-            SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-            SPECIAL_GAME_TYPES.HAPPY_HOUR
-        ];
-      case 'redRoom':
-        // Per la stanza rossa tutti i giochi (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-        return [
-          SPECIAL_GAME_TYPES.POINT_FINGER,
-          SPECIAL_GAME_TYPES.INFAMATA,
-          SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
-          SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
-          SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
-          SPECIAL_GAME_TYPES.NEW_RULE,
-          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
-          SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
-          SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
-          SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
-          SPECIAL_GAME_TYPES.NON_HO_MAI,
-          SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-          SPECIAL_GAME_TYPES.HAPPY_HOUR,
-          SPECIAL_GAME_TYPES.TIMER_CHALLENGE
-        ];
-      case 'darkRoom':
-        // Per la dark room (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-        return [
-          SPECIAL_GAME_TYPES.INFAMATA,
-          SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
-          SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
-          SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
-          SPECIAL_GAME_TYPES.NEW_RULE,
-          SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
-          SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
-          SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
-          SPECIAL_GAME_TYPES.NON_HO_MAI,
-          SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-          SPECIAL_GAME_TYPES.HAPPY_HOUR,
-          SPECIAL_GAME_TYPES.TIMER_CHALLENGE
-        ];
-      case 'party':
-        // Per la party room (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-        return [
-          SPECIAL_GAME_TYPES.POINT_FINGER,
-          SPECIAL_GAME_TYPES.INFAMATA,
-          SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
-          SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
-          SPECIAL_GAME_TYPES.NEW_RULE,
-          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
-          SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
-          SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
-          SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
-          SPECIAL_GAME_TYPES.NON_HO_MAI,
-          SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-          SPECIAL_GAME_TYPES.HAPPY_HOUR,
-          SPECIAL_GAME_TYPES.ONE_VS_ONE,
-          SPECIAL_GAME_TYPES.TIMER_CHALLENGE
-        ];
-      case 'neonRoulette':
-      default:
-        // Per la Neon Roulette e come default, tutti i giochi rimanenti
-        return [
-          SPECIAL_GAME_TYPES.POINT_FINGER,
-          SPECIAL_GAME_TYPES.INFAMATA,
-          SPECIAL_GAME_TYPES.TRUTH_OR_DARE,
-          SPECIAL_GAME_TYPES.WOULD_YOU_RATHER,
-          SPECIAL_GAME_TYPES.CHAT_DETECTIVE,
-          SPECIAL_GAME_TYPES.NEW_RULE,
-          SPECIAL_GAME_TYPES.TUTTO_HA_UN_PREZZO,
-          SPECIAL_GAME_TYPES.TUTTI_QUELLI_CHE,
-          SPECIAL_GAME_TYPES.PENITENZE_GRUPPO,
-          SPECIAL_GAME_TYPES.PENITENZA_RANDOM,
-          SPECIAL_GAME_TYPES.NON_HO_MAI,
-          SPECIAL_GAME_TYPES.CHI_E_PIU_PROBABILE,
-          SPECIAL_GAME_TYPES.HAPPY_HOUR,
-          SPECIAL_GAME_TYPES.ONE_VS_ONE,
-          SPECIAL_GAME_TYPES.TIMER_CHALLENGE
-        ];
-    }
-  };
-  
-  // Stato per tracciare quali giochi sono stati usati (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-  const [specialGamesUsed, setSpecialGamesUsed] = useState({
-    redRoom: { 
-      pointFinger: false, 
-      infamata: false, 
-      truthOrDare: false, 
-      wouldYouRather: false, 
-      chatDetective: false, 
-      newRule: false, 
-      tuttoHaUnPrezzo: false, 
-      tuttiQuelliChe: false, 
-      penitenzeGruppo: false, 
-      penitenzaRandom: false, 
-      nonHoMai: false,
-      chiEPiuProbabile: false,
-      happyHour: false,
-      oneVsOne: false,
-      timerChallenge: false
-    },
-    darkRoom: { 
-      pointFinger: false, 
-      infamata: false, 
-      truthOrDare: false, 
-      wouldYouRather: false, 
-      chatDetective: false, 
-      newRule: false, 
-      tuttoHaUnPrezzo: false, 
-      tuttiQuelliChe: false, 
-      penitenzeGruppo: false, 
-      penitenzaRandom: false, 
-      nonHoMai: false,
-      chiEPiuProbabile: false,
-      happyHour: false,
-      oneVsOne: false,
-      timerChallenge: false
-    },
-    coppie: { 
-      pointFinger: false, 
-      infamata: false, 
-      truthOrDare: false, 
-      wouldYouRather: false, 
-      chatDetective: false, 
-      newRule: false, 
-      tuttoHaUnPrezzo: false, 
-      tuttiQuelliChe: false, 
-      penitenzeGruppo: false, 
-      penitenzaRandom: false, 
-      nonHoMai: false,
-      chiEPiuProbabile: false,
-      happyHour: false,
-      oneVsOne: false,
-      timerChallenge: false
-    },
-    party: { 
-      pointFinger: false, 
-      infamata: false, 
-      truthOrDare: false, 
-      wouldYouRather: false, 
-      chatDetective: false, 
-      newRule: false, 
-      tuttoHaUnPrezzo: false, 
-      tuttiQuelliChe: false, 
-      penitenzeGruppo: false, 
-      penitenzaRandom: false, 
-      nonHoMai: false,
-      chiEPiuProbabile: false,
-      happyHour: false,
-      oneVsOne: false,
-      timerChallenge: false
-    },
-    neonRoulette: { 
-      pointFinger: false, 
-      infamata: false, 
-      truthOrDare: false, 
-      wouldYouRather: false, 
-      chatDetective: false, 
-      newRule: false, 
-      tuttoHaUnPrezzo: false, 
-      tuttiQuelliChe: false, 
-      penitenzeGruppo: false, 
-      penitenzaRandom: false, 
-      nonHoMai: false,
-      chiEPiuProbabile: false,
-      happyHour: false,
-      oneVsOne: false,
-      timerChallenge: false
-    }
-  });
-  
-  // Stato per tracciare quando deve apparire ciascun gioco (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-  const [specialGamesRound, setSpecialGamesRound] = useState({
-    redRoom: { 
-      pointFinger: 30, 
-      infamata: 20, 
-      truthOrDare: 25, 
-      wouldYouRather: 10, 
-      chatDetective: 45, 
-      newRule: 5, 
-      tuttoHaUnPrezzo: 18, 
-      tuttiQuelliChe: 22, 
-      penitenzeGruppo: 13, 
-      penitenzaRandom: 28, 
-      nonHoMai: 33,
-      chiEPiuProbabile: 24,
-      happyHour: 38,
-      oneVsOne: 42,
-      timerChallenge: 16
-    },
-    darkRoom: { 
-      pointFinger: 30, 
-      infamata: 20, 
-      truthOrDare: 25, 
-      wouldYouRather: 10, 
-      chatDetective: 45, 
-      newRule: 5, 
-      tuttoHaUnPrezzo: 18, 
-      tuttiQuelliChe: 22, 
-      penitenzeGruppo: 13, 
-      penitenzaRandom: 28, 
-      nonHoMai: 33,
-      chiEPiuProbabile: 24,
-      happyHour: 38,
-      oneVsOne: 42,
-      timerChallenge: 16
-    },
-    coppie: { 
-      pointFinger: 30, 
-      infamata: 20, 
-      truthOrDare: 25, 
-      wouldYouRather: 10, 
-      chatDetective: 45, 
-      newRule: 5, 
-      tuttoHaUnPrezzo: 18, 
-      tuttiQuelliChe: 22, 
-      penitenzeGruppo: 13, 
-      penitenzaRandom: 28, 
-      nonHoMai: 33,
-      chiEPiuProbabile: 24,
-      happyHour: 38,
-      oneVsOne: 42,
-      timerChallenge: 16
-    },
-    party: { 
-      pointFinger: 30, 
-      infamata: 20, 
-      truthOrDare: 25, 
-      wouldYouRather: 10, 
-      chatDetective: 45, 
-      newRule: 5, 
-      tuttoHaUnPrezzo: 18, 
-      tuttiQuelliChe: 22, 
-      penitenzeGruppo: 13, 
-      penitenzaRandom: 28, 
-      nonHoMai: 33,
-      chiEPiuProbabile: 24,
-      happyHour: 38,
-      oneVsOne: 42,
-      timerChallenge: 16
-    },
-    neonRoulette: { 
-      pointFinger: 30, 
-      infamata: 20, 
-      truthOrDare: 25, 
-      wouldYouRather: 10, 
-      chatDetective: 45, 
-      newRule: 5, 
-      tuttoHaUnPrezzo: 18, 
-      tuttiQuelliChe: 22, 
-      penitenzeGruppo: 13, 
-      penitenzaRandom: 28, 
-      nonHoMai: 33,
-      chiEPiuProbabile: 24,
-      happyHour: 38,
-      oneVsOne: 42,
-      timerChallenge: 16
-    }
-  });
-  
-  // Stato per il gioco speciale attualmente in corso
-  const [activeSpecialGame, setActiveSpecialGame] = useState(null);
-  // Giocatore coinvolto nel gioco speciale (se presente)
-  const [specialGamePlayer, setSpecialGamePlayer] = useState(null);
-  
-  // NUOVO: Contatore per tracciare l'ultima azione speciale
-  const [lastSpecialGameRound, setLastSpecialGameRound] = useState({
-    redRoom: 0,
-    darkRoom: 0,
-    coppie: 0,
-    party: 0,
-    neonRoulette: 0
-  });
-  
-  // NUOVO: Lista dei debiti assegnati
-  const [debtList, setDebtList] = useState([]);
-  
-  // NUOVO: Costante per l'intervallo minimo tra giochi speciali
-  const MIN_ACTIONS_BETWEEN_SPECIAL_GAMES = 2;
-  
   // Nuovi stati per il paywall
   const [hasPlayedFreeGame, setHasPlayedFreeGame] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
   const [selectedPaymentOption, setSelectedPaymentOption] = useState(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
-  // Nuovi stati per il gioco Obbligo Verità Debito
-  const [truthDarePlayers, setTruthDarePlayers] = useState([]);
-  const [currentTruthDareChoice, setCurrentTruthDareChoice] = useState(null);
-  const [truthDareContent, setTruthDareContent] = useState(null);
-  const [truthDareState, setTruthDareState] = useState(null); // "choosing", "executing", "completed"
-  const [truthDareContentPool, setTruthDareContentPool] = useState({
-    truth: [],
-    dare: []
+  // NUOVO: Flag per controllare se è stata caricata la prima azione
+  const [isFirstActionLoaded, setIsFirstActionLoaded] = useState(false);
+  
+  // Inizializza lo hook per i giochi speciali
+  const specialGames = useSpecialGames({
+    t,
+    players,
+    selectedRoom,
+    currentPlayerIndex,
+    actionsCounter,
+    setCurrentAction,
+    setPlayerPenalties,
+    playerPenalties,
+    loadBackupActions,
+    MAX_ACTIONS_PER_GAME
   });
-
-  // Nuovo stato per il gioco "Preferiresti"
-  const [wouldYouRatherContent, setWouldYouRatherContent] = useState(null);
   
   // Verifica lo stato del paywall quando il componente si monta
   useEffect(() => {
@@ -413,19 +104,37 @@ const useGameLogic = () => {
     }
   }, []);
   
-  // Effetto per caricare la prima domanda quando lo stato è 'playing'
+  // MODIFICATO: Effetto per caricare la prima domanda quando lo stato è 'playing'
   useEffect(() => {
-    if (gameState === 'playing' && selectedRoom) {
-      // Usa una flag per assicurarti che questo venga eseguito solo una volta
-      const firstLoadFlag = 'firstActionLoaded_' + selectedRoom.id;
-      if (!sessionStorage.getItem(firstLoadFlag)) {
+    if (gameState === 'playing' && selectedRoom && !isFirstActionLoaded) {
+      console.log("=== DEBUG useEffect for first action ===");
+      console.log("gameState:", gameState);
+      console.log("selectedRoom:", selectedRoom?.id);
+      console.log("isFirstActionLoaded:", isFirstActionLoaded);
+      console.log("roomActionsPool for room:", roomActionsPool[selectedRoom.id]?.length);
+      
+      // Verifica che il pool di azioni sia caricato prima di procedere
+      if (roomActionsPool[selectedRoom.id] && roomActionsPool[selectedRoom.id].length > 0) {
+        console.log("Pool is ready, loading first action");
         setTimeout(() => {
           updateCurrentAction();
-          sessionStorage.setItem(firstLoadFlag, 'true');
+          setIsFirstActionLoaded(true);
         }, 100);
+      } else {
+        console.log("Pool not ready yet, waiting...");
+        // Se il pool non è ancora pronto, riprova dopo un breve delay
+        const retryTimeout = setTimeout(() => {
+          if (roomActionsPool[selectedRoom.id] && roomActionsPool[selectedRoom.id].length > 0) {
+            console.log("Pool ready on retry, loading first action");
+            updateCurrentAction();
+            setIsFirstActionLoaded(true);
+          }
+        }, 300);
+        
+        return () => clearTimeout(retryTimeout);
       }
     }
-  }, [gameState, selectedRoom]);
+  }, [gameState, selectedRoom, isFirstActionLoaded, roomActionsPool]);
   
   // Funzione per cambiare la lingua dell'app
   const changeLanguage = (newLanguage) => {
@@ -528,50 +237,54 @@ const useGameLogic = () => {
   };
   
   // Carica il file backupActions nella lingua corrente
-const loadBackupActions = async () => {
-  try {
-    // Determina il nome del file in base alla lingua corrente
-    const backupActionsFileName = `backupActions_${language}.json`;
-    let backupActionsModule;
-    
-    // Prima tenta di caricare dalla cartella actions
+  async function loadBackupActions() {
     try {
-      // Importa il file dalla cartella actions
-      backupActionsModule = await import(`./actions/${backupActionsFileName}`);
-      console.log(`Caricato con successo: ./actions/${backupActionsFileName}`);
-      return backupActionsModule.default;
-    } catch (error) {
-      console.warn(`Errore nel caricamento di ./actions/${backupActionsFileName}:`, error);
+      // Determina il nome del file in base alla lingua corrente
+      const backupActionsFileName = `backupActions_${language}.json`;
+      let backupActionsModule;
       
-      // Se non riesce, prova con la lingua inglese come fallback
+      // Prima tenta di caricare dalla cartella actions
       try {
-        backupActionsModule = await import('./actions/backupActions_en.json');
-        console.log('Fallback: Caricato backupActions_en.json');
+        // Importa il file dalla cartella actions
+        backupActionsModule = await import(`./actions/${backupActionsFileName}`);
+        console.log(`Caricato con successo: ./actions/${backupActionsFileName}`);
         return backupActionsModule.default;
-      } catch (enError) {
-        console.warn('Errore nel caricamento del fallback inglese:', enError);
+      } catch (error) {
+        console.warn(`Errore nel caricamento di ./actions/${backupActionsFileName}:`, error);
         
-        // Ultimo tentativo: italiano
+        // Se non riesce, prova con la lingua inglese come fallback
         try {
-          backupActionsModule = await import('./actions/backupActions_it.json');
-          console.log('Fallback: Caricato backupActions_it.json');
+          backupActionsModule = await import('./actions/backupActions_en.json');
+          console.log('Fallback: Caricato backupActions_en.json');
           return backupActionsModule.default;
-        } catch (itError) {
-          console.error('Impossibile caricare qualsiasi file di backup:', itError);
-          return {}; // Restituisce un oggetto vuoto se tutti i tentativi falliscono
+        } catch (enError) {
+          console.warn('Errore nel caricamento del fallback inglese:', enError);
+          
+          // Ultimo tentativo: italiano
+          try {
+            backupActionsModule = await import('./actions/backupActions_it.json');
+            console.log('Fallback: Caricato backupActions_it.json');
+            return backupActionsModule.default;
+          } catch (itError) {
+            console.error('Impossibile caricare qualsiasi file di backup:', itError);
+            return {}; // Restituisce un oggetto vuoto se tutti i tentativi falliscono
+          }
         }
       }
+    } catch (error) {
+      console.error('Errore generale nel caricamento dei file backupActions:', error);
+      return {}; // Restituisce un oggetto vuoto in caso di errore generale
     }
-  } catch (error) {
-    console.error('Errore generale nel caricamento dei file backupActions:', error);
-    return {}; // Restituisce un oggetto vuoto in caso di errore generale
   }
-};
   
-  // Seleziona una stanza e prepara il gioco
+  // MODIFICATO: Seleziona una stanza e prepara il gioco
   const selectRoom = async (room) => {
+    console.log("=== DEBUG selectRoom ===");
+    console.log("Selected room:", room.id);
+    
     setSelectedRoom(room);
     setIsLoading(true);
+    setIsFirstActionLoaded(false); // NUOVO: Reset del flag
     
     try {
       // Carica il file backupActions nella lingua corrente
@@ -586,73 +299,8 @@ const loadBackupActions = async () => {
       // Resetta il contatore delle azioni
       setActionsCounter(0);
       
-      // Resetta lo stato dei giochi speciali
-      setActiveSpecialGame(null);
-      setSpecialGamePlayer(null);
-      setWouldYouRatherContent(null);
-      
-      // Resetta lo stato del timer
-      setIsTimerActive(false);
-      setTimerSeconds(20);
-      setTimerChallengeContent(null);
-      
-      // NUOVO: Resetta il contatore dell'ultima azione speciale
-      setLastSpecialGameRound(prev => ({
-        ...prev,
-        [room.id]: 0
-      }));
-      
-      // Distribuisci i giochi speciali in modo uniforme ma casuale
-      const gamePositions = distributeSpecialGames(MAX_ACTIONS_PER_GAME, room.id);
-      
-      // Resetta tutti gli stati dei giochi speciali (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-      setSpecialGamesUsed(prev => ({
-        ...prev,
-        [room.id]: {
-          pointFinger: false,
-          infamata: false,
-          truthOrDare: false,
-          wouldYouRather: false,
-          chatDetective: false,
-          newRule: false,
-          tuttoHaUnPrezzo: false,
-          tuttiQuelliChe: false,
-          penitenzeGruppo: false,
-          penitenzaRandom: false,
-          nonHoMai: false,
-          chiEPiuProbabile: false,
-          happyHour: false,
-          oneVsOne: false,
-          timerChallenge: false
-        }
-      }));
-      
-      // Imposta i round per ogni gioco speciale (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-      setSpecialGamesRound(prev => ({
-        ...prev,
-        [room.id]: {
-          pointFinger: gamePositions.pointFinger || 30,
-          infamata: gamePositions.infamata || 20,
-          truthOrDare: gamePositions.truthOrDare || 25,
-          wouldYouRather: gamePositions.wouldYouRather || 10,
-          chatDetective: gamePositions.chatDetective || 45,
-          newRule: gamePositions.newRule || 5,
-          tuttoHaUnPrezzo: gamePositions.tuttoHaUnPrezzo || 18,
-          tuttiQuelliChe: gamePositions.tuttiQuelliChe || 22,
-          penitenzeGruppo: gamePositions.penitenzeGruppo || 13,
-          penitenzaRandom: gamePositions.penitenzaRandom || 28,
-          nonHoMai: gamePositions.nonHoMai || 33,
-          chiEPiuProbabile: gamePositions.chiEPiuProbabile || 24,
-          happyHour: gamePositions.happyHour || 38,
-          oneVsOne: gamePositions.oneVsOne || 42,
-          timerChallenge: gamePositions.timerChallenge || 16
-        }
-      }));
-      
-      // Resetta la lista dei debiti quando si inizia una nuova stanza
-      if (room.id !== selectedRoom?.id) {
-        setDebtList([]);
-      }
+      // Inizializza gli stati per i giochi speciali
+      specialGames.initializeSpecialGames(room.id);
       
       // Carica le azioni di gruppo dal backup
       if (backupActions.groupActions && backupActions.groupActions.length > 0) {
@@ -697,6 +345,9 @@ const loadBackupActions = async () => {
         setGroupActionPositions(positions);
         setGroupActionsShown(0);
       }
+      
+      // NUOVO: Creiamo una variabile temporanea per il nuovo pool di azioni
+      let newRoomActionsPool = {};
       
       // Se è la modalità Neon Roulette, combina azioni da tutte le altre stanze
       if (room.id === 'neonRoulette') {
@@ -815,11 +466,11 @@ const loadBackupActions = async () => {
         console.log("Special Games: " + selectedSpecialGameActions.length + " azioni");
         console.log(t.logMessages.totalStats.replace('{count}', shuffledActions.length));
         
-        // Aggiorna il pool di azioni per la Neon Roulette
-        setRoomActionsPool(prev => ({
-          ...prev,
+        // NUOVO: Aggiorna il pool temporaneo invece che lo stato direttamente
+        newRoomActionsPool = {
+          ...roomActionsPool,
           neonRoulette: shuffledActions
-        }));
+        };
       } 
       // Altrimenti, carica le azioni normali della stanza
       else {
@@ -832,13 +483,27 @@ const loadBackupActions = async () => {
             .sort(() => Math.random() - 0.5)
             .slice(0, Math.max(MAX_ACTIONS_PER_GAME * 2, 50));
           
-          // Aggiorna le azioni disponibili
-          setRoomActionsPool(prev => ({
-            ...prev,
+          // NUOVO: Aggiorna il pool temporaneo invece che lo stato direttamente
+          newRoomActionsPool = {
+            ...roomActionsPool,
             [room.id]: shuffledBackupActions
-          }));
+          };
+        } else {
+          // Se non ci sono azioni nel backup, almeno inizializza con un array vuoto
+          newRoomActionsPool = {
+            ...roomActionsPool,
+            [room.id]: []
+          };
         }
       }
+      
+      console.log("=== DEBUG newRoomActionsPool ===");
+      console.log("Room:", room.id);
+      console.log("Actions count:", newRoomActionsPool[room.id]?.length);
+      console.log("First action:", newRoomActionsPool[room.id]?.[0]?.text?.substring(0, 50));
+      
+      // NUOVO: Aggiorna tutti gli stati necessari in una sola operazione
+      setRoomActionsPool(newRoomActionsPool);
       
       // Resetta l'indice delle azioni
       setCurrentActionIndex(prev => ({
@@ -853,8 +518,22 @@ const loadBackupActions = async () => {
       const randomPlayerIndex = Math.floor(Math.random() * players.length);
       setCurrentPlayerIndex(randomPlayerIndex);
       
+      // NUOVO: Attendiamo un momento per assicurarci che gli stati siano aggiornati
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Vai alla schermata di gioco
       setGameState('playing');
+      
+      // NUOVO: Carica immediatamente la prima azione dopo aver impostato lo stato
+      setTimeout(() => {
+        console.log("=== Loading first action directly ===");
+        console.log("Pool ready:", newRoomActionsPool[room.id]?.length);
+        if (newRoomActionsPool[room.id] && newRoomActionsPool[room.id].length > 0) {
+          console.log("Calling updateCurrentAction directly");
+          updateCurrentActionWithPool(newRoomActionsPool);
+          setIsFirstActionLoaded(true);
+        }
+      }, 200);
       
     } catch (error) {
       console.error('Errore:', error);
@@ -863,713 +542,18 @@ const loadBackupActions = async () => {
     }
   };
   
-  // NUOVO: Funzione per distribuire i giochi speciali nella partita
-  const distributeSpecialGames = (maxActions, roomId) => {
-    // Distanza minima voluta tra i giochi
-    const MIN_SPACING = 3; // Come richiesto
+  // NUOVO: Versione di updateCurrentAction che accetta il pool come parametro
+  const updateCurrentActionWithPool = async (poolToUse = null) => {
+    const actualPool = poolToUse || roomActionsPool;
+    const roomId = selectedRoom?.id;
     
-    // Otteniamo i giochi disponibili per questa stanza
-    const availableGameTypes = getAvailableSpecialGames(roomId);
+    if (!roomId) return;
     
-    // Convertiamo i tipi numerici nei nomi dei giochi
-    const availableGames = availableGameTypes.map(gameType => SPECIAL_GAMES[gameType]);
-    
-    // Assicuriamoci che nella modalità Neon Roulette vengano inclusi tutti i giochi speciali
-    let shuffledGames = [];
-    if (roomId === 'neonRoulette') {
-      // Per Neon Roulette, includiamo TUTTI i giochi speciali
-      shuffledGames = [...SPECIAL_GAMES].sort(() => Math.random() - 0.5);
-    } else {
-      // Per le altre stanze, utilizziamo solo i giochi disponibili
-      shuffledGames = [...availableGames].sort(() => Math.random() - 0.5);
-    }
-    
-    // Range disponibile per la distribuzione dei giochi
-    const minPosition = 5; // Iniziamo dopo le prime azioni
-    const maxPosition = maxActions - 5; // Finiamo prima della fine
-    const availableRange = maxPosition - minPosition;
-    
-    // Verifica se abbiamo abbastanza spazio per tutti i giochi con la distanza minima
-    const minRequiredSpace = shuffledGames.length * (1 + MIN_SPACING) - MIN_SPACING;
-    if (minRequiredSpace > availableRange) {
-      console.warn(`Attenzione: non c'è abbastanza spazio per distribuire tutti i giochi con la distanza minima richiesta.`);
-    }
-    
-    // Calcola la dimensione ottimale dei segmenti (garantendo la distanza minima se possibile)
-    const segmentSize = Math.max(MIN_SPACING + 1, Math.floor(availableRange / shuffledGames.length));
-    
-    // Crea le posizioni con un po' di randomicità ma mantieni la distanza minima
-    const positions = {};
-    
-    shuffledGames.forEach((game, index) => {
-      // Base position nel suo segmento
-      const segmentStart = minPosition + (index * segmentSize);
-      // Il segmento finisce prima dell'inizio del prossimo segmento
-      const segmentEnd = Math.min(maxPosition, segmentStart + segmentSize - 1);
-      
-      // Se è il primo gioco, non c'è un gioco precedente
-      if (index === 0) {
-        // Posiziona il primo gioco in una posizione casuale all'interno del suo segmento
-        positions[game] = segmentStart + Math.floor(Math.random() * (segmentEnd - segmentStart + 1));
-      } else {
-        // Per i giochi successivi, verifica la distanza dal gioco precedente
-        const prevGame = shuffledGames[index - 1];
-        const prevPosition = positions[prevGame];
-        
-        // La posizione minima valida è prevPosition + MIN_SPACING
-        const minValidPosition = prevPosition + MIN_SPACING;
-        
-        // Se la posizione minima valida è oltre la fine del segmento, usa quella
-        if (minValidPosition > segmentEnd) {
-          positions[game] = minValidPosition;
-        } else {
-          // Altrimenti, scegli una posizione casuale nel range valido
-          positions[game] = minValidPosition + Math.floor(Math.random() * (segmentEnd - minValidPosition + 1));
-        }
-      }
-    });
-    
-    // Per i giochi non disponibili in questa stanza, impostiamo una posizione
-    // molto alta in modo che non vengano mai attivati
-    SPECIAL_GAMES.forEach(game => {
-      if (!positions[game]) {
-        positions[game] = maxActions * 2; // Posizione irraggiungibile
-      }
-    });
-    
-    return positions;
-  };
-  
-  // Funzione per continuare dopo un'azione speciale
-  const nextTurnAfterSpecialGame = () => {
-    if (!selectedRoom) return;
-    const roomId = selectedRoom.id;
-    
-    // Se è in corso il gioco Obbligo Verità Debito
-    if (activeSpecialGame === "truthOrDare") {
-      // Rimuovi il primo giocatore dalla lista (quello che ha appena giocato)
-      if (truthDarePlayers.length > 0) {
-        const updatedPlayers = [...truthDarePlayers];
-        updatedPlayers.shift();
-        setTruthDarePlayers(updatedPlayers);
-        
-        // Se ci sono ancora giocatori da processare
-        if (updatedPlayers.length > 0) {
-          const nextPlayerIndex = updatedPlayers[0];
-          setSpecialGamePlayer(players[nextPlayerIndex]);
-          setCurrentTruthDareChoice(null);
-          setTruthDareContent(null);
-          setTruthDareState("choosing");
-          setCurrentAction({ 
-            text: t.truthDareNextPlayerIntro.replace('{player}', players[nextPlayerIndex])
-          });
-          return;
-        }
-      }
-      
-      // Se tutti i giocatori hanno giocato, termina il gioco speciale
-      setTruthDareState("completed");
-    }
-    
-    // Ferma il timer se è attivo
-    if (isTimerActive) {
-      setIsTimerActive(false);
-    }
-    
-    // Aggiorna il contatore dell'ultima azione speciale
-    setLastSpecialGameRound(prev => ({
-      ...prev,
-      [roomId]: actionsCounter
-    }));
-    
-    // Resetta gli stati del gioco speciale
-    setActiveSpecialGame(null);
-    setSpecialGamePlayer(null);
-    setTruthDarePlayers([]);
-    setCurrentTruthDareChoice(null);
-    setTruthDareContent(null);
-    setTruthDareState(null);
-    setWouldYouRatherContent(null);
-    setTimerChallengeContent(null);
-    
-    // Prosegui con il turno normale
-    nextTurn(true); // true indica che stiamo proseguendo dopo un'azione speciale
-  };
-  
-  // Nuova funzione per gestire la scelta di Obbligo/Verità/Debito
-  const handleTruthDareChoice = (choice) => {
-    setCurrentTruthDareChoice(choice);
-    
-    if (choice === "truth" || choice === "dare") {
-      // Seleziona un contenuto casuale dal pool appropriato
-      const pool = truthDareContentPool[choice];
-      if (pool && pool.length > 0) {
-        const randomIndex = Math.floor(Math.random() * pool.length);
-        const content = pool[randomIndex];
-        setTruthDareContent(content);
-      } else {
-        // Fallback in caso di pool vuoto
-        setTruthDareContent(choice === "truth" 
-          ? "Rispondi a una domanda personale che ti verrà fatta dal gruppo"
-          : "Esegui un'azione che ti verrà assegnata dal gruppo");
-      }
-    } else {
-      // Per "debt" non mostriamo contenuto
-      setTruthDareContent(null);
-      
-      // Opzionale: aggiungi il debito alla lista dei debiti
-      const newDebt = {
-        player: specialGamePlayer,
-        status: 'active',
-        description: t.debts.debtDescription
-      };
-      setDebtList([...debtList, newDebt]);
-    }
-    
-    // Cambia lo stato del gioco
-    setTruthDareState("executing");
-  };
-  
-  // Funzioni per gestire il timer
-  const startTimer = () => {
-    console.log("startTimer è stata chiamata!");
-    
-    // Resetta e avvia il timer
-    setTimerSeconds(20);
-    setIsTimerActive(true);
-    
-    // Cancella eventuali intervalli precedenti
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-      timerIntervalRef.current = null;
-    }
-    
-    // Crea un nuovo riferimento per l'intervallo
-    const intervalId = setInterval(() => {
-      setTimerSeconds(prev => {
-        if (prev <= 1) {
-          clearInterval(intervalId);
-          setIsTimerActive(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    // Salva il riferimento
-    timerIntervalRef.current = intervalId;
-  };
-  
-  // Assicurati di pulire l'intervallo quando il componente viene smontato
-  useEffect(() => {
-    return () => {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-        timerIntervalRef.current = null;
-      }
-    };
-  }, []);
-  
-  // NUOVO: Funzione helper per gestire i giochi speciali
-  const handleSpecialGame = async (gameType) => {
-    if (!selectedRoom) return;
-    const roomId = selectedRoom.id;
-    
-    // Carica le azioni dal file corretto
-    const backupActions = await loadBackupActions();
-    
-    // Verifica che esista la sezione specialGames nel backupActions
-    if (!backupActions.specialGames || !backupActions.specialGames[gameType]) {
-      console.error(t.logMessages.missingSpecialGame.replace('{type}', gameType));
-      // Continua con il prossimo turno normale in caso di errore
-      nextTurn();
-      return;
-    }
-    
-    // Ottieni il testo del gioco dal backup
-    let actionText = backupActions.specialGames[gameType].text;
-    
-    // Gestisci i vari tipi di gioco (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-    switch (gameType) {
-      case "pointFinger":
-      case "infamata":
-      case "chatDetective":
-      case "nonHoMai":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        break;
-      
-      case "truthOrDare":
-        // Crea una lista di tutti gli indici dei giocatori da processare
-        const playerIndices = Array.from({ length: players.length }, (_, i) => i);
-        
-        // Imposta il giocatore corrente come primo e poi mescola il resto
-        const currentFirst = [currentPlayerIndex];
-        const remainingPlayers = playerIndices.filter(idx => idx !== currentPlayerIndex);
-        const shuffledRemaining = remainingPlayers.sort(() => Math.random() - 0.5);
-        
-        // Combina per avere il giocatore attuale per primo e poi tutti gli altri
-        setTruthDarePlayers([...currentFirst, ...shuffledRemaining]);
-        
-        // Imposta lo stato iniziale del gioco
-        setTruthDareState("choosing");
-        setCurrentTruthDareChoice(null);
-        setTruthDareContent(null);
-        
-        // Carica il pool di contenuti per verità e obblighi specifici per la stanza
-        let truthPool = [];
-        let darePool = [];
-
-        if (backupActions.truthDareGame) {
-          // Prima cerca contenuti specifici per la stanza
-          if (backupActions.truthDareGame.truth && backupActions.truthDareGame.truth[roomId]) {
-            truthPool = [...backupActions.truthDareGame.truth[roomId]];
-          } 
-          // Fallback sul pool generico
-          else if (backupActions.truthDareGame.truth) {
-            truthPool = [...backupActions.truthDareGame.truth];
-          }
-          
-          if (backupActions.truthDareGame.dare && backupActions.truthDareGame.dare[roomId]) {
-            darePool = [...backupActions.truthDareGame.dare[roomId]];
-          } 
-          // Fallback sul pool generico
-          else if (backupActions.truthDareGame.dare) {
-            darePool = [...backupActions.truthDareGame.dare];
-          }
-          
-          // Per Neon Roulette, mescola contenuti da tutte le stanze
-          if (roomId === 'neonRoulette') {
-            truthPool = [];
-            darePool = [];
-            
-            if (backupActions.truthDareGame.truth) {
-              if (backupActions.truthDareGame.truth.party) truthPool.push(...backupActions.truthDareGame.truth.party);
-              if (backupActions.truthDareGame.truth.redRoom) truthPool.push(...backupActions.truthDareGame.truth.redRoom);
-              if (backupActions.truthDareGame.truth.darkRoom) truthPool.push(...backupActions.truthDareGame.truth.darkRoom);
-              if (backupActions.truthDareGame.truth.coppie) truthPool.push(...backupActions.truthDareGame.truth.coppie);
-            }
-            
-            if (backupActions.truthDareGame.dare) {
-              if (backupActions.truthDareGame.dare.party) darePool.push(...backupActions.truthDareGame.dare.party);
-              if (backupActions.truthDareGame.dare.redRoom) darePool.push(...backupActions.truthDareGame.dare.redRoom);
-              if (backupActions.truthDareGame.dare.darkRoom) darePool.push(...backupActions.truthDareGame.dare.darkRoom);
-              if (backupActions.truthDareGame.dare.coppie) darePool.push(...backupActions.truthDareGame.dare.coppie);
-            }
-            
-            // Se non ci sono pool specifici, usa quelli generici
-            if (truthPool.length === 0 && backupActions.truthDareGame.truth) {
-              truthPool = [...backupActions.truthDareGame.truth];
-            }
-            if (darePool.length === 0 && backupActions.truthDareGame.dare) {
-              darePool = [...backupActions.truthDareGame.dare];
-            }
-          }
-          
-          // Mescola i pool
-          setTruthDareContentPool({
-            truth: truthPool.sort(() => Math.random() - 0.5),
-            dare: darePool.sort(() => Math.random() - 0.5)
-          });
-        }
-        
-        // Il giocatore corrente sarà il primo a giocare
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = t.truthDareIntro.replace('{player}', players[currentPlayerIndex]);
-        break;
-        
-      case "wouldYouRather":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Seleziona una domanda tematizzata in base alla stanza corrente
-        let wouldYouRatherQuestions = [];
-        
-        // Cerca prima le domande specifiche per la stanza
-        if (backupActions.wouldYouRather && backupActions.wouldYouRather[roomId] && 
-            backupActions.wouldYouRather[roomId].length > 0) {
-          wouldYouRatherQuestions = backupActions.wouldYouRather[roomId];
-        } 
-        // Se non ci sono domande specifiche per la stanza o siamo in Neon Roulette, usa il pool generico
-        else if (roomId === 'neonRoulette') {
-          // Per Neon Roulette, raccogliamo domande da tutte le stanze
-          const allQuestions = [];
-          if (backupActions.wouldYouRather) {
-            if (backupActions.wouldYouRather.party) allQuestions.push(...backupActions.wouldYouRather.party);
-            if (backupActions.wouldYouRather.redRoom) allQuestions.push(...backupActions.wouldYouRather.redRoom);
-            if (backupActions.wouldYouRather.darkRoom) allQuestions.push(...backupActions.wouldYouRather.darkRoom);
-            if (backupActions.wouldYouRather.coppie) allQuestions.push(...backupActions.wouldYouRather.coppie);
-          }
-          wouldYouRatherQuestions = allQuestions.length > 0 ? allQuestions : (backupActions.wouldYouRather || []);
-        }
-        // Fallback al pool generico se non ci sono domande specifiche
-        else if (backupActions.wouldYouRather && backupActions.wouldYouRather.length > 0) {
-          wouldYouRatherQuestions = backupActions.wouldYouRather;
-        }
-        
-        // Se abbiamo domande, seleziona una casualmente
-        if (wouldYouRatherQuestions.length > 0) {
-          const randomIndex = Math.floor(Math.random() * wouldYouRatherQuestions.length);
-          const question = wouldYouRatherQuestions[randomIndex].text;
-          
-          // Imposta la domanda per uso futuro
-          setWouldYouRatherContent(question);
-          
-          // Aggiungi la domanda al testo dell'azione CON UN A CAPO
-          actionText += "\n\n" + question;
-        }
-        break;
-        
-      case "newRule":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Seleziona una regola casuale, se disponibile nel backup
-        if (backupActions.specialGames[gameType].rules && backupActions.specialGames[gameType].rules.length > 0) {
-          const rules = backupActions.specialGames[gameType].rules;
-          const randomRuleIndex = Math.floor(Math.random() * rules.length);
-          const selectedRule = rules[randomRuleIndex];
-          
-          // Sostituisci [regola] con la regola selezionata
-          actionText = actionText.replace(/\[regola\]/g, selectedRule);
-        } else {
-          // Fallback se non ci sono regole disponibili
-          actionText = actionText.replace(/\[regola\]/g, "fare qualcosa di specifico");
-        }
-        break;
-        
-      case "tuttoHaUnPrezzo":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Selezioniamo una sfida appropriata in base alla stanza
-        if (backupActions.specialGames && backupActions.specialGames.tuttoHaUnPrezzo) {
-          let challenges = [];
-          
-          if (roomId === 'redRoom' && backupActions.specialGames.tuttoHaUnPrezzo.redRoom) {
-            challenges = backupActions.specialGames.tuttoHaUnPrezzo.redRoom;
-          } else if (roomId === 'party' && backupActions.specialGames.tuttoHaUnPrezzo.party) {
-            challenges = backupActions.specialGames.tuttoHaUnPrezzo.party;
-          } else if (roomId === 'neonRoulette') {
-            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
-            const allChallenges = [];
-            if (backupActions.specialGames.tuttoHaUnPrezzo.redRoom) 
-              allChallenges.push(...backupActions.specialGames.tuttoHaUnPrezzo.redRoom);
-            if (backupActions.specialGames.tuttoHaUnPrezzo.party) 
-              allChallenges.push(...backupActions.specialGames.tuttoHaUnPrezzo.party);
-            
-            challenges = allChallenges;
-          }
-          
-          if (challenges && challenges.length > 0) {
-            // Seleziona una sfida casuale
-            const randomIndex = Math.floor(Math.random() * challenges.length);
-            const challenge = challenges[randomIndex];
-            
-            // Aggiungi la sfida al testo dell'azione
-            actionText += "\n\n" + challenge;
-          }
-        }
-        break;
-
-      case "tuttiQuelliChe":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Selezioniamo una sfida appropriata in base alla stanza
-        if (backupActions.specialGames && backupActions.specialGames.tuttiQuelliChe) {
-          let challenges = [];
-          
-          if (roomId === 'redRoom' && backupActions.specialGames.tuttiQuelliChe.redRoom) {
-            challenges = backupActions.specialGames.tuttiQuelliChe.redRoom;
-          } else if (roomId === 'darkRoom' && backupActions.specialGames.tuttiQuelliChe.darkRoom) {
-            challenges = backupActions.specialGames.tuttiQuelliChe.darkRoom;
-          } else if (roomId === 'party' && backupActions.specialGames.tuttiQuelliChe.party) {
-            challenges = backupActions.specialGames.tuttiQuelliChe.party;
-          } else if (roomId === 'neonRoulette') {
-            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
-            const allChallenges = [];
-            if (backupActions.specialGames.tuttiQuelliChe.redRoom) 
-              allChallenges.push(...backupActions.specialGames.tuttiQuelliChe.redRoom);
-            if (backupActions.specialGames.tuttiQuelliChe.darkRoom) 
-              allChallenges.push(...backupActions.specialGames.tuttiQuelliChe.darkRoom);
-            if (backupActions.specialGames.tuttiQuelliChe.party)
-              allChallenges.push(...backupActions.specialGames.tuttiQuelliChe.party);
-            
-            challenges = allChallenges;
-          }
-          
-          if (challenges && challenges.length > 0) {
-            // Seleziona una sfida casuale
-            const randomIndex = Math.floor(Math.random() * challenges.length);
-            const challenge = challenges[randomIndex];
-            
-            // Aggiungi la sfida al testo dell'azione
-            actionText += "\n\n" + challenge;
-          }
-        }
-        break;
-
-      case "penitenzeGruppo":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Selezioniamo una sfida appropriata in base alla stanza
-        if (backupActions.specialGames && backupActions.specialGames.penitenzeGruppo) {
-          let challenges = [];
-          
-          if (roomId === 'redRoom' && backupActions.specialGames.penitenzeGruppo.redRoom) {
-            challenges = backupActions.specialGames.penitenzeGruppo.redRoom;
-          } else if (roomId === 'darkRoom' && backupActions.specialGames.penitenzeGruppo.darkRoom) {
-            challenges = backupActions.specialGames.penitenzeGruppo.darkRoom;
-          } else if (roomId === 'party' && backupActions.specialGames.penitenzeGruppo.party) {
-            challenges = backupActions.specialGames.penitenzeGruppo.party;
-          } else if (roomId === 'neonRoulette') {
-            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
-            const allChallenges = [];
-            if (backupActions.specialGames.penitenzeGruppo.redRoom) 
-              allChallenges.push(...backupActions.specialGames.penitenzeGruppo.redRoom);
-            if (backupActions.specialGames.penitenzeGruppo.darkRoom) 
-              allChallenges.push(...backupActions.specialGames.penitenzeGruppo.darkRoom);
-            if (backupActions.specialGames.penitenzeGruppo.party)
-              allChallenges.push(...backupActions.specialGames.penitenzeGruppo.party);
-            
-            challenges = allChallenges;
-          }
-          
-          if (challenges && challenges.length > 0) {
-            // Seleziona una sfida casuale
-            const randomIndex = Math.floor(Math.random() * challenges.length);
-            const challenge = challenges[randomIndex];
-            
-            // Aggiungi la sfida al testo dell'azione
-            actionText += "\n\n" + challenge;
-          }
-        }
-        break;
-        
-      case "penitenzaRandom":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Selezioniamo una sfida appropriata in base alla stanza
-        if (backupActions.specialGames && backupActions.specialGames.penitenzaRandom) {
-          let challenges = [];
-          
-          if (roomId === 'redRoom' && backupActions.specialGames.penitenzaRandom.redRoom) {
-            challenges = backupActions.specialGames.penitenzaRandom.redRoom;
-          } else if (roomId === 'darkRoom' && backupActions.specialGames.penitenzaRandom.darkRoom) {
-            challenges = backupActions.specialGames.penitenzaRandom.darkRoom;
-          } else if (roomId === 'party' && backupActions.specialGames.penitenzaRandom.party) {
-            challenges = backupActions.specialGames.penitenzaRandom.party;
-          } else if (roomId === 'neonRoulette') {
-            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
-            const allChallenges = [];
-            if (backupActions.specialGames.penitenzaRandom.redRoom) 
-              allChallenges.push(...backupActions.specialGames.penitenzaRandom.redRoom);
-            if (backupActions.specialGames.penitenzaRandom.darkRoom) 
-              allChallenges.push(...backupActions.specialGames.penitenzaRandom.darkRoom);
-            if (backupActions.specialGames.penitenzaRandom.party)
-              allChallenges.push(...backupActions.specialGames.penitenzaRandom.party);
-            
-            challenges = allChallenges;
-          }
-          
-          if (challenges && challenges.length > 0) {
-            // Seleziona una sfida casuale
-            const randomIndex = Math.floor(Math.random() * challenges.length);
-            const challenge = challenges[randomIndex];
-            
-            // Aggiungi la sfida al testo dell'azione
-            actionText += "\n\n" + challenge;
-          }
-        }
-        break;
-        
-      case "chiEPiuProbabile":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Seleziona una domanda tematizzata in base alla stanza corrente
-        let chiEPiuProbabileQuestions = [];
-
-        // Cerca prima le domande specifiche per la stanza
-        if (backupActions.specialGames && backupActions.specialGames.chiEPiuProbabile) {
-          if (backupActions.specialGames.chiEPiuProbabile[roomId] && 
-              backupActions.specialGames.chiEPiuProbabile[roomId].length > 0) {
-            chiEPiuProbabileQuestions = backupActions.specialGames.chiEPiuProbabile[roomId];
-          } 
-          // Per Neon Roulette, raccogliamo domande da tutte le stanze
-          else if (roomId === 'neonRoulette') {
-            const allQuestions = [];
-            if (backupActions.specialGames.chiEPiuProbabile.party) 
-              allQuestions.push(...backupActions.specialGames.chiEPiuProbabile.party);
-            if (backupActions.specialGames.chiEPiuProbabile.redRoom) 
-              allQuestions.push(...backupActions.specialGames.chiEPiuProbabile.redRoom);
-            if (backupActions.specialGames.chiEPiuProbabile.darkRoom) 
-              allQuestions.push(...backupActions.specialGames.chiEPiuProbabile.darkRoom);
-            if (backupActions.specialGames.chiEPiuProbabile.coppie) 
-              allQuestions.push(...backupActions.specialGames.chiEPiuProbabile.coppie);
-            
-            chiEPiuProbabileQuestions = allQuestions;
-          }
-          // Fallback alle actions generiche se non ci sono domande specifiche
-          else if (backupActions.specialGames.chiEPiuProbabile.actions && 
-                   backupActions.specialGames.chiEPiuProbabile.actions.length > 0) {
-            chiEPiuProbabileQuestions = backupActions.specialGames.chiEPiuProbabile.actions;
-          }
-        }
-
-        // Se abbiamo domande, seleziona una casualmente
-        if (chiEPiuProbabileQuestions.length > 0) {
-          const randomIndex = Math.floor(Math.random() * chiEPiuProbabileQuestions.length);
-          const question = chiEPiuProbabileQuestions[randomIndex];
-          
-          // Aggiungi la domanda all'azione con un a capo
-          actionText += "\n\n" + question;
-        }
-        break;
-
-      case "happyHour":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Genera un numero casuale di penalità tra 1 e 3
-        const penaltyCount = Math.floor(Math.random() * 3) + 1;
-        
-        // Sostituisci {count} con il numero di penalità
-        actionText = actionText.replace(/{count}/g, penaltyCount);
-        
-        // Applica le penalità a tutti i giocatori
-        const updatedPenalties = {...playerPenalties};
-        players.forEach(player => {
-          updatedPenalties[player] = (updatedPenalties[player] || 0) + penaltyCount;
-        });
-        setPlayerPenalties(updatedPenalties);
-        break;
-        
-      case "oneVsOne":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Seleziona un altro giocatore casuale per la sfida
-        let opponentIndex;
-        do {
-          opponentIndex = Math.floor(Math.random() * players.length);
-        } while (opponentIndex === currentPlayerIndex);
-        
-        // Sostituisci {opponent} con il nome dell'avversario
-        actionText = actionText.replace(/{opponent}/g, players[opponentIndex]);
-        break;
-        
-      case "timerChallenge":
-        // Il giocatore corrente sarà il protagonista
-        setSpecialGamePlayer(players[currentPlayerIndex]);
-        
-        // Sostituisci {player} con il nome del giocatore corrente
-        actionText = actionText.replace(/{player}/g, players[currentPlayerIndex]);
-        
-        // Seleziona una sfida appropriata in base alla stanza
-        if (backupActions.specialGames && backupActions.specialGames.timerChallenge) {
-          let challenges = [];
-          
-          if (roomId === 'redRoom' && backupActions.specialGames.timerChallenge.redRoom) {
-            challenges = backupActions.specialGames.timerChallenge.redRoom;
-          } else if (roomId === 'darkRoom' && backupActions.specialGames.timerChallenge.darkRoom) {
-            challenges = backupActions.specialGames.timerChallenge.darkRoom;
-          } else if (roomId === 'party' && backupActions.specialGames.timerChallenge.party) {
-            challenges = backupActions.specialGames.timerChallenge.party;
-          } else if (roomId === 'neonRoulette') {
-            // Per Neon Roulette, usa una combinazione di sfide da tutte le stanze disponibili
-            const allChallenges = [];
-            if (backupActions.specialGames.timerChallenge.redRoom) 
-              allChallenges.push(...backupActions.specialGames.timerChallenge.redRoom);
-            if (backupActions.specialGames.timerChallenge.darkRoom) 
-              allChallenges.push(...backupActions.specialGames.timerChallenge.darkRoom);
-            if (backupActions.specialGames.timerChallenge.party)
-              allChallenges.push(...backupActions.specialGames.timerChallenge.party);
-            
-            challenges = allChallenges;
-          }
-          
-          if (challenges && challenges.length > 0) {
-            // Seleziona una sfida casuale
-            const randomIndex = Math.floor(Math.random() * challenges.length);
-            const challenge = challenges[randomIndex];
-            
-            // Salva il contenuto della sfida
-            setTimerChallengeContent(challenge);
-            
-            // Aggiungi la sfida al testo dell'azione
-            actionText += "\n\n" + challenge;
-          }
-        }
-        
-        // Reset del timer
-        setTimerSeconds(20);
-        setIsTimerActive(false);
-        break;
-    }
-    
-    // Imposta il gioco speciale attivo
-    setActiveSpecialGame(gameType);
-    
-    // Marca il gioco come usato
-    setSpecialGamesUsed(prev => ({
-      ...prev,
-      [roomId]: {
-        ...prev[roomId],
-        [gameType]: true
-      }
-    }));
-    
-    // Imposta l'azione corrente
-    setCurrentAction({ text: actionText });
-    
-    // Aggiorna il contatore dell'ultima azione speciale
-    setLastSpecialGameRound(prev => ({
-      ...prev,
-      [roomId]: actionsCounter
-    }));
-  };
-  
-  // Funzione dedicata per aggiornare l'azione corrente
-  const updateCurrentAction = async () => {
-    if (!selectedRoom) return;
-    
-    const roomId = selectedRoom.id;
+    console.log("=== DEBUG updateCurrentActionWithPool ===");
+    console.log("roomId:", roomId);
+    console.log("actionsCounter:", actionsCounter);
+    console.log("poolToUse provided:", !!poolToUse);
+    console.log("actualPool for room:", actualPool[roomId]?.length);
     
     // Carica le azioni dal file di backup
     const backupActions = await loadBackupActions();
@@ -1577,7 +561,7 @@ const loadBackupActions = async () => {
     // Verifica se è il momento di mostrare un'azione di gruppo
     if (groupActionsPool.length > 0 && 
         groupActionPositions.includes(actionsCounter) && 
-        groupActionsShown < 8) {  // Modificato da 2 a 8
+        groupActionsShown < 8) {
       
       // Seleziona un'azione di gruppo casuale
       const randomIndex = Math.floor(Math.random() * groupActionsPool.length);
@@ -1600,44 +584,29 @@ const loadBackupActions = async () => {
       return;
     }
     
-    // Verifica se ci sono abbastanza azioni dall'ultima azione speciale
-    const actionsSinceLastSpecial = actionsCounter - lastSpecialGameRound[roomId];
-    const canShowSpecialGame = actionsSinceLastSpecial >= MIN_ACTIONS_BETWEEN_SPECIAL_GAMES;
-    
-    // Controlla se è il momento di mostrare un gioco speciale
-    if (canShowSpecialGame && actionsCounter < MAX_ACTIONS_PER_GAME - 1) {
-      // Otteniamo i giochi disponibili per questa stanza
-      const availableGameTypes = getAvailableSpecialGames(roomId);
+    // Verifica se è il momento di mostrare un gioco speciale
+    console.log("Checking for special game...");
+    if (specialGames.shouldShowSpecialGame(actionsCounter, roomId)) {
+      console.log("Should show special game!");
       
-      // Convertiamo i tipi numerici nei nomi dei giochi
-      const availableGames = availableGameTypes.map(gameType => SPECIAL_GAMES[gameType]);
-      
-      // Per Neon Roulette, assicuriamoci che tutti i giochi siano considerati
-      const gamesToCheck = roomId === 'neonRoulette' ? SPECIAL_GAMES : availableGames;
-      
-      // Trova il gioco non ancora usato con la posizione più vicina alla posizione attuale
-      let nextGameToShow = null;
-      let nextGamePosition = Infinity;
-      
-      for (const gameType of gamesToCheck) {
-        const gamePosition = specialGamesRound[roomId][gameType];
-        
-        // Verifica se il gioco non è ancora stato usato e se è il momento giusto
-        if (!specialGamesUsed[roomId][gameType] && actionsCounter >= gamePosition && gamePosition < nextGamePosition) {
-          nextGameToShow = gameType;
-          nextGamePosition = gamePosition;
-        }
-      }
+      // Trova il prossimo gioco da mostrare
+      const nextGameToShow = specialGames.findNextSpecialGame(actionsCounter, roomId);
+      console.log("Next game to show:", nextGameToShow);
       
       // Se abbiamo trovato un gioco da mostrare, mostralo
       if (nextGameToShow) {
-        handleSpecialGame(nextGameToShow);
+        console.log("Handling special game:", nextGameToShow);
+        await specialGames.handleSpecialGame(nextGameToShow);
         return;
       }
     }
     
-    const currentPool = roomActionsPool[roomId];
+    const currentPool = actualPool[roomId];
     let index = currentActionIndex[roomId];
+    
+    console.log("=== DEBUG normal action selection ===");
+    console.log("currentPool length:", currentPool?.length);
+    console.log("index:", index);
     
     // Se non ci sono azioni nel pool, usa quelle predefinite
     if (!currentPool || currentPool.length === 0) {
@@ -1699,26 +668,30 @@ const loadBackupActions = async () => {
     // Ottieni l'azione
     let actionText = currentPool[adjustedIndex].text;
     
-    // Gestisci il segnaposto playerB
-if (actionText.includes("{playerB}")) {
-  // Ottieni il nome del giocatore corrente
-  const currentPlayer = players[currentPlayerIndex];
-  
-  // Crea una lista di tutti gli altri giocatori (escluso quello corrente)
-  let otherPlayers = players.filter(player => player !== currentPlayer);
-  
-  if (otherPlayers.length > 0) {
-    // Seleziona un giocatore casuale tra gli altri
-    const randomPlayerIndex = Math.floor(Math.random() * otherPlayers.length);
-    const randomPlayerName = otherPlayers[randomPlayerIndex];
+    console.log("=== DEBUG selected action ===");
+    console.log("adjustedIndex:", adjustedIndex);
+    console.log("actionText:", actionText?.substring(0, 100));
     
-    // Sostituisci il segnaposto con il nome del giocatore scelto
-    actionText = actionText.replace(/{playerB}/g, randomPlayerName);
-  } else {
-    // Fallback se non ci sono altri giocatori
-    actionText = actionText.replace(/{playerB}/g, "qualcun altro");
-  }
-}
+    // Gestisci il segnaposto playerB
+    if (actionText.includes("{playerB}")) {
+      // Ottieni il nome del giocatore corrente
+      const currentPlayer = players[currentPlayerIndex];
+      
+      // Crea una lista di tutti gli altri giocatori (escluso quello corrente)
+      let otherPlayers = players.filter(player => player !== currentPlayer);
+      
+      if (otherPlayers.length > 0) {
+        // Seleziona un giocatore casuale tra gli altri
+        const randomPlayerIndex = Math.floor(Math.random() * otherPlayers.length);
+        const randomPlayerName = otherPlayers[randomPlayerIndex];
+        
+        // Sostituisci il segnaposto con il nome del giocatore scelto
+        actionText = actionText.replace(/{playerB}/g, randomPlayerName);
+      } else {
+        // Fallback se non ci sono altri giocatori
+        actionText = actionText.replace(/{playerB}/g, "qualcun altro");
+      }
+    }
     
     // Controlla prima se la frase contiene un punto interrogativo
     if (actionText.includes("?")) {
@@ -1763,9 +736,15 @@ if (actionText.includes("{playerB}")) {
     // Imposta l'azione corrente
     setCurrentAction({ text: actionText });
     
+    console.log("=== DEBUG final action set ===");
+    console.log("Final actionText:", actionText?.substring(0, 100));
+    
     // Incrementa il contatore delle azioni
     setActionsCounter(prev => prev + 1);
   };
+  
+  // Funzione dedicata per aggiornare l'azione corrente (versione originale per i turni successivi)
+  const updateCurrentAction = () => updateCurrentActionWithPool(null);
   
   // NUOVO: Funzione per gestire il pulsante "Fatto"
   const handleDone = () => {
@@ -1790,6 +769,11 @@ if (actionText.includes("{playerB}")) {
   const nextTurn = (afterSpecialAction = false) => {
     const roomId = selectedRoom.id;
     
+    console.log("=== DEBUG nextTurn ===");
+    console.log("afterSpecialAction:", afterSpecialAction);
+    console.log("activeSpecialGame:", specialGames.activeSpecialGame);
+    console.log("actionsCounter:", actionsCounter);
+    
     // Verifica se il numero massimo di azioni è stato raggiunto
     if (actionsCounter >= MAX_ACTIONS_PER_GAME - 1) {
       // Segna che l'utente ha giocato la partita gratuita
@@ -1802,7 +786,7 @@ if (actionText.includes("{playerB}")) {
     }
     
     // Incrementa l'indice per la prossima volta, ma solo se non siamo in una fase speciale
-    if (!activeSpecialGame || afterSpecialAction) {
+    if (!specialGames.activeSpecialGame || afterSpecialAction) {
       setCurrentActionIndex(prev => ({
         ...prev,
         [roomId]: prev[roomId] + 1
@@ -1819,7 +803,7 @@ if (actionText.includes("{playerB}")) {
     
     // Se non siamo in un turno speciale o stiamo procedendo dopo un'azione speciale,
     // seleziona un nuovo giocatore casuale
-    if (!activeSpecialGame || afterSpecialAction) {
+    if (!specialGames.activeSpecialGame || afterSpecialAction) {
       // Seleziona un giocatore casuale diverso da quello attuale
       let nextPlayerIndex;
       do {
@@ -1833,6 +817,11 @@ if (actionText.includes("{playerB}")) {
     setTimeout(() => {
       updateCurrentAction();
     }, 50);
+  };
+  
+  // Funzione per continuare dopo un'azione speciale
+  const nextTurnAfterSpecialGame = () => {
+    specialGames.nextTurnAfterSpecialGame(nextTurn);
   };
   
   // NUOVO: Funzione per terminare il gioco dopo aver visualizzato la leaderboard
@@ -1885,70 +874,10 @@ if (actionText.includes("{playerB}")) {
     setSelectedRoom(null);
     setPreviousAction(null);
     setActionsCounter(0);
+    setIsFirstActionLoaded(false); // NUOVO: Reset del flag
     
     // NUOVO: Resetta il contatore delle penalità
     setPlayerPenalties({});
-    
-    // Resetta gli stati dei giochi speciali
-    setActiveSpecialGame(null);
-    setSpecialGamePlayer(null);
-    setWouldYouRatherContent(null);
-    
-    // Resetta tutti gli stati di giochi usati e round (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-    const resetUsedGames = {};
-    const resetGameRounds = {};
-    
-    // Resetta per ogni stanza e ogni tipo di gioco
-    t.rooms.forEach(room => {
-      resetUsedGames[room.id] = SPECIAL_GAMES.reduce((acc, game) => {
-        acc[game] = false;
-        return acc;
-      }, {});
-      
-      resetGameRounds[room.id] = SPECIAL_GAMES.reduce((acc, game, index) => {
-        // Valori di default se non abbiamo posizioni specifiche (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-        const defaultPositions = {
-          pointFinger: 30,
-          infamata: 20,
-          truthOrDare: 25,
-          wouldYouRather: 10,
-          chatDetective: 45,
-          newRule: 5,
-          tuttoHaUnPrezzo: 18,
-          tuttiQuelliChe: 22,
-          penitenzeGruppo: 13,
-          penitenzaRandom: 28,
-          nonHoMai: 33,
-          chiEPiuProbabile: 24,
-          happyHour: 38,
-          oneVsOne: 42,
-          timerChallenge: 16
-        };
-        acc[game] = defaultPositions[game] || 10 + (index * 10);
-        return acc;
-      }, {});
-    });
-    
-    setSpecialGamesUsed(resetUsedGames);
-    setSpecialGamesRound(resetGameRounds);
-    
-    // Resetta la lista dei debiti
-    setDebtList([]);
-    
-    // NUOVO: Resetta il contatore dell'ultima azione speciale
-    setLastSpecialGameRound({
-      redRoom: 0,
-      darkRoom: 0,
-      coppie: 0,
-      party: 0,
-      neonRoulette: 0
-    });
-    
-    // Resetta gli stati del gioco Obbligo Verità Debito
-    setTruthDarePlayers([]);
-    setCurrentTruthDareChoice(null);
-    setTruthDareContent(null);
-    setTruthDareState(null);
     
     // Resetta le azioni di gruppo
     setGroupActionsPool([]);
@@ -1990,24 +919,6 @@ if (actionText.includes("{playerB}")) {
     resetGame();
   };
   
-  // Funzione helper per ottenere il messaggio appropriato per il gioco speciale corrente
-  const getSpecialGameMessage = () => {
-    if (!activeSpecialGame || !specialGamePlayer) return null;
-    
-    // Messaggi per ciascun tipo di gioco (RIMOSSI bouncer, cringeOrClassy, ilPezzoGrosso)
-    if (activeSpecialGame === "truthOrDare") {
-      if (truthDareState === "choosing") {
-        return t.specialGames.truthOrDare.choosing.replace('{player}', specialGamePlayer);
-      } else {
-        const choiceKey = currentTruthDareChoice || 'truth';
-        return t.specialGames.truthOrDare[choiceKey].replace('{player}', specialGamePlayer);
-      }
-    }
-    
-    // Per gli altri giochi
-    return t.specialGames[activeSpecialGame]?.replace('{player}', specialGamePlayer) || null;
-  };
-
   // NUOVO: Ottieni la leaderboard ordinata per numero di penalità
   const getLeaderboard = () => {
     return Object.entries(playerPenalties)
@@ -2019,7 +930,7 @@ if (actionText.includes("{playerB}")) {
   return {
     // Constants
     MAX_ACTIONS_PER_GAME,
-    MIN_ACTIONS_BETWEEN_SPECIAL_GAMES,
+    MIN_ACTIONS_BETWEEN_SPECIAL_GAMES: specialGames.MIN_ACTIONS_BETWEEN_SPECIAL_GAMES,
     
     // State
     language,
@@ -2033,22 +944,25 @@ if (actionText.includes("{playerB}")) {
     isLoading,
     loadingProgress,
     currentRoomIndex,
-    activeSpecialGame,
-    specialGamePlayer,
-    debtList,
     hasPlayedFreeGame,
     hasPaid,
     selectedPaymentOption,
     isProcessingPayment,
-    truthDarePlayers,
-    currentTruthDareChoice,
-    truthDareContent,
-    truthDareState,
-    playerPenalties, // NUOVO: Espone il contatore delle penalità
-    wouldYouRatherContent, // NUOVO: Contenuto del gioco "preferiresti"
-    isTimerActive,
-    timerSeconds,
-    timerChallengeContent,
+    playerPenalties,
+    actionsCounter,
+    
+    // Stati dai giochi speciali
+    activeSpecialGame: specialGames.activeSpecialGame,
+    specialGamePlayer: specialGames.specialGamePlayer,
+    debtList: specialGames.debtList,
+    truthDarePlayers: specialGames.truthDarePlayers,
+    currentTruthDareChoice: specialGames.currentTruthDareChoice,
+    truthDareContent: specialGames.truthDareContent,
+    truthDareState: specialGames.truthDareState,
+    wouldYouRatherContent: specialGames.wouldYouRatherContent,
+    isTimerActive: specialGames.isTimerActive,
+    timerSeconds: specialGames.timerSeconds,
+    timerChallengeContent: specialGames.timerChallengeContent,
     
     // Functions
     changeLanguage,
@@ -2062,20 +976,22 @@ if (actionText.includes("{playerB}")) {
     selectRoom,
     nextTurn,
     nextTurnAfterSpecialGame,
-    handleTruthDareChoice,
     goBack,
     resetGame,
     selectPaymentOption,
     processPayment,
     resetPaywallState,
-    getSpecialGameMessage,
-    handleDone, // NUOVO: Funzione per il pulsante "Fatto"
-    handlePay, // NUOVO: Funzione per il pulsante "Paga"
-    getLeaderboard, // NUOVO: Funzione per ottenere la leaderboard
-    endGame, // NUOVO: Funzione per terminare il gioco dopo la leaderboard
-    startTimer,
+    handleDone,
+    handlePay,
+    getLeaderboard,
+    endGame,
     
-    // Additional state setters that need to be exposed
+    // Funzioni dai giochi speciali
+    handleTruthDareChoice: specialGames.handleTruthDareChoice,
+    getSpecialGameMessage: specialGames.getSpecialGameMessage,
+    startTimer: specialGames.startTimer,
+    
+    // Additional state setters che devono essere esposti
     setCurrentRoomIndex,
     setGameState
   };
