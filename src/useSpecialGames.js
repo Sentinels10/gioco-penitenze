@@ -1,4 +1,4 @@
-// useSpecialGames.js - Custom hook per gestire i giochi speciali (con fix domande duplicate)
+// useSpecialGames.js - Custom hook per gestire i giochi speciali (con supporto modalità giochi)
 import { useState, useEffect } from 'react';
 
 /**
@@ -13,14 +13,14 @@ const useSpecialGames = (props) => {
     currentPlayerIndex,
     actionsCounter,
     setCurrentAction,
-    setPlayerPenalties,
-    playerPenalties,
     loadBackupActions,
-    MAX_ACTIONS_PER_GAME
+    MAX_ACTIONS_PER_GAME,
+    gameMode,
+    selectedGames
   } = props;
 
   // Intervallo minimo di azioni tra un gioco speciale e l'altro
-  const MIN_ACTIONS_BETWEEN_SPECIAL_GAMES = 5;
+  const MIN_ACTIONS_BETWEEN_SPECIAL_GAMES = 3; // Ridotto per modalità giochi
 
   // Stati per i giochi speciali
   const [activeSpecialGame, setActiveSpecialGame] = useState(null);
@@ -35,14 +35,14 @@ const useSpecialGames = (props) => {
   const [truthDareContent, setTruthDareContent] = useState(null);
   const [truthDareState, setTruthDareState] = useState("choosing"); // "choosing" o "executing"
   
-  // NUOVO: Stati per evitare domande duplicate
+  // Stati per evitare domande duplicate
   const [usedTruthQuestions, setUsedTruthQuestions] = useState([]);
   const [usedDareQuestions, setUsedDareQuestions] = useState([]);
   
   // Stati per il gioco "preferiresti"
   const [wouldYouRatherContent, setWouldYouRatherContent] = useState(null);
   
-  // Stati per il gioco "Questo o Quello" (la funzionalità da aggiungere)
+  // Stati per il gioco "Questo o Quello"
   const [questoOQuelloContent, setQuestoOQuelloContent] = useState(null);
   
   // Stati per timer challenge
@@ -57,6 +57,8 @@ const useSpecialGames = (props) => {
   const initializeSpecialGames = async (roomId) => {
     console.log("=== DEBUG initializeSpecialGames ===");
     console.log("roomId:", roomId);
+    console.log("gameMode:", gameMode);
+    console.log("selectedGames:", selectedGames);
     
     setActiveSpecialGame(null);
     setSpecialGamePlayer(null);
@@ -73,59 +75,102 @@ const useSpecialGames = (props) => {
     setTimerChallengeContent(null);
     setSpecialGamesShown(0);
     
-    // NUOVO: Reset delle domande utilizzate
+    // Reset delle domande utilizzate
     setUsedTruthQuestions([]);
     setUsedDareQuestions([]);
     
     // Determina le posizioni in cui dovrebbero apparire i giochi speciali
     const positions = [];
     
-    // Creiamo un elenco di giochi speciali appropriati per la stanza
-    const validSpecialGames = getValidSpecialGames(roomId);
-    
-    // Scegliamo quanti giochi speciali mostrare in base alla lunghezza della partita
-    // e alla disponibilità di giochi validi
-    const numSpecialGames = Math.min(10, validSpecialGames.length);
-    
-    // Dividiamo la partita in segmenti per distribuire i giochi speciali
-    // Escludiamo le prime 5 azioni e le ultime 5 per non avere giochi speciali all'inizio o alla fine
-    const startPosition = 5;
-    const endPosition = MAX_ACTIONS_PER_GAME - 5;
-    const availableRange = endPosition - startPosition;
-    
-    // Calcoliamo quante azioni normali dovrebbero esserci tra ogni gioco speciale
-    const interval = Math.floor(availableRange / numSpecialGames);
-    
-    // Garantiamo almeno MIN_ACTIONS_BETWEEN_SPECIAL_GAMES azioni normali tra ogni gioco speciale
-    const minSpacing = MIN_ACTIONS_BETWEEN_SPECIAL_GAMES;
-    
-    // Generiamo le posizioni con un po' di randomicità ma mantenendo la distanza minima
-    for (let i = 0; i < numSpecialGames; i++) {
-      // Base position nel suo segmento
-      const basePosition = startPosition + (i * interval);
+    // Se siamo in modalità giochi, usa solo i giochi selezionati
+    if (gameMode === 'games') {
+      const validSpecialGames = getValidSpecialGamesForGameMode();
       
-      // Aggiungiamo un po' di randomicità ma manteniamo la distanza minima
-      // La randomicità è limitata per non sconfinare nel segmento successivo
-      const maxOffset = Math.max(0, Math.min(interval - minSpacing, 3));
-      const randomOffset = Math.floor(Math.random() * maxOffset);
+      if (validSpecialGames.length === 0) {
+        console.log("No games selected for games mode");
+        setSpecialGamePositions([]);
+        return;
+      }
       
-      positions.push({
-        position: basePosition + randomOffset,
-        gameType: validSpecialGames[i % validSpecialGames.length]
-      });
+      // In modalità giochi, mostriamo i giochi speciali più frequentemente
+      const numSpecialGames = Math.min(20, validSpecialGames.length * 7); // Più giochi speciali
+      
+      // Distribuiamo i giochi speciali in modo più frequente
+      const startPosition = 1; // Iniziamo quasi subito
+      const endPosition = MAX_ACTIONS_PER_GAME - 2;
+      const availableRange = endPosition - startPosition;
+      
+      // Intervallo più piccolo tra i giochi speciali
+      const interval = Math.max(2, Math.floor(availableRange / numSpecialGames));
+      
+      for (let i = 0; i < numSpecialGames; i++) {
+        const basePosition = startPosition + (i * interval);
+        const randomOffset = Math.floor(Math.random() * 2); // Meno randomicità
+        
+        // Cicla attraverso i giochi selezionati
+        const gameType = validSpecialGames[i % validSpecialGames.length];
+        
+        positions.push({
+          position: basePosition + randomOffset,
+          gameType: gameType
+        });
+      }
+    } else {
+      // Logica originale per modalità stanze
+      const validSpecialGames = getValidSpecialGames(roomId);
+      const numSpecialGames = Math.min(10, validSpecialGames.length);
+      
+      const startPosition = 5;
+      const endPosition = MAX_ACTIONS_PER_GAME - 5;
+      const availableRange = endPosition - startPosition;
+      const interval = Math.floor(availableRange / numSpecialGames);
+      const minSpacing = MIN_ACTIONS_BETWEEN_SPECIAL_GAMES;
+      
+      for (let i = 0; i < numSpecialGames; i++) {
+        const basePosition = startPosition + (i * interval);
+        const maxOffset = Math.max(0, Math.min(interval - minSpacing, 3));
+        const randomOffset = Math.floor(Math.random() * maxOffset);
+        
+        positions.push({
+          position: basePosition + randomOffset,
+          gameType: validSpecialGames[i % validSpecialGames.length]
+        });
+      }
     }
     
     console.log("Generated special game positions:", positions);
     setSpecialGamePositions(positions);
   };
   
-  // Ottiene i giochi speciali validi per la stanza corrente
+  // Ottiene i giochi speciali validi per la modalità giochi
+  const getValidSpecialGamesForGameMode = () => {
+    if (!selectedGames) return [];
+    
+    const validGames = [];
+    
+    if (selectedGames.truthOrDare) {
+      validGames.push("truthOrDare");
+    }
+    
+    if (selectedGames.wouldYouRather) {
+      validGames.push("wouldYouRather");
+    }
+    
+    if (selectedGames.nonHoMai) {
+      validGames.push("nonHoMai");
+    }
+    
+    console.log("Valid games for game mode:", validGames);
+    return validGames;
+  };
+  
+  // Ottiene i giochi speciali validi per la stanza corrente (logica originale)
   const getValidSpecialGames = (roomId) => {
     // Default giochi per tutte le stanze
     const commonGames = [
       "truthOrDare",
       "wouldYouRather",
-      "questoOQuello", // Aggiungiamo il nuovo gioco
+      "questoOQuello",
       "timerChallenge"
     ];
     
@@ -182,6 +227,7 @@ const useSpecialGames = (props) => {
     console.log("=== DEBUG shouldShowSpecialGame ===");
     console.log("counter:", counter);
     console.log("roomId:", roomId);
+    console.log("gameMode:", gameMode);
     console.log("activeSpecialGame:", activeSpecialGame);
     console.log("specialGamePositions:", specialGamePositions);
     
@@ -205,6 +251,7 @@ const useSpecialGames = (props) => {
     console.log("=== DEBUG findNextSpecialGame ===");
     console.log("counter:", counter);
     console.log("roomId:", roomId);
+    console.log("gameMode:", gameMode);
     
     if (!roomId) return null;
     
@@ -222,6 +269,7 @@ const useSpecialGames = (props) => {
   const handleSpecialGame = async (gameType) => {
     console.log("=== DEBUG handleSpecialGame ===");
     console.log("gameType:", gameType);
+    console.log("gameMode:", gameMode);
     console.log("Current activeSpecialGame:", activeSpecialGame);
     
     // Se c'è già un gioco speciale attivo, non fare nulla
@@ -275,6 +323,11 @@ const useSpecialGames = (props) => {
         handleTimerChallengeGame(backupActions, randomPlayerIndex);
         break;
         
+      case "nonHoMai":
+        // Prepara il gioco "Non ho mai"
+        handleNonHoMaiGame(backupActions, randomPlayerIndex);
+        break;
+        
       default:
         // Per gli altri giochi speciali, mostra semplicemente il messaggio
         const gameText = backupActions.specialGames[gameType].text;
@@ -315,7 +368,7 @@ const useSpecialGames = (props) => {
     setTruthDareContent(null);
     setTruthDareState("choosing");
     
-    // NUOVO: Reset delle domande utilizzate quando inizia un nuovo gioco Truth or Dare
+    // Reset delle domande utilizzate quando inizia un nuovo gioco Truth or Dare
     setUsedTruthQuestions([]);
     setUsedDareQuestions([]);
     
@@ -329,7 +382,18 @@ const useSpecialGames = (props) => {
     setCurrentAction({ text: introText });
   };
   
-  // NUOVO: Funzione helper per selezionare una domanda non utilizzata
+  // Funzione per gestire il gioco "Non ho mai"
+  const handleNonHoMaiGame = (backupActions, randomPlayerIndex) => {
+    // Usa il testo dal backup actions o da specialGames
+    const gameText = t.specialGames.nonHoMai;
+    const playerName = players[randomPlayerIndex];
+    const formattedText = gameText.replace(/{player}/g, playerName);
+    
+    // Imposta l'azione corrente
+    setCurrentAction({ text: formattedText });
+  };
+  
+  // Funzione helper per selezionare una domanda non utilizzata
   const selectUnusedQuestion = (allOptions, usedQuestions) => {
     console.log("=== DEBUG selectUnusedQuestion ===");
     console.log("Total options:", allOptions.length);
@@ -363,7 +427,7 @@ const useSpecialGames = (props) => {
     };
   };
   
-  // Funzione per gestire la scelta in Truth or Dare (MODIFICATA)
+  // Funzione per gestire la scelta in Truth or Dare
   const handleTruthDareChoice = async (choice) => {
     console.log("=== DEBUG handleTruthDareChoice ===");
     console.log("choice:", choice);
@@ -402,20 +466,21 @@ const useSpecialGames = (props) => {
     }
     
     // Altrimenti, gestisci truth o dare
-    const selectedRoomId = selectedRoom?.id || 'party';
+    // In modalità giochi usa sempre 'party' come fallback
+    const selectedRoomId = gameMode === 'games' ? 'party' : (selectedRoom?.id || 'party');
     
     // Verifica se la stanza corrente ha contenuti truth/dare specifici
     if (backupActions.truthDareGame && 
         backupActions.truthDareGame[choice] && 
         backupActions.truthDareGame[choice][selectedRoomId]) {
       
-      // NUOVO: Seleziona una domanda evitando duplicati
+      // Seleziona una domanda evitando duplicati
       const allOptions = backupActions.truthDareGame[choice][selectedRoomId];
       const currentUsedQuestions = choice === "truth" ? usedTruthQuestions : usedDareQuestions;
       
       const { selectedContent, shouldResetUsedList } = selectUnusedQuestion(allOptions, currentUsedQuestions);
       
-      // NUOVO: Aggiorna l'array delle domande utilizzate
+      // Aggiorna l'array delle domande utilizzate
       if (choice === "truth") {
         if (shouldResetUsedList) {
           setUsedTruthQuestions([selectedContent]);
@@ -450,7 +515,8 @@ const useSpecialGames = (props) => {
   // Funzione per gestire il gioco "Preferiresti"
   const handleWouldYouRatherGame = (backupActions, randomPlayerIndex) => {
     // Verifica se ci sono domande disponibili per la stanza corrente
-    const roomId = selectedRoom?.id || 'party';
+    // In modalità giochi usa sempre 'party' come fallback
+    const roomId = gameMode === 'games' ? 'party' : (selectedRoom?.id || 'party');
     
     if (backupActions.wouldYouRather && 
         backupActions.wouldYouRather[roomId]) {
@@ -481,7 +547,7 @@ const useSpecialGames = (props) => {
   // Funzione per gestire il gioco "Questo o Quello"
   const handleQuestoOQuelloGame = (backupActions, randomPlayerIndex) => {
     // Verifica se ci sono domande disponibili per la stanza corrente
-    const roomId = selectedRoom?.id || 'party';
+    const roomId = gameMode === 'games' ? 'party' : (selectedRoom?.id || 'party');
     
     if (backupActions.specialGames && 
         backupActions.specialGames.questoOQuello &&
@@ -520,7 +586,7 @@ const useSpecialGames = (props) => {
   // Funzione per gestire il gioco "Timer Challenge"
   const handleTimerChallengeGame = (backupActions, randomPlayerIndex) => {
     // Verifica se ci sono sfide disponibili per la stanza corrente
-    const roomId = selectedRoom?.id || 'party';
+    const roomId = gameMode === 'games' ? 'party' : (selectedRoom?.id || 'party');
     
     if (backupActions.specialGames && 
         backupActions.specialGames.timerChallenge &&
@@ -596,6 +662,9 @@ const useSpecialGames = (props) => {
       case "timerChallenge":
         return t.specialGames.timerChallenge.replace('{player}', specialGamePlayer);
         
+      case "nonHoMai":
+        return t.specialGames.nonHoMai.replace('{player}', specialGamePlayer);
+        
       default:
         if (t.specialGames[activeSpecialGame]) {
           return t.specialGames[activeSpecialGame].replace('{player}', specialGamePlayer);
@@ -611,24 +680,32 @@ const useSpecialGames = (props) => {
     console.log("truthDareState:", truthDareState);
     console.log("currentTruthDareIndex:", currentTruthDareIndex);
     console.log("truthDarePlayers length:", truthDarePlayers.length);
+    console.log("gameMode:", gameMode);
     
     // Logica specifica per ogni tipo di gioco
     if (activeSpecialGame === "truthOrDare") {
-      // Se siamo in Truth or Dare, passa al giocatore successivo o termina il gioco
-      if (currentTruthDareIndex < truthDarePlayers.length - 1) {
-        console.log("Moving to next truth/dare player");
-        // Passa al giocatore successivo
-        setCurrentTruthDareIndex(prev => prev + 1);
-        setCurrentTruthDareChoice(null);
-        setTruthDareContent(null);
-        setTruthDareState("choosing");
-        
-        // Aggiorna il messaggio per il prossimo giocatore
-        const nextPlayer = truthDarePlayers[currentTruthDareIndex + 1];
-        const nextIntroText = t.truthDareNextPlayerIntro.replace('{player}', nextPlayer);
-        setCurrentAction({ text: nextIntroText });
-        
-        return;
+      // In modalità giochi, Truth or Dare non gira tra tutti i giocatori
+      // ma fa solo una domanda per volta
+      if (gameMode === 'games') {
+        console.log("Games mode - ending truth or dare after one question");
+        // Termina subito il gioco speciale - il reset avverrà dopo
+      } else {
+        // Modalità stanze - comportamento originale
+        if (currentTruthDareIndex < truthDarePlayers.length - 1) {
+          console.log("Moving to next truth/dare player");
+          // Passa al giocatore successivo
+          setCurrentTruthDareIndex(prev => prev + 1);
+          setCurrentTruthDareChoice(null);
+          setTruthDareContent(null);
+          setTruthDareState("choosing");
+          
+          // Aggiorna il messaggio per il prossimo giocatore
+          const nextPlayer = truthDarePlayers[currentTruthDareIndex + 1];
+          const nextIntroText = t.truthDareNextPlayerIntro.replace('{player}', nextPlayer);
+          setCurrentAction({ text: nextIntroText });
+          
+          return;
+        }
       }
     }
     
@@ -646,7 +723,7 @@ const useSpecialGames = (props) => {
     setTimerSeconds(20);
     setTimerChallengeContent(null);
     
-    // NUOVO: Reset delle domande utilizzate quando il gioco Truth or Dare finisce completamente
+    // Reset delle domande utilizzate quando il gioco Truth or Dare finisce completamente
     if (activeSpecialGame === "truthOrDare") {
       setUsedTruthQuestions([]);
       setUsedDareQuestions([]);
@@ -680,7 +757,7 @@ const useSpecialGames = (props) => {
     timerChallengeContent,
     specialGamePositions,
     
-    // NUOVO: Stati per domande utilizzate (per debug se necessario)
+    // Stati per domande utilizzate (per debug se necessario)
     usedTruthQuestions,
     usedDareQuestions,
     

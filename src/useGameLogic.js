@@ -1,4 +1,4 @@
-// useGameLogic.js - Custom hook per gestire lo stato e la logica del gioco (con fix prima azione vuota)
+// useGameLogic.js - Custom hook per gestire lo stato e la logica del gioco
 import { useState, useEffect, useRef } from 'react';
 import translations from './translations';
 import useSpecialGames from './useSpecialGames';
@@ -12,7 +12,7 @@ const useGameLogic = () => {
   // Riferimento alle traduzioni nella lingua corrente
   const t = translations[language];
   
-  // Game states: 'welcome', 'playerSetup', 'roomSelection', 'playing', 'gameOver', 'paywall', 'languageSelection', 'leaderboard'
+  // Game states: 'welcome', 'gameSelection', 'playerSetup', 'roomSelection', 'playing', 'gameOver', 'paywall', 'languageSelection'
   const [gameState, setGameState] = useState('welcome');
   const [players, setPlayers] = useState([]);
   const [inputPlayers, setInputPlayers] = useState([{ id: 1, name: '' }]);
@@ -21,13 +21,17 @@ const useGameLogic = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [previousAction, setPreviousAction] = useState(null);
   
+  // Stati per la selezione giochi (usati quando si entra nella stanza "giochi")
+  const [selectedGames, setSelectedGames] = useState({
+    truthOrDare: false,
+    wouldYouRather: false,
+    nonHoMai: false
+  });
+  
   // Contatore per le azioni giocate in una partita (nascosto dall'UI)
   const [actionsCounter, setActionsCounter] = useState(0);
   // Costante per il numero massimo di azioni per partita
   const MAX_ACTIONS_PER_GAME = 50;
-  
-  // NUOVO: Sistema di punteggio
-  const [playerPenalties, setPlayerPenalties] = useState({});
   
   // State for the loading
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +46,7 @@ const useGameLogic = () => {
     darkRoom: [],
     coppie: [],
     party: [],
+    giochi: [], // Nuovo pool per la stanza giochi
     neonRoulette: []
   });
   
@@ -51,6 +56,7 @@ const useGameLogic = () => {
     darkRoom: 0,
     coppie: 0,
     party: 0,
+    giochi: 0,
     neonRoulette: 0
   });
   
@@ -67,7 +73,7 @@ const useGameLogic = () => {
   const [selectedPaymentOption, setSelectedPaymentOption] = useState(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
-  // NUOVO: Flag per controllare se è stata caricata la prima azione
+  // Flag per controllare se è stata caricata la prima azione
   const [isFirstActionLoaded, setIsFirstActionLoaded] = useState(false);
   
   // Inizializza lo hook per i giochi speciali
@@ -78,10 +84,10 @@ const useGameLogic = () => {
     currentPlayerIndex,
     actionsCounter,
     setCurrentAction,
-    setPlayerPenalties,
-    playerPenalties,
     loadBackupActions,
-    MAX_ACTIONS_PER_GAME
+    MAX_ACTIONS_PER_GAME,
+    gameMode: selectedRoom?.id === 'giochi' ? 'games' : 'rooms',
+    selectedGames
   });
   
   // Verifica lo stato del paywall quando il componente si monta
@@ -104,17 +110,20 @@ const useGameLogic = () => {
     }
   }, []);
   
-  // MODIFICATO: Effetto per caricare la prima domanda quando lo stato è 'playing'
+  // Effetto per caricare la prima domanda quando lo stato è 'playing'
   useEffect(() => {
     if (gameState === 'playing' && selectedRoom && !isFirstActionLoaded) {
       console.log("=== DEBUG useEffect for first action ===");
       console.log("gameState:", gameState);
       console.log("selectedRoom:", selectedRoom?.id);
       console.log("isFirstActionLoaded:", isFirstActionLoaded);
-      console.log("roomActionsPool for room:", roomActionsPool[selectedRoom.id]?.length);
+      
+      const poolKey = selectedRoom.id;
+      console.log("poolKey:", poolKey);
+      console.log("roomActionsPool for key:", roomActionsPool[poolKey]?.length);
       
       // Verifica che il pool di azioni sia caricato prima di procedere
-      if (roomActionsPool[selectedRoom.id] && roomActionsPool[selectedRoom.id].length > 0) {
+      if (roomActionsPool[poolKey] && roomActionsPool[poolKey].length > 0) {
         console.log("Pool is ready, loading first action");
         setTimeout(() => {
           updateCurrentAction();
@@ -124,7 +133,7 @@ const useGameLogic = () => {
         console.log("Pool not ready yet, waiting...");
         // Se il pool non è ancora pronto, riprova dopo un breve delay
         const retryTimeout = setTimeout(() => {
-          if (roomActionsPool[selectedRoom.id] && roomActionsPool[selectedRoom.id].length > 0) {
+          if (roomActionsPool[poolKey] && roomActionsPool[poolKey].length > 0) {
             console.log("Pool ready on retry, loading first action");
             updateCurrentAction();
             setIsFirstActionLoaded(true);
@@ -172,6 +181,27 @@ const useGameLogic = () => {
     }
   };
   
+  // Funzioni per gestire la selezione dei giochi (per la stanza "giochi")
+  const toggleGameSelection = (gameType) => {
+    setSelectedGames(prev => ({
+      ...prev,
+      [gameType]: !prev[gameType]
+    }));
+  };
+  
+  const proceedWithSelectedGames = () => {
+    // Verifica che almeno un gioco sia selezionato
+    const hasSelectedGames = Object.values(selectedGames).some(selected => selected);
+    
+    if (!hasSelectedGames) {
+      alert(t.gameSelection.noGamesSelectedError);
+      return;
+    }
+    
+    // Avvia la modalità giochi con i giochi selezionati
+    startGamesMode();
+  };
+  
   // Aggiunge un nuovo input box per un giocatore
   const addPlayerInput = () => {
     if (inputPlayers.length < 15) {
@@ -212,14 +242,121 @@ const useGameLogic = () => {
     
     setPlayers(validPlayers);
     
-    // NUOVO: Inizializza i punteggi per tutti i giocatori a 0
-    const initialPenalties = {};
-    validPlayers.forEach(player => {
-      initialPenalties[player] = 0;
-    });
-    setPlayerPenalties(initialPenalties);
-    
+    // Vai alla selezione stanze
     setGameState('roomSelection');
+  };
+  
+  // Avvia la modalità giochi selezionati
+  const startGamesMode = async () => {
+    console.log("=== DEBUG startGamesMode ===");
+    console.log("selectedGames:", selectedGames);
+    
+    setIsLoading(true);
+    setIsFirstActionLoaded(false);
+    
+    try {
+      // Simulazione caricamento
+      for (let i = 0; i <= 100; i += 10) {
+        setLoadingProgress(i);
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      // Resetta il contatore delle azioni
+      setActionsCounter(0);
+      
+      // Inizializza gli stati per i giochi speciali
+      specialGames.initializeSpecialGames('giochi');
+      
+      // Prepara il pool di azioni per la modalità giochi
+      await prepareGamesPool();
+      
+      // Resetta l'indice delle azioni
+      setCurrentActionIndex(prev => ({
+        ...prev,
+        giochi: 0
+      }));
+      
+      // Resetta l'azione precedente
+      setPreviousAction(null);
+      
+      // Seleziona un giocatore casuale per iniziare
+      const randomPlayerIndex = Math.floor(Math.random() * players.length);
+      setCurrentPlayerIndex(randomPlayerIndex);
+      
+      // Attendiamo un momento per assicurarci che gli stati siano aggiornati
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Vai alla schermata di gioco
+      setGameState('playing');
+      
+      // Carica immediatamente la prima azione
+      setTimeout(() => {
+        console.log("=== Loading first action for games mode ===");
+        updateCurrentAction();
+        setIsFirstActionLoaded(true);
+      }, 200);
+      
+    } catch (error) {
+      console.error('Errore nell\'avvio modalità giochi:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Prepara il pool di azioni per la modalità giochi
+  const prepareGamesPool = async () => {
+    const backupActions = await loadBackupActions();
+    const gamesPool = [];
+    
+    // Conta quanti giochi sono selezionati
+    const selectedGamesCount = Object.values(selectedGames).filter(selected => selected).length;
+    
+    console.log("Games mode - adding ONLY selected games");
+    
+    // Calcola quante istanze di ogni gioco aggiungere per riempire la partita
+    const totalInstances = 50; // Abbastanza per una lunga partita
+    const instancesPerGame = Math.floor(totalInstances / selectedGamesCount);
+    const extraInstances = totalInstances % selectedGamesCount;
+    
+    let gameIndex = 0;
+    
+    if (selectedGames.truthOrDare) {
+      const instances = instancesPerGame + (gameIndex < extraInstances ? 1 : 0);
+      for (let i = 0; i < instances; i++) {
+        gamesPool.push({ text: "SPECIAL_GAME:truthOrDare" });
+      }
+      gameIndex++;
+    }
+    
+    if (selectedGames.wouldYouRather) {
+      const instances = instancesPerGame + (gameIndex < extraInstances ? 1 : 0);
+      for (let i = 0; i < instances; i++) {
+        gamesPool.push({ text: "SPECIAL_GAME:wouldYouRather" });
+      }
+      gameIndex++;
+    }
+    
+    if (selectedGames.nonHoMai) {
+      const instances = instancesPerGame + (gameIndex < extraInstances ? 1 : 0);
+      for (let i = 0; i < instances; i++) {
+        gamesPool.push({ text: "SPECIAL_GAME:nonHoMai" });
+      }
+      gameIndex++;
+    }
+    
+    // Mescola il pool per randomizzare l'ordine dei giochi
+    const finalPool = gamesPool.sort(() => Math.random() - 0.5);
+    
+    // Aggiorna il pool
+    setRoomActionsPool(prev => ({
+      ...prev,
+      giochi: finalPool
+    }));
+    
+    console.log("Games pool prepared with", finalPool.length, "actions");
+    console.log("Selected games count:", selectedGamesCount);
+    console.log("Special games instances:", finalPool.filter(a => a.text.startsWith("SPECIAL_GAME:")).length);
+    console.log("Normal actions:", finalPool.filter(a => !a.text.startsWith("SPECIAL_GAME:")).length);
   };
   
   // Gestisce il tasto Enter negli input dei giocatori
@@ -277,14 +414,27 @@ const useGameLogic = () => {
     }
   }
   
-  // MODIFICATO: Seleziona una stanza e prepara il gioco
+  // Seleziona una stanza e prepara il gioco
   const selectRoom = async (room) => {
     console.log("=== DEBUG selectRoom ===");
     console.log("Selected room:", room.id);
     
     setSelectedRoom(room);
+    
+    // Se la stanza selezionata è "giochi", mostra la schermata di selezione giochi
+    if (room.id === 'giochi') {
+      // Reset della selezione dei giochi
+      setSelectedGames({
+        truthOrDare: false,
+        wouldYouRather: false,
+        nonHoMai: false
+      });
+      setGameState('gameSelection');
+      return;
+    }
+    
     setIsLoading(true);
-    setIsFirstActionLoaded(false); // NUOVO: Reset del flag
+    setIsFirstActionLoaded(false);
     
     try {
       // Carica il file backupActions nella lingua corrente
@@ -305,7 +455,6 @@ const useGameLogic = () => {
       // Carica le azioni di gruppo dal backup
       if (backupActions.groupActions && backupActions.groupActions.length > 0) {
         // Mescola le azioni di gruppo e seleziona fino a 15 per questa partita
-        // (aumentato da 10 per garantire abbastanza azioni uniche)
         const shuffledGroupActions = [...backupActions.groupActions]
           .sort(() => Math.random() - 0.5)
           .slice(0, 15);
@@ -313,7 +462,6 @@ const useGameLogic = () => {
         setGroupActionsPool(shuffledGroupActions);
         
         // Determina in quali posizioni dovrebbero apparire le azioni di gruppo
-        // Ora vogliamo 8 azioni di gruppo durante la partita
         const positions = [];
         
         // Dividiamo la partita in segmenti per distribuire le azioni di gruppo
@@ -346,7 +494,7 @@ const useGameLogic = () => {
         setGroupActionsShown(0);
       }
       
-      // NUOVO: Creiamo una variabile temporanea per il nuovo pool di azioni
+      // Creiamo una variabile temporanea per il nuovo pool di azioni
       let newRoomActionsPool = {};
       
       // Se è la modalità Neon Roulette, combina azioni da tutte le altre stanze
@@ -375,7 +523,7 @@ const useGameLogic = () => {
           partyActions = [...backupActions.party];
         }
         
-        // MIGLIORAMENTO: Raccogliamo anche le azioni dai giochi speciali
+        // Raccogliamo anche le azioni dai giochi speciali
         if (backupActions.specialGames) {
           // Raccogliamo tutte le azioni dei giochi speciali
           Object.values(backupActions.specialGames).forEach(gameData => {
@@ -405,7 +553,6 @@ const useGameLogic = () => {
         }
         
         // Se qualche categoria ha poche o nessuna azione, usa il fallback
-        // Nota: Il roomContent è ora sostituito con traduzioni
         const roomContent = {
           redRoom: { text: t.noActionAvailable },
           darkRoom: { text: t.noActionAvailable },
@@ -466,7 +613,6 @@ const useGameLogic = () => {
         console.log("Special Games: " + selectedSpecialGameActions.length + " azioni");
         console.log(t.logMessages.totalStats.replace('{count}', shuffledActions.length));
         
-        // NUOVO: Aggiorna il pool temporaneo invece che lo stato direttamente
         newRoomActionsPool = {
           ...roomActionsPool,
           neonRoulette: shuffledActions
@@ -483,7 +629,6 @@ const useGameLogic = () => {
             .sort(() => Math.random() - 0.5)
             .slice(0, Math.max(MAX_ACTIONS_PER_GAME * 2, 50));
           
-          // NUOVO: Aggiorna il pool temporaneo invece che lo stato direttamente
           newRoomActionsPool = {
             ...roomActionsPool,
             [room.id]: shuffledBackupActions
@@ -502,7 +647,7 @@ const useGameLogic = () => {
       console.log("Actions count:", newRoomActionsPool[room.id]?.length);
       console.log("First action:", newRoomActionsPool[room.id]?.[0]?.text?.substring(0, 50));
       
-      // NUOVO: Aggiorna tutti gli stati necessari in una sola operazione
+      // Aggiorna tutti gli stati necessari in una sola operazione
       setRoomActionsPool(newRoomActionsPool);
       
       // Resetta l'indice delle azioni
@@ -518,13 +663,13 @@ const useGameLogic = () => {
       const randomPlayerIndex = Math.floor(Math.random() * players.length);
       setCurrentPlayerIndex(randomPlayerIndex);
       
-      // NUOVO: Attendiamo un momento per assicurarci che gli stati siano aggiornati
+      // Attendiamo un momento per assicurarci che gli stati siano aggiornati
       await new Promise(resolve => setTimeout(resolve, 100));
       
       // Vai alla schermata di gioco
       setGameState('playing');
       
-      // NUOVO: Carica immediatamente la prima azione dopo aver impostato lo stato
+      // Carica immediatamente la prima azione dopo aver impostato lo stato
       setTimeout(() => {
         console.log("=== Loading first action directly ===");
         console.log("Pool ready:", newRoomActionsPool[room.id]?.length);
@@ -542,7 +687,7 @@ const useGameLogic = () => {
     }
   };
   
-  // NUOVO: Versione di updateCurrentAction che accetta il pool come parametro
+  // Versione di updateCurrentAction che accetta il pool come parametro
   const updateCurrentActionWithPool = async (poolToUse = null) => {
     const actualPool = poolToUse || roomActionsPool;
     const roomId = selectedRoom?.id;
@@ -558,6 +703,61 @@ const useGameLogic = () => {
     // Carica le azioni dal file di backup
     const backupActions = await loadBackupActions();
 
+    // In modalità giochi, mostra solo i giochi speciali selezionati
+    if (roomId === 'giochi') {
+      const currentPool = actualPool[roomId];
+      let index = currentActionIndex[roomId];
+      
+      if (!currentPool || currentPool.length === 0) {
+        setCurrentAction({ text: t.noActionAvailable });
+        setActionsCounter(prev => prev + 1);
+        return;
+      }
+      
+      // Se abbiamo esaurito le azioni, ricomincia dal primo
+      let adjustedIndex = index % currentPool.length;
+      
+      // Ottieni l'azione
+      const currentPoolAction = currentPool[adjustedIndex];
+      let actionText = currentPoolAction.text;
+      
+      // Controlla se è un gioco speciale
+      if (actionText.startsWith("SPECIAL_GAME:")) {
+        const gameType = actionText.replace("SPECIAL_GAME:", "");
+        console.log("Triggering special game from games mode:", gameType);
+        
+        // Attiva il gioco speciale
+        await specialGames.handleSpecialGame(gameType);
+        return;
+      }
+      
+      // Gestisci il segnaposto playerB per azioni normali
+      if (actionText.includes("{playerB}")) {
+        const currentPlayer = players[currentPlayerIndex];
+        let otherPlayers = players.filter(player => player !== currentPlayer);
+        
+        if (otherPlayers.length > 0) {
+          const randomPlayerIndex = Math.floor(Math.random() * otherPlayers.length);
+          const randomPlayerName = otherPlayers[randomPlayerIndex];
+          actionText = actionText.replace(/{playerB}/g, randomPlayerName);
+        } else {
+          actionText = actionText.replace(/{playerB}/g, "qualcun altro");
+        }
+      }
+      
+      // Salva l'azione corrente per confrontarla la prossima volta
+      setPreviousAction(currentPoolAction.text);
+      
+      // Imposta l'azione corrente
+      setCurrentAction({ text: actionText });
+      
+      // Incrementa il contatore delle azioni
+      setActionsCounter(prev => prev + 1);
+      
+      return;
+    }
+
+    // Codice originale per modalità stanze...
     // Verifica se è il momento di mostrare un'azione di gruppo
     if (groupActionsPool.length > 0 && 
         groupActionPositions.includes(actionsCounter) && 
@@ -696,7 +896,6 @@ const useGameLogic = () => {
     // Controlla prima se la frase contiene un punto interrogativo
     if (actionText.includes("?")) {
       // Espressione regolare per catturare domande con penalità alla fine
-      // Questa è più flessibile e dovrebbe catturare varie forme
       const questionPenaltyRegex = /\?.*?(\d+)\s*penal(i|i)t(à|a)/i;
       const match = actionText.match(questionPenaltyRegex);
       
@@ -746,33 +945,15 @@ const useGameLogic = () => {
   // Funzione dedicata per aggiornare l'azione corrente (versione originale per i turni successivi)
   const updateCurrentAction = () => updateCurrentActionWithPool(null);
   
-  // NUOVO: Funzione per gestire il pulsante "Fatto"
-  const handleDone = () => {
-    // Passa al turno successivo senza aggiungere penalità
-    nextTurn();
-  };
-  
-  // NUOVO: Funzione per gestire il pulsante "Paga"
-  const handlePay = () => {
-    // Aggiungi una penalità al giocatore corrente
-    const currentPlayer = players[currentPlayerIndex];
-    setPlayerPenalties(prev => ({
-      ...prev,
-      [currentPlayer]: (prev[currentPlayer] || 0) + 1
-    }));
-    
-    // Passa al turno successivo
-    nextTurn();
-  };
-  
   // Passa al turno successivo
   const nextTurn = (afterSpecialAction = false) => {
-    const roomId = selectedRoom.id;
+    const roomId = selectedRoom?.id;
     
     console.log("=== DEBUG nextTurn ===");
     console.log("afterSpecialAction:", afterSpecialAction);
     console.log("activeSpecialGame:", specialGames.activeSpecialGame);
     console.log("actionsCounter:", actionsCounter);
+    console.log("roomId:", roomId);
     
     // Verifica se il numero massimo di azioni è stato raggiunto
     if (actionsCounter >= MAX_ACTIONS_PER_GAME - 1) {
@@ -780,8 +961,8 @@ const useGameLogic = () => {
       setHasPlayedFreeGame(true);
       localStorage.setItem('hasPlayedFreeGame', 'true');
       
-      // NUOVO: Vai alla schermata della leaderboard invece che al game over
-      setGameState('leaderboard');
+      // Vai direttamente al game over
+      setGameState('gameOver');
       return;
     }
     
@@ -824,15 +1005,12 @@ const useGameLogic = () => {
     specialGames.nextTurnAfterSpecialGame(nextTurn);
   };
   
-  // NUOVO: Funzione per terminare il gioco dopo aver visualizzato la leaderboard
-  const endGame = () => {
-    // Vai alla schermata di game over
-    setGameState('gameOver');
-  };
-  
   // Navigazione tra le schermate
   const goBack = () => {
     switch (gameState) {
+      case 'gameSelection':
+        setGameState('roomSelection');
+        break;
       case 'playerSetup':
         setGameState('welcome');
         break;
@@ -841,9 +1019,6 @@ const useGameLogic = () => {
         break;
       case 'playing':
         setGameState('roomSelection');
-        break;
-      case 'leaderboard': // NUOVO: Gestisci il ritorno dalla leaderboard
-        setGameState('gameOver');
         break;
       case 'gameOver':
         // Se l'utente ha già giocato e non ha pagato, mostra il paywall
@@ -874,10 +1049,12 @@ const useGameLogic = () => {
     setSelectedRoom(null);
     setPreviousAction(null);
     setActionsCounter(0);
-    setIsFirstActionLoaded(false); // NUOVO: Reset del flag
-    
-    // NUOVO: Resetta il contatore delle penalità
-    setPlayerPenalties({});
+    setIsFirstActionLoaded(false);
+    setSelectedGames({
+      truthOrDare: false,
+      wouldYouRather: false,
+      nonHoMai: false
+    });
     
     // Resetta le azioni di gruppo
     setGroupActionsPool([]);
@@ -905,8 +1082,8 @@ const useGameLogic = () => {
       setIsProcessingPayment(false);
       setSelectedPaymentOption(null);
       
-      // Vai alla schermata di setup giocatori
-      setGameState('playerSetup');
+      // Vai alla schermata iniziale
+      setGameState('welcome');
     }, 2000);
   };
   
@@ -917,13 +1094,6 @@ const useGameLogic = () => {
     setHasPaid(false);
     setHasPlayedFreeGame(false);
     resetGame();
-  };
-  
-  // NUOVO: Ottieni la leaderboard ordinata per numero di penalità
-  const getLeaderboard = () => {
-    return Object.entries(playerPenalties)
-      .sort(([, penaltiesA], [, penaltiesB]) => penaltiesB - penaltiesA)
-      .map(([player, penalties]) => ({ player, penalties }));
   };
 
   // Export everything that will be needed by the UI component
@@ -948,8 +1118,10 @@ const useGameLogic = () => {
     hasPaid,
     selectedPaymentOption,
     isProcessingPayment,
-    playerPenalties,
     actionsCounter,
+    
+    // Stati per la selezione giochi (della stanza giochi)
+    selectedGames,
     
     // Stati dai giochi speciali
     activeSpecialGame: specialGames.activeSpecialGame,
@@ -981,10 +1153,10 @@ const useGameLogic = () => {
     selectPaymentOption,
     processPayment,
     resetPaywallState,
-    handleDone,
-    handlePay,
-    getLeaderboard,
-    endGame,
+    
+    // Funzioni per la selezione giochi (della stanza giochi)
+    toggleGameSelection,
+    proceedWithSelectedGames,
     
     // Funzioni dai giochi speciali
     handleTruthDareChoice: specialGames.handleTruthDareChoice,

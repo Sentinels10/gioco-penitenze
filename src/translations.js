@@ -10,18 +10,17 @@ const translations = {
     startButton: "INIZIA",
     backButton: "Indietro",
     nextButton: "NEXT",
-    doneButton: "FATTO", // NUOVO: Pulsante per completare l'azione
-    payButton: "PAGA", // NUOVO: Pulsante per pagare la penalità
+    doneButton: "FATTO",
+    payButton: "PAGA",
     enterButton: "ENTRA",
     resetButton: "Reset (Solo Test)",
     startGameButton: "START",
-    startTimerButton: "⏱️ AVVIA TIMER", // NUOVO: Pulsante per avviare il timer
+    startTimerButton: "⏱️ AVVIA TIMER",
     
     // Titoli delle schermate
     playersScreenTitle: "PLAYERS",
     roomsScreenTitle: "ROOMS",
     unlockGameTitle: "SBLOCCA IL GIOCO",
-    leaderboardTitle: "CLASSIFICA", // NUOVO: Titolo per la schermata di classifica
     
     // Placeholder e label
     playerInputPlaceholder: "Enter player name",
@@ -35,18 +34,37 @@ const translations = {
     returnToRoomsMessage: "tornare alla selezione delle stanze",
     unlockMoreGamesMessage: "sbloccare altre partite",
     
+    // Sezione per la selezione giochi (ora parte della stanza giochi)
+    gameSelection: {
+      title: "GIOCHI",
+      description: "Seleziona i giochi che vuoi includere nella partita",
+      continueButton: "CONTINUA",
+      selectedGamesTitle: "GIOCHI SELEZIONATI",
+      selectedGamesDescription: "Mix dei giochi che hai scelto",
+      noGamesSelectedError: "Seleziona almeno un gioco per continuare!",
+      games: {
+        truthOrDare: {
+          name: "Obbligo o Verità",
+          description: "Il classico gioco di verità e obbligo con opzione debito"
+        },
+        wouldYouRather: {
+          name: "Preferiresti",
+          description: "Domande difficili dove devi scegliere tra due opzioni"
+        },
+        nonHoMai: {
+          name: "Non ho mai",
+          description: "Confessa le cose che hai o non hai mai fatto"
+        }
+      }
+    },
+    
     // Schermata paywall
     freeGameEndedTitle: "Partita gratuita terminata!",
     freeGameEndedMessage: "Hai utilizzato la tua partita gratuita. Sblocca l'app per giocare illimitatamente con tutti i tuoi amici!",
     purchaseButton: "ACQUISTA",
     processingPayment: "ELABORAZIONE...",
     
-    // NUOVO: Schermata di classifica (leaderboard)
-    leaderboardSubtitle: "Penalità accumulate",
-    penaltiesLabel: "penalità",
-    continueButton: "CONTINUA",
-    
-    // NUOVO: Timer Challenge
+    // Timer Challenge
     timerChallenge: {
       timeUp: "TEMPO SCADUTO!",
       timeRemaining: "Tempo rimanente: {seconds}s",
@@ -90,6 +108,12 @@ const translations = {
         name: 'Coppie', 
         description: 'Domande e sfide romantiche per innamorati',
         color: '#EAB308'
+      },
+      { 
+        id: 'giochi', 
+        name: 'Giochi', 
+        description: 'Seleziona e combina diversi mini-giochi',
+        color: '#8B5CF6'
       },
       { 
         id: 'neonRoulette', 
@@ -211,18 +235,17 @@ const translations = {
     startButton: "START",
     backButton: "Back",
     nextButton: "NEXT",
-    doneButton: "DONE", // NUOVO: Button to complete the action
-    payButton: "PAY", // NUOVO: Button to pay the penalty
+    doneButton: "DONE",
+    payButton: "PAY",
     enterButton: "ENTER",
     resetButton: "Reset (Test Only)",
     startGameButton: "START",
-    startTimerButton: "⏱️ START TIMER", // NUOVO: Button to start the timer
+    startTimerButton: "⏱️ START TIMER",
     
     // Screen titles
     playersScreenTitle: "PLAYERS",
     roomsScreenTitle: "ROOMS",
     unlockGameTitle: "UNLOCK THE GAME",
-    leaderboardTitle: "LEADERBOARD", // NUOVO: Title for the leaderboard screen
     
     // Placeholders and labels
     playerInputPlaceholder: "Enter player name",
@@ -236,18 +259,37 @@ const translations = {
     returnToRoomsMessage: "return to room selection",
     unlockMoreGamesMessage: "unlock more games",
     
+    // Game selection section (now part of games room)
+    gameSelection: {
+      title: "GAMES",
+      description: "Select the games you want to include in the match",
+      continueButton: "CONTINUE",
+      selectedGamesTitle: "SELECTED GAMES",
+      selectedGamesDescription: "Mix of the games you chose",
+      noGamesSelectedError: "Select at least one game to continue!",
+      games: {
+        truthOrDare: {
+          name: "Truth or Dare",
+          description: "The classic truth and dare game with debt option"
+        },
+        wouldYouRather: {
+          name: "Would You Rather",
+          description: "Difficult questions where you must choose between two options"
+        },
+        nonHoMai: {
+          name: "Never Have I Ever",
+          description: "Confess the things you have or have never done"
+        }
+      }
+    },
+    
     // Paywall screen
     freeGameEndedTitle: "Free game ended!",
     freeGameEndedMessage: "You've used your free game. Unlock the app to play unlimited games with all your friends!",
     purchaseButton: "PURCHASE",
     processingPayment: "PROCESSING...",
     
-    // NUOVO: Leaderboard screen
-    leaderboardSubtitle: "Penalties accumulated",
-    penaltiesLabel: "penalties",
-    continueButton: "CONTINUE",
-    
-    // NUOVO: Timer Challenge
+    // Timer Challenge
     timerChallenge: {
       timeUp: "TIME'S UP!",
       timeRemaining: "Time remaining: {seconds}s",
@@ -291,6 +333,12 @@ const translations = {
         name: 'Couples', 
         description: 'Romantic questions and challenges for lovers',
         color: '#EAB308'
+      },
+      { 
+        id: 'giochi', 
+        name: 'Games', 
+        description: 'Select and combine different mini-games',
+        color: '#8B5CF6'
       },
       { 
         id: 'neonRoulette', 
@@ -416,13 +464,12 @@ const translations = {
     enterButton: "ENTRER",
     resetButton: "Réinitialiser (Test Uniquement)",
     startGameButton: "DÉMARRER",
-    startTimerButton: "⏱️ LANCER TIMER", // NOUVEAU: Bouton pour démarrer le timer
+    startTimerButton: "⏱️ LANCER TIMER",
     
     // Titres des écrans
     playersScreenTitle: "JOUEURS",
     roomsScreenTitle: "SALLES",
     unlockGameTitle: "DÉBLOQUER LE JEU",
-    leaderboardTitle: "CLASSEMENT",
     
     // Placeholders et labels
     playerInputPlaceholder: "Nom du joueur",
@@ -436,18 +483,37 @@ const translations = {
     returnToRoomsMessage: "retourner à la sélection des salles",
     unlockMoreGamesMessage: "débloquer plus de jeux",
     
+    // Section de sélection des jeux (maintenant partie de la salle de jeux)
+    gameSelection: {
+      title: "JEUX",
+      description: "Sélectionnez les jeux que vous voulez inclure dans la partie",
+      continueButton: "CONTINUER",
+      selectedGamesTitle: "JEUX SÉLECTIONNÉS",
+      selectedGamesDescription: "Mélange des jeux que vous avez choisis",
+      noGamesSelectedError: "Sélectionnez au moins un jeu pour continuer!",
+      games: {
+        truthOrDare: {
+          name: "Vérité ou Action",
+          description: "Le jeu classique de vérité et action avec option dette"
+        },
+        wouldYouRather: {
+          name: "Préférerais-tu",
+          description: "Questions difficiles où vous devez choisir entre deux options"
+        },
+        nonHoMai: {
+          name: "Je n'ai jamais",
+          description: "Confessez les choses que vous avez ou n'avez jamais faites"
+        }
+      }
+    },
+    
     // Écran paywall
     freeGameEndedTitle: "Partie gratuite terminée!",
     freeGameEndedMessage: "Vous avez utilisé votre partie gratuite. Débloquez l'application pour jouer de façon illimitée avec tous vos amis!",
     purchaseButton: "ACHETER",
     processingPayment: "TRAITEMENT...",
     
-    // Écran de classement
-    leaderboardSubtitle: "Pénalités accumulées",
-    penaltiesLabel: "pénalités",
-    continueButton: "CONTINUER",
-    
-    // NOUVEAU: Timer Challenge
+    // Timer Challenge
     timerChallenge: {
       timeUp: "TEMPS ÉCOULÉ!",
       timeRemaining: "Temps restant: {seconds}s",
@@ -491,6 +557,12 @@ const translations = {
         name: 'Couples', 
         description: 'Questions et défis romantiques pour les amoureux',
         color: '#EAB308'
+      },
+      { 
+        id: 'giochi', 
+        name: 'Jeux', 
+        description: 'Sélectionnez et combinez différents mini-jeux',
+        color: '#8B5CF6'
       },
       { 
         id: 'neonRoulette', 
@@ -616,13 +688,12 @@ const translations = {
     enterButton: "EINTRETEN",
     resetButton: "Zurücksetzen (Nur Test)",
     startGameButton: "START",
-    startTimerButton: "⏱️ TIMER STARTEN", // NOUVEAU: Button für Timer-Start
+    startTimerButton: "⏱️ TIMER STARTEN",
     
     // Bildschirmtitel
     playersScreenTitle: "SPIELER",
     roomsScreenTitle: "RÄUME",
     unlockGameTitle: "SPIEL FREISCHALTEN",
-    leaderboardTitle: "BESTENLISTE",
     
     // Platzhalter und Labels
     playerInputPlaceholder: "Spielername eingeben",
@@ -636,18 +707,37 @@ const translations = {
     returnToRoomsMessage: "zur Raumauswahl zurückzukehren",
     unlockMoreGamesMessage: "mehr Spiele freizuschalten",
     
+    // Sektion für Spielauswahl (jetzt Teil des Spielraums)
+    gameSelection: {
+      title: "SPIELE",
+      description: "Wählen Sie die Spiele aus, die Sie in das Match einbeziehen möchten",
+      continueButton: "WEITER",
+      selectedGamesTitle: "AUSGEWÄHLTE SPIELE",
+      selectedGamesDescription: "Mix der Spiele, die Sie gewählt haben",
+      noGamesSelectedError: "Wählen Sie mindestens ein Spiel aus, um fortzufahren!",
+      games: {
+        truthOrDare: {
+          name: "Wahrheit oder Pflicht",
+          description: "Das klassische Wahrheit und Pflicht Spiel mit Schuld-Option"
+        },
+        wouldYouRather: {
+          name: "Was hättest du lieber",
+          description: "Schwierige Fragen, bei denen Sie zwischen zwei Optionen wählen müssen"
+        },
+        nonHoMai: {
+          name: "Ich habe nie",
+          description: "Gestehen Sie die Dinge, die Sie getan oder nie getan haben"
+        }
+      }
+    },
+    
     // Paywall-Bildschirm
     freeGameEndedTitle: "Kostenloses Spiel beendet!",
     freeGameEndedMessage: "Sie haben Ihr kostenloses Spiel verwendet. Schalten Sie die App frei, um unbegrenzt mit all Ihren Freunden zu spielen!",
     purchaseButton: "KAUFEN",
     processingPayment: "VERARBEITUNG...",
     
-    // Bestenliste-Bildschirm
-    leaderboardSubtitle: "Angesammelte Strafen",
-    penaltiesLabel: "Strafen",
-    continueButton: "FORTFAHREN",
-    
-    // NOUVEAU: Timer Challenge
+    // Timer Challenge
     timerChallenge: {
       timeUp: "ZEIT IST UM!",
       timeRemaining: "Verbleibende Zeit: {seconds}s",
@@ -691,6 +781,12 @@ const translations = {
         name: 'Paare', 
         description: 'Romantische Fragen und Herausforderungen für Verliebte',
         color: '#EAB308'
+      },
+      { 
+        id: 'giochi', 
+        name: 'Spiele', 
+        description: 'Wählen und kombinieren Sie verschiedene Mini-Spiele',
+        color: '#8B5CF6'
       },
       { 
         id: 'neonRoulette', 
