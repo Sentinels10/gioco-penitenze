@@ -167,7 +167,7 @@ const translations = {
     },
     
     // Spiegazione del gioco "preferiresti"
-    wouldYouRatherExplanation: "Tutti votano: alza la mano per la prima opzione, tienila abbassata per la seconda. Chi è in minoranza fa penalità!",
+    wouldYouRatherExplanation: "Votate contemporaneamente per alzata di mano!",
     
     // Opzioni gioco Verità o Obbligo
     truthDareOptions: {
