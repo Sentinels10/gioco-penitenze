@@ -125,26 +125,26 @@ const translations = {
     
     // Giochi speciali
     specialGames: {
-      pointFinger: "{player} sta scegliendo una caratteristica e tutti voteranno...",
-      infamata: "{player} sta decidendo a chi assegnare la domanda o sfida...",
+      pointFinger: "",//"{player} sta scegliendo una caratteristica e tutti voteranno...",
+      infamata: "",//"{player} sta decidendo a chi assegnare la domanda o sfida...",
       truthOrDare: {
         choosing: "{player} deve scegliere tra Verità, Obbligo o Debito!",
         truth: "{player} ha scelto Verità!",
         dare: "{player} ha scelto Obbligo!",
         debt: "{player} ha scelto Debito!"
       },
-      wouldYouRather: "{player} ha posto la domanda: Preferiresti? Tutti devono votare! La minoranza riceve penalità",
-      questoOQuello: "{player} ha attivato QUESTO O QUELLO! Tutti votano: alza la mano per la prima opzione, tienila abbassata per la seconda. Chi è in minoranza fa 3 penalità!",
-      chatDetective: "{player} è il detective di WhatsApp!",
-      tuttoHaUnPrezzo: "{player} ha avviato il gioco TUTTO HA UN PREZZO!",
-      tuttiQuelliChe: "{player} ha attivato il gioco TUTTI QUELLI CHE!",
-      penitenzeGruppo: "{player} ha attivato PENITENZE DI GRUPPO!",
-      penitenzaRandom: "{player} ha attivato le PENITENZE RANDOM!",
-      nonHoMai: "{player} ha iniziato il gioco NON HO MAI! Dopo di lui tocca al giocatore alla sua destra, finché non lo fanno tutti",
-      chiEPiuProbabile: "{player} ha attivato il gioco CHI È PIÙ PROBABILE CHE! Tutti votano contemporaneamente puntando il dito. Chi riceve più voti fa le penalità!",
-      happyHour: "{player} ha attivato HAPPY HOUR! Tutti ricevono {count} penalità! 🎉",
+      wouldYouRather: "",//"{player} ha posto la domanda: Preferiresti? Tutti devono votare! La minoranza riceve penalità",
+      questoOQuello: "",//"{player} ha attivato QUESTO O QUELLO! Tutti votano: alza la mano per la prima opzione, tienila abbassata per la seconda. Chi è in minoranza fa 3 penalità!",
+      chatDetective: "",//"{player} è il detective di WhatsApp!",
+      tuttoHaUnPrezzo: "",//"{player} ha avviato il gioco TUTTO HA UN PREZZO!",
+      tuttiQuelliChe: "",//"{player} ha attivato il gioco TUTTI QUELLI CHE!",
+      penitenzeGruppo: "",//"{player} ha attivato PENITENZE DI GRUPPO!",
+      penitenzaRandom: "",//"{player} ha attivato le PENITENZE RANDOM!",
+      nonHoMai: "",//"{player} ha iniziato il gioco NON HO MAI! Dopo di lui tocca al giocatore alla sua destra, finché non lo fanno tutti",
+      chiEPiuProbabile: "",//"{player} ha attivato il gioco CHI È PIÙ PROBABILE CHE! Tutti votano contemporaneamente puntando il dito. Chi riceve più voti fa le penalità!",
+      happyHour: "",//"{player} ha attivato HAPPY HOUR! Tutti ricevono {count} penalità! 🎉",
       oneVsOne: "1V1!",
-      timerChallenge: "{player} ha attivato SFIDE A TEMPO! Clicca il timer per iniziare la sfida!"
+      timerChallenge: "",//"{player} ha attivato SFIDE A TEMPO! Clicca il timer per iniziare la sfida!"
     },
     
     // Terminologia giochi speciali

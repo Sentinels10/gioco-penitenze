@@ -264,85 +264,99 @@ const useSpecialGames = (props) => {
     
     return matchingPosition ? matchingPosition.gameType : null;
   };
-  
-  // Gestisce l'attivazione di un gioco speciale
+
+  // Funzione per gestire l'attivazione di un gioco speciale
   const handleSpecialGame = async (gameType) => {
     console.log("=== DEBUG handleSpecialGame ===");
     console.log("gameType:", gameType);
     console.log("gameMode:", gameMode);
     console.log("Current activeSpecialGame:", activeSpecialGame);
-    
-    // Se c'è già un gioco speciale attivo, non fare nulla
+
     if (activeSpecialGame) {
       console.log("Special game already active, returning");
       return;
     }
-    
-    // Carica il file backupActions nella lingua corrente
+
     const backupActions = await loadBackupActions();
-    
-    // Verifica se il tipo di gioco speciale esiste nel file di backup
+
     if (!backupActions.specialGames || !backupActions.specialGames[gameType]) {
       console.error(`${t.logMessages.missingSpecialGame.replace('{type}', gameType)}`);
       return;
     }
-    
-    // Seleziona un giocatore casuale per il gioco speciale
-    // (potrebbe essere diverso dal giocatore corrente)
+
     const randomPlayerIndex = Math.floor(Math.random() * players.length);
     setSpecialGamePlayer(players[randomPlayerIndex]);
-    
-    // Imposta il gioco speciale attivo
     setActiveSpecialGame(gameType);
-    
-    // Incrementa il contatore dei giochi speciali mostrati
     setSpecialGamesShown(prev => prev + 1);
-    
+
     console.log("Setting activeSpecialGame to:", gameType);
     console.log("specialGamePlayer set to:", players[randomPlayerIndex]);
-    
-    // Gestisci la logica specifica per ogni tipo di gioco
+
     switch (gameType) {
       case "truthOrDare":
-        // Prepara il gioco Truth or Dare
         handleTruthOrDareGame(randomPlayerIndex, backupActions);
         break;
       
       case "wouldYouRather":
-        // Prepara il gioco "Preferiresti"
         handleWouldYouRatherGame(backupActions, randomPlayerIndex);
         break;
         
       case "questoOQuello":
-        // Prepara il gioco "Questo o Quello"
         handleQuestoOQuelloGame(backupActions, randomPlayerIndex);
         break;
         
       case "timerChallenge":
-        // Prepara il gioco "Timer Challenge"
         handleTimerChallengeGame(backupActions, randomPlayerIndex);
         break;
         
       case "nonHoMai":
-        // Prepara il gioco "Non ho mai"
         handleNonHoMaiGame(backupActions, randomPlayerIndex);
         break;
-        
+      
+      // NUOVA LOGICA PER I GIOCHI CON CONTENUTO DINAMICO
+      case "tuttiQuelliChe":
+      case "tuttoHaUnPrezzo":
+      case "penitenzaRandom":
+      case "chiEPiuProbabile":
+        handleGenericSpecialGameWithContent(gameType, backupActions, randomPlayerIndex);
+        break;
+
       default:
-        // Per gli altri giochi speciali, mostra semplicemente il messaggio
+        // Logica originale per giochi semplici (es. Infamata, HappyHour)
         const gameText = backupActions.specialGames[gameType].text;
-        
-        // Sostituisce {player} con il nome del giocatore selezionato casualmente
         const playerName = players[randomPlayerIndex];
         const formattedText = gameText.replace(/{player}/g, playerName);
-        
-        // Sostituisci {count} con un numero casuale da 1 a 5 (per giochi che lo richiedono)
         const randomCount = Math.floor(Math.random() * 5) + 1;
         const finalText = formattedText.replace(/{count}/g, randomCount);
         
-        // Imposta l'azione corrente
         setCurrentAction({ text: finalText });
         break;
+    }
+  };
+
+  // NUOVA FUNZIONE HELPER per giochi con contenuto per stanza
+  const handleGenericSpecialGameWithContent = (gameType, backupActions, randomPlayerIndex) => {
+    const roomId = gameMode === 'games' ? 'party' : (selectedRoom?.id || 'party');
+    const gameData = backupActions.specialGames[gameType];
+    const playerName = players[randomPlayerIndex];
+    
+    // Prendi il testo introduttivo
+    const introText = (gameData.text || "").replace(/{player}/g, playerName);
+
+    if (gameData && gameData[roomId] && gameData[roomId].length > 0) {
+      // Seleziona un'azione casuale dalla lista della stanza corrente
+      const options = gameData[roomId];
+      const randomIndex = Math.floor(Math.random() * options.length);
+      const selectedContent = options[randomIndex];
+      
+      // Combina l'introduzione con il contenuto specifico
+      setCurrentAction({ 
+        text: `${introText}\n\n${selectedContent}` 
+      });
+    } else {
+      // Fallback: se non ci sono azioni per la stanza, mostra solo l'introduzione
+      console.warn(`No content for game "${gameType}" in room "${roomId}".`);
+      setCurrentAction({ text: introText });
     }
   };
   
@@ -667,7 +681,13 @@ const useSpecialGames = (props) => {
         
       default:
         if (t.specialGames[activeSpecialGame]) {
-          return t.specialGames[activeSpecialGame].replace('{player}', specialGamePlayer);
+          // Usa il testo principale se disponibile (es. da `specialGames.tuttiQuelliChe.text`)
+          const gameInfo = t.specialGames[activeSpecialGame];
+          if (typeof gameInfo === 'string') {
+              return gameInfo.replace('{player}', specialGamePlayer);
+          } else if (typeof gameInfo === 'object' && gameInfo.text) {
+              return gameInfo.text.replace('{player}', specialGamePlayer);
+          }
         }
         return "";
     }

@@ -20,7 +20,7 @@
 },
 
 "questoOQuello": {
-    "text": "Tutti votano: alza la mano per la prima opzione, tienila abbassata per la seconda. Chi è in minoranza fa 3 penalità!",
+    "text": "Tutti votano per alzata di mano. Chi è in minoranza fa 3 penalità!",
     "redRoom": [
       "Sesso veloce e intenso o lento e romantico?",
       "Luci accese o spente durante il sesso?",
@@ -169,7 +169,7 @@
   ]
   },
 "penitenzaRandom": {
-  "text": "{player} ha attivato PENITENZE RANDOM!",
+  "text": "",
   "redRoom": [
     "Chi ha mai fatto sexting paga 3 penalità",
     "Chi ha una cotta segreta per qualcuno in questa stanza paga 3 penalità",
@@ -255,7 +255,7 @@
       ]
     },
       "tuttiQuelliChe": {
-        "text": "{player} ha attivato il gioco TUTTI QUELLI CHE!",
+        "text": "",
         "redRoom": [
           "Tutti quelli che hanno trombato oggi devono fare 3 penalità",
           "Tutti quelli che hanno mai fatto sexting devono fare 3 penalità",
@@ -295,7 +295,7 @@
       },
 
   "penitenzeGruppo": {
-    "text": "{player} ha attivato PENITENZE DI GRUPPO!",
+    "text": "",
     "party": [
       "Bevono tutti quelli che hanno postato una foto sui social nelle ultime 24 ore",
       "Bevono tutti quelli che hanno mai partecipato a un karaoke",
