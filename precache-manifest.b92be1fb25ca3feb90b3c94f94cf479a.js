@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "9504979f0aba94bad49030d843fbe5fa",
+    "revision": "80049bcfe28ce5103f684688d5bb9226",
     "url": "/gioco-penitenze/index.html"
   },
   {
-    "revision": "1807895e2dccaf9106a7",
+    "revision": "0e6275dce72d9fd0d84a",
     "url": "/gioco-penitenze/static/css/main.1aa36282.chunk.css"
   },
   {
@@ -12,8 +12,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/gioco-penitenze/static/js/0.d1f6d920.chunk.js"
   },
   {
-    "revision": "6c479a091188c095a9d4",
-    "url": "/gioco-penitenze/static/js/1.fa2ea594.chunk.js"
+    "revision": "a8b7e9f927558608afee",
+    "url": "/gioco-penitenze/static/js/1.21d963d2.chunk.js"
   },
   {
     "revision": "7b9e6a794e5d909eaa60",
@@ -28,12 +28,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/gioco-penitenze/static/js/5.5a018b3d.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "1807895e2dccaf9106a7",
-    "url": "/gioco-penitenze/static/js/main.c9c59d1c.chunk.js"
+    "revision": "0e6275dce72d9fd0d84a",
+    "url": "/gioco-penitenze/static/js/main.dd4a7e89.chunk.js"
   },
   {
-    "revision": "68873d513bca5c9aafd8",
-    "url": "/gioco-penitenze/static/js/runtime-main.2ba5f655.js"
+    "revision": "9b754eac40d059cbe950",
+    "url": "/gioco-penitenze/static/js/runtime-main.31607499.js"
   },
   {
     "revision": "f00b599bced6dea980776d79e63baede",
